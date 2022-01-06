@@ -28,6 +28,8 @@ You will need to setup a GitHub **personal access token** in order for the Power
 3. I would also reccomend setting the expiration to 7 days
 4. Copy the generated token value for use the -githubToken parameter
 
+![GitHub PAT](/images/github_pat.png)
+
 ### Required PowerShell Modules
 The script will check and install any missing modules. For reference the below is required
 - PowerShellForGitHub 
