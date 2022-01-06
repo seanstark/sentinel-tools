@@ -5,7 +5,7 @@
         A couple of disclaimers:
             1. In order for rules to be created successfully the corresponding tables used in the query must already exist.
             2. Some templates may not be working as intended and have incorrectly defined column to entity mappings in the query. These will fail during creation. 
-               If run across either sumbit an issue via github or fork the github repo and submit a pull request - https://github.com/Azure/Azure-Sentinel#contributing
+               If you run across either sumbit an issue via github or fork the github repo and submit a pull request - https://github.com/Azure/Azure-Sentinel#contributing
             3. Filtering by data connector name is not that reliable due to many analytics rule templates not defining the required data connectors
             4. Combining filter parameters will create an inclusive set of results
 
