@@ -1,10 +1,9 @@
 # Creating Scheduled Analytics Rules From Templates
 
-
 ## Overview
 **create-scheduledRuleFromTemplate.ps1** is a powershell script you can leverage to import (create) multiple scheduled analytics rules from the [Sentinel Github rule template repository](https://github.com/Azure/Azure-Sentinel/tree/master/Detections)
 
-This script was written to account for current limitations when leveraging the **Az.Sentinel** or **Az.SecurityInsights** powershell modules. Most of which are related to an incomplete set of properties being resturned such as tactics and techniques from the API endpoints. 
+This script was written to account for current limitations when leveraging the **AzSentinel** or **Az.SecurityInsights** powershell modules. Most of which are related to an incomplete set of properties being resturned such as tactics and techniques from the API endpoints. 
 
 ## Features
 
@@ -19,12 +18,22 @@ This script was written to account for current limitations when leveraging the *
 - YAML files in the github repo may have incorrect query column to entity mappings defined. The rule creation will fail during the script run. If you run across either sumbit an issue via github on the YAML file or fork the github repo and submit a pull request - https://github.com/Azure/Azure-Sentinel#contributing
 - A fair number of rule templates do not have values for required data connectors. Be aware when using the dataconnector filter parameter you may not get a complete list of rules that leverage associated tables
 
-
-
 ## Configuration Requirements
 
+### Github Personal Access Token
+You will need to setup a GitHub **personal access token** in order for the PowerShell script to gather the rule template details. This is required to avoid GitHub API limits. 
 
+1. Navigate to https://github.com/settings/tokens/new
+2. Generate a new token with the public_repo scope
+3. I would also reccomend setting the expiration to 7 days
+4. Copy the generated token value for use the -githubToken parameter
 
+### Required PowerShell Modules
+The script will check and install any missing modules. For reference the below is required
+- PowerShellForGitHub 
+- Az.Accounts 
+- Az.SecurityInsights 
+- powershell-yaml
 
 ## Running the Script
 
