@@ -42,9 +42,9 @@ You will need to setup a GitHub **personal access token** in order for the Power
 2. Generate a new token with the public_repo scope
 3. I would also reccomend setting the expiration to 7 days
 4. Copy the generated token value for use the **-githubToken** parameter
-
+<p>&nbsp;</p>
 ![GitHub PAT](/images/github_pat.png)
-
+<p>&nbsp;</p>
 ### Required PowerShell Modules
 The script will check and install any missing modules. For reference the below is required
 - PowerShellForGitHub 
