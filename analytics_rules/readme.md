@@ -1,4 +1,4 @@
-# Creating Scheduled Rules from Templates
+# Creating Scheduled Analytics Rules From Templates
 
 
 ## Overview
@@ -28,8 +28,10 @@ This script was written to account for current limitations when leveraging the *
 
 ## Running the Script
 
-```powershell
-$rules = .\create-scheduledRuleFromTemplate.ps1 -subscriptionId 'ada06e68-375e-4564-be3a-c6cacebf41c5' -resourceGroupName 'sentinel-prd' -workspaceName 'sentinel-prd' -githubToken 'ghp_ECgzFoyPsbSKrFoK5B2EOUmy4P0Rb3yd' -detectionFolderName 'ASimAuthentication','ASimProcess'
+> Note: `-githubToken` example is not a valid token
 
+Create rules from all templates
+```powershell
+$rules = .\create-scheduledRuleFromTemplate.ps1 -subscriptionId 'ada06e68-375e-4564-be3a-c6cacebf41c5' -resourceGroupName 'sentinel-prd' -workspaceName 'sentinel-prd' -githubToken 'ghp_ECgzFoyPsbSKrFB2pTrEEOUmy4P0Rb3yd'
 ```
 
