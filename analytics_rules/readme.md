@@ -16,7 +16,7 @@
     + [Filter by severity and tactics of alert rule templates](#filter-by-severity-and-tactics-of-alert-rule-templates)
 	
 ## Overview
-**create-scheduledRuleFromTemplate.ps1** is a powershell script you can leverage to import (create) multiple scheduled analytics rules from the [Sentinel Github rule template repository](https://github.com/Azure/Azure-Sentinel/tree/master/Detections)
+[**create-scheduledRuleFromTemplate.ps1**[(/create-scheduledRuleFromTemplate.ps1) is a powershell script you can leverage to import (create) multiple scheduled analytics rules from the [Sentinel Github rule template repository](https://github.com/Azure/Azure-Sentinel/tree/master/Detections)
 
 This script was written to account for current limitations when leveraging the **AzSentinel** or **Az.SecurityInsights** powershell modules. Most of which are related to an incomplete set of properties being resturned such as tactics and techniques from the API endpoints. 
 
@@ -41,7 +41,9 @@ You will need to setup a GitHub **personal access token** in order for the Power
 1. Navigate to https://github.com/settings/tokens/new
 2. Generate a new token with the public_repo scope
 3. I would also reccomend setting the expiration to 7 days
-4. Copy the generated token value for use the -githubToken parameter
+4. Copy the generated token value for use the **-githubToken** parameter
+
+![GitHub PAT](/images/github_pat.png)
 
 ### Required PowerShell Modules
 The script will check and install any missing modules. For reference the below is required
