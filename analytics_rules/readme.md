@@ -1,5 +1,5 @@
 # Creating Scheduled Analytics Rules From Templates
-- [Creating Scheduled Analytics Rules From Templates](#creating-scheduled-analytics-rules-from-templates)
+
 - [Overview](#overview)
 - [Features](#features)
 - [Known Limitations](#known-limitations)
