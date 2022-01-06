@@ -1,18 +1,19 @@
 # Creating Scheduled Analytics Rules From Templates
 - [Creating Scheduled Analytics Rules From Templates](#creating-scheduled-analytics-rules-from-templates)
-  * [Overview](#overview)
-  * [Features](#features)
-  * [Known Limitations](#known-limitations)
-  * [Configuration Requirements](#configuration-requirements)
-    + [Github Personal Access Token](#github-personal-access-token)
-    + [Required PowerShell Modules](#required-powershell-modules)
-  * [Running the Script](#running-the-script)
+- [Overview](#overview)
+- [Features](#features)
+- [Known Limitations](#known-limitations)
+- [Configuration Requirements](#configuration-requirements)
+  * [Github Personal Access Token](#github-personal-access-token)
+  * [Required PowerShell Modules](#required-powershell-modules)
+- [Running the Script](#running-the-script)
     + [Create rules from all templates](#create-rules-from-all-templates)
     + [Create rules from all templates in a disabled state](#create-rules-from-all-templates-in-a-disabled-state)
     + [Run in report only mode](#run-in-report-only-mode)
     + [Filter by detection child folder name](#filter-by-detection-child-folder-name)
     + [Filter by severity of alert rule templates](#filter-by-severity-of-alert-rule-templates)
     + [Filter by severity and tactics of alert rule templates](#filter-by-severity-and-tactics-of-alert-rule-templates)
+	
 ## Overview
 **create-scheduledRuleFromTemplate.ps1** is a powershell script you can leverage to import (create) multiple scheduled analytics rules from the [Sentinel Github rule template repository](https://github.com/Azure/Azure-Sentinel/tree/master/Detections)
 
