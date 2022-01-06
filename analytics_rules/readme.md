@@ -16,7 +16,7 @@
     + [Filter by severity and tactics of alert rule templates](#filter-by-severity-and-tactics-of-alert-rule-templates)
 	
 ## Overview
-[**create-scheduledRuleFromTemplate.ps1**[(/create-scheduledRuleFromTemplate.ps1) is a powershell script you can leverage to import (create) multiple scheduled analytics rules from the [Sentinel Github rule template repository](https://github.com/Azure/Azure-Sentinel/tree/master/Detections)
+[**create-scheduledRuleFromTemplate.ps1**](/create-scheduledRuleFromTemplate.ps1) is a powershell script you can leverage to import (create) multiple scheduled analytics rules from the [Sentinel Github rule template repository](https://github.com/Azure/Azure-Sentinel/tree/master/Detections)
 
 This script was written to account for current limitations when leveraging the **AzSentinel** or **Az.SecurityInsights** powershell modules. Most of which are related to an incomplete set of properties being resturned such as tactics and techniques from the API endpoints. 
 
