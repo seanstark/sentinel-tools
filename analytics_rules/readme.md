@@ -49,6 +49,9 @@ The script will check and install any missing modules. For reference the below i
 - Az.SecurityInsights 
 - powershell-yaml
 
+### Required Sentinel Roles
+- Microsoft Sentinel Contributor 
+
 ## Running the Script
 Below are some examples on running the script.
 > Note: `-githubToken` example is not a valid token
