@@ -57,7 +57,7 @@
     .NOTES
         Author: seanstark-ms
         Website: https://starkonsec.medium.com/
-        Link to GitHub Source: 
+        Link to GitHub Source: https://github.com/seanstark/sentinel-tools/blob/main/analytics_rules/create-scheduledRuleFromTemplate.ps1
         Requires PowerShell Version 7.0 and above
         Requires PowerShell Modules: 'PowerShellForGitHub', 'Az.Accounts', 'Az.SecurityInsights', 'powershell-yaml'
 #>
