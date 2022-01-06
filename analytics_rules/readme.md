@@ -6,6 +6,7 @@
 - [Configuration Requirements](#configuration-requirements)
   * [Github Personal Access Token](#github-personal-access-token)
   * [Required PowerShell Modules](#required-powershell-modules)
+  * [Required Sentinel Roles](#required-sentinel-roles)
 - [Running the Script](#running-the-script)
     + [Create rules from all templates](#create-rules-from-all-templates)
     + [Create rules from all templates in a disabled state](#create-rules-from-all-templates-in-a-disabled-state)
