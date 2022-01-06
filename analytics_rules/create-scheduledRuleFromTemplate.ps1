@@ -2,12 +2,12 @@
     .DESCRIPTION
         You can leverage this script to create multiple scheduled analytics rules from the analytics rules templates on github https://github.com/Azure/Azure-Sentinel/tree/master/Detections.
         
-        A couple of disclaimers:
-            1. In order for rules to be created successfully the corresponding tables used in the query must already exist.
-            2. Some templates may not be working as intended and have incorrectly defined column to entity mappings in the query. These will fail during creation. 
-               If you run across either sumbit an issue via github or fork the github repo and submit a pull request - https://github.com/Azure/Azure-Sentinel#contributing
-            3. Filtering by data connector name is not that reliable due to many analytics rule templates not defining the required data connectors
-            4. Combining filter parameters will create an inclusive set of results
+        Known Limitations
+            1. Associated tables in the rule query need to exist first for the rule to be created. Tables are generally created when you start ingesting data. 
+               If the table does not exist the rule creation will fail during the script run
+            2. YAML files in the github repo may have incorrect query column to entity mappings defined. The rule creation will fail during the script run. 
+               If you run across either sumbit an issue via github on the YAML file or fork the github repo and submit a pull request - https://github.com/Azure/Azure-Sentinel#contributing
+            3. A fair number of rule templates do not have values for required data connectors. Be aware when using the dataconnector filter parameter you may not get a complete list of rules that leverage associated tables
 
     .PARAMETER subscriptionId
         Specify the subscriptionID GUID where your Sentinel Workspace Resides
@@ -35,7 +35,11 @@
         Optionally you set the reportOnly parameter to true to only report on what templates will be created
 
     .EXAMPLE
+        Create rules from all templates
         $rules = .\create-scheduledRuleFromTemplate.ps1 -subscriptionId 'ada06e68-375e-4564-be3a-c6cacebf41c5' -resourceGroupName 'sentinel-prd' -workspaceName 'sentinel-prd' -githubToken 'ghp_ECgzFoyPsbSKrFB2pTrEEOUmy4P0Rb3yd'
+    .EXAMPLE
+        Create rules from all templates in a disabled state
+        $rules = .\create-scheduledRuleFromTemplate.ps1 -subscriptionId 'ada06e68-375e-4564-be3a-c6cacebf41c5' -resourceGroupName 'sentinel-prd' -workspaceName 'sentinel-prd' -githubToken 'ghp_ECgzFoyPsbSKrFB2pTrEEOUmy4P0Rb3yd' -enabled $false
     .EXAMPLE
         Filter by detection child folder name
         $rules = .\create-scheduledRuleFromTemplate.ps1 -subscriptionId 'ada06e68-375e-4564-be3a-c6cacebf41c5' -resourceGroupName 'sentinel-prd' -workspaceName 'sentinel-prd' -githubToken 'ghp_ECgzFoyPsbSKrFoK5B2EOUmy4P0Rb3yd' -detectionFolderName 'ASimAuthentication','ASimProcess'
