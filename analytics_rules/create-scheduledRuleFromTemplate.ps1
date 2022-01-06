@@ -1,3 +1,62 @@
+<#
+    .DESCRIPTION
+        You can leverage this script to create multiple scheduled analytics rules from the analytics rules templates on github https://github.com/Azure/Azure-Sentinel/tree/master/Detections.
+        
+        A couple of disclaimers:
+            1. In order for rules to be created successfully the corresponding tables used in the query must already exist.
+            2. Some templates may not be working as intended and have incorrectly defined column to entity mappings in the query. These will fail during creation. 
+               If run across either sumbit an issue via github or fork the github repo and submit a pull request - https://github.com/Azure/Azure-Sentinel#contributing
+            3. Filtering by data connector name is not that reliable due to many analytics rule templates not defining the required data connectors
+            4. Combining filter parameters will create an inclusive set of results
+
+    .PARAMETER subscriptionId
+        Specify the subscriptionID GUID where your Sentinel Workspace Resides
+    .PARAMETER resourceGroupName
+        Specify the Resource Group Name where your Sentinel Workspace Resides
+    .PARAMETER workspaceName
+        Specify the Sentinel Workspace Name
+    .PARAMETER githubToken
+        Specify the GitHub Access Personal Access Token you created. Refer to the steps in [] to configure this token correctly.
+    .PARAMETER apiVersion
+        Optionally you can specify the API version of the Microsoft.SecurityInsights/alertRules endpoint
+    .PARAMETER severity
+        Optionally you can enter one or more rule severities separated by commas to filter rule templates on
+    .PARAMETER detectionFolderName
+        Optionally you can enter one or more child folders under https://github.com/Azure/Azure-Sentinel/tree/master/Detections separated by commas to filter rule templates on
+    .PARAMETER techniques
+        Optionally you can enter one or more techniques separated by commas to filter rule templates on
+    .PARAMETER tactics
+        Optionally you can enter one or more tactics separated by commas to filter rule templates on
+    .PARAMETER dataConnector
+        Optionally you can enter one or more dataConnector names separated by commas to filter rule templates on
+     .PARAMETER enable
+        Optionally you set the enable parameter to false to create rules but not enable them by default
+    .PARAMETER reportOnly
+        Optionally you set the reportOnly parameter to true to only report on what templates will be created
+    .EXAMPLE
+        $rules = .\create-scheduledRuleFromTemplate.ps1 -subscriptionId 'ada06e68-375e-4564-be3a-c6cacebf41c5' -resourceGroupName 'sentinel-prd' -workspaceName 'sentinel-prd' -githubToken 'ghp_ECgzFoyPsbSKrFB2pTrEEOUmy4P0Rb3yd'
+    .EXAMPLE
+        Filter by detection child folder name
+        $rules = .\create-scheduledRuleFromTemplate.ps1 -subscriptionId 'ada06e68-375e-4564-be3a-c6cacebf41c5' -resourceGroupName 'sentinel-prd' -workspaceName 'sentinel-prd' -githubToken 'ghp_ECgzFoyPsbSKrFoK5B2EOUmy4P0Rb3yd' -detectionFolderName 'ASimAuthentication','ASimProcess'
+    
+    .EXAMPLE
+        Filter by severity of alert rule templates
+        $rules = .\create-scheduledRuleFromTemplate.ps1 -subscriptionId 'ada06e68-375e-4564-be3a-c6cacebf41c5' -resourceGroupName 'sentinel-prd' -workspaceName 'sentinel-prd' -githubToken 'ghp_ECgzFoyPsbSKrFoK5B2pOUmy4P0Rb3yd' -severity 'High','Medium'
+    .EXAMPLE
+        Filter by severity and tactic of alert rule templates
+        $rules = .\create-scheduledRuleFromTemplate.ps1 -subscriptionId 'ada06e68-375e-4564-be3a-c6cacebf41c5' -resourceGroupName 'sentinel-prd' -workspaceName 'sentinel-prd' -githubToken 'ghp_ECgzFoyPsbSKrFoK5B2pOUmy4P0Rb3yd' -severity 'High','Medium' -tactic 'CredentialAccess'
+    .EXAMPLE
+        Run in report only mode
+        $rules = .\create-scheduledRuleFromTemplate.ps1 -subscriptionId 'ada06e68-375e-4564-be3a-c6cacebf41c5' -resourceGroupName 'sentinel-prd' -workspaceName 'sentinel-prd' -detectionFolderName 'ASimAuthentication','ASimProcess' -githubToken 'ghp_ECgzFoyPsbSKrFoK5B2pOUmy4P0Rb3yd' -reportOnly $true
+        
+        $rules | Select name, severity, tactics, techniques, requiredDataConnectors, templateURL
+    .NOTES
+        Author: seanstark-ms
+        Website: https://starkonsec.medium.com/
+        Link to GitHub Source: 
+        Requires PowerShell Version 7.0 and above
+        Requires PowerShell Modules: 'PowerShellForGitHub', 'Az.Accounts', 'Az.SecurityInsights', 'powershell-yaml'
+#>
 
 param(
     [Parameter(Mandatory=$true)]
@@ -44,70 +103,6 @@ param(
     [Parameter(Mandatory=$false,
     HelpMessage='Set to $true if you only want to report on alert rule templates that will be enabled')]
     [boolean]$reportOnly = $false
-
-    <#
-        .DESCRIPTION
-            You can leverage this script to create multiple scheduled analytics rules from the analytics rules templates on github https://github.com/Azure/Azure-Sentinel/tree/master/Detections.
-            
-            A couple of disclaimiers:
-                1. In order for rules to be created successfully the corresponding tables used in the query must already exist.
-                2. Some templates may not be working as intended and have incorrectly defined column to entity mappings in the query. These will fail during creation. 
-                   If run across either sumbit an issue via github or fork the github repo and submit a pull request - https://github.com/Azure/Azure-Sentinel#contributing
-                3. Filtering by data connector name is not reliable due to many analytics rule templates not definining the required data connectors
-                4. Combining filter parameters will create an inclusive set of results
-    
-        .PARAMETER subscriptionId
-            Specify the subscriptionID GUID where your Sentinel Workspace Resides
-        .PARAMETER resourceGroupName
-            Specify the Resource Group Name where your Sentinel Workspace Resides
-        .PARAMETER workspaceName
-            Specify the Sentinel Workspace Name
-        .PARAMETER githubToken
-            Specify the GitHub Access Personal Access Token you created. Refer to the steps in []to configure this token correctly.
-        .PARAMETER apiVersion
-            Optionally you can specify the API version of the Microsoft.SecurityInsights/alertRules endpoint
-        .PARAMETER severity
-            Optionally you can enter one or more rule severities separated by commas to filter rule templates on
-        .PARAMETER detectionFolderName
-            Optionally you can enter one or more child folders under https://github.com/Azure/Azure-Sentinel/tree/master/Detections separated by commas to filter rule templates on
-        .PARAMETER techniques
-            Optionally you can enter one or more techniques separated by commas to filter rule templates on
-        .PARAMETER tactics
-            Optionally you can enter one or more tactics separated by commas to filter rule templates on
-        .PARAMETER dataConnector
-            Optionally you can enter one or more dataConnector names separated by commas to filter rule templates on
-         .PARAMETER enable
-            Optionally you set the enable parameter to false to create rules but not enable them by default
-        .PARAMETER reportOnly
-            Optionally you set the reportOnly parameter to true to only report on what templates will be created
-
-        .EXAMPLE
-            $rules = .\enable-scheduledRuleTemplates.ps1 -subscriptionId 'ada06e68-375e-4564-be3a-c6cacebf41c5' -resourceGroupName 'sentinel-prd' -workspaceName 'sentinel-prd' -githubToken 'ghp_ECgzFoyPsbSKrFB2pTrEEOUmy4P0Rb3yd'
-
-        .EXAMPLE
-            Filter by detection child folder name
-            $rules = .\enable-scheduledRuleTemplates.ps1 -subscriptionId 'ada06e68-375e-4564-be3a-c6cacebf41c5' -resourceGroupName 'sentinel-prd' -workspaceName 'sentinel-prd' -githubToken 'ghp_ECgzFoyPsbSKrFoK5B2EOUmy4P0Rb3yd' -detectionFolderName 'ASimAuthentication','ASimProcess'
-        
-        .EXAMPLE
-            Filter by severity of alert rule templates
-            $rules = .\enable-scheduledRuleTemplates.ps1 -subscriptionId 'ada06e68-375e-4564-be3a-c6cacebf41c5' -resourceGroupName 'sentinel-prd' -workspaceName 'sentinel-prd' -githubToken 'ghp_ECgzFoyPsbSKrFoK5B2pOUmy4P0Rb3yd' -severity 'High','Medium'
-
-        .EXAMPLE
-            Filter by severity and tactic of alert rule templates
-            $rules = .\enable-scheduledRuleTemplates.ps1 -subscriptionId 'ada06e68-375e-4564-be3a-c6cacebf41c5' -resourceGroupName 'sentinel-prd' -workspaceName 'sentinel-prd' -githubToken 'ghp_ECgzFoyPsbSKrFoK5B2pOUmy4P0Rb3yd' -severity 'High','Medium' -tactic 'CredentialAccess'
-
-        .EXAMPLE
-            Run in report only mode
-            $rules = .\enable-scheduledRuleTemplates.ps1 -subscriptionId 'ada06e68-375e-4564-be3a-c6cacebf41c5' -resourceGroupName 'sentinel-prd' -workspaceName 'sentinel-prd' -detectionFolderName 'ASimAuthentication', 'ASimProcess' -githubToken 'ghp_ECgzFoyPsbSKrFoK5B2pOUmy4P0Rb3yd' -reportOnly $true
-            $rules | Select name, severity, tactics, techniques, requiredDataConnectors, templateURL
-
-        .NOTES
-            Author: seanstark
-            Website: https://starkonsec.medium.com/
-            Link to GitHub Source: 
-            Requires PowerShell Version 7.0 and above
-            Requires PowerShell Modules: 'PowerShellForGitHub', 'Az.Accounts', 'Az.SecurityInsights', 'powershell-yaml'
-    #>
 )
 
 #Requires -Version 7.0
@@ -228,11 +223,13 @@ If($dataConnector){
     $filterScript = check-filterScript -filterToAdd ('$(match-Lists -filterParameter $dataConnector -list $_.properties.requiredDataConnectors) -eq $true')
 }
 
+#Filter templates based on defined filter parameters
 If ($filterScript){
     Write-Verbose ('Filters that will be applied: {0}' -f $filterScript)
     $alertRuleTemplates = $alertRuleTemplates | where -FilterScript $filterScript
 }
-# Next lets find which rules need to be created that don't already exist
+
+# Find which rules need to be created that don't already exist
 $rulesToCreate = $alertRuleTemplates | Where id -notin $existingRules.AlertRuleTemplateName
 Write-Host ('Found a total of {0} Rule Templates to Enable' -f $rulesToCreate.count) -ForegroundColor Cyan
 
