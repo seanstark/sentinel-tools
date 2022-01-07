@@ -59,7 +59,14 @@ The script will check and install any missing modules. For reference the below i
 
 ## Running the Script
 Below are some examples on running the script. In the examples below the script output is assinged to a variable $rules. 
-I would reccomend assigning the script output to variable to easily review the results as some rule creations may fail,
+I would reccomend assigning the script output to variable to easily review the results as some rule creations may fail.
+
+```powershell
+$rules | Where created -eq $false | Select ruleName, created, errorCode, errorMessage
+
+$rules | Where created -eq $true
+
+```
 
 > Rules will created in an **enabled** state by default
 
