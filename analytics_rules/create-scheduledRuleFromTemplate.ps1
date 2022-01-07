@@ -29,10 +29,16 @@
         Optionally you can enter one or more tactics separated by commas to filter rule templates on
     .PARAMETER dataConnector
         Optionally you can enter one or more dataConnector names separated by commas to filter rule templates on
+    .PARAMETER dataType
+        Optionally you can enter one or more data type names separated by commas to filter rule templates on. Data Type names refer to the table names in Sentinel
+    .PARAMETER queryFilter
+        Optionally you can enter one or more strings separated by commas to filter the query in the rule templates on. A common example is to filter based on tables names
+    .PARAMETER tag
+        Optionally you can enter one or more tag names separated by commas to filter rule templates on
      .PARAMETER enable
         Optionally you set the enable parameter to false to create rules but not enable them by default
     .PARAMETER reportOnly
-        Optionally you set the reportOnly parameter to true to only report on what templates will be created
+        Optionally you can specify the reportOnly parameter to only report on what templates will be created
 
     .EXAMPLE
         Create rules from all templates
@@ -51,7 +57,7 @@
         $rules = .\create-scheduledRuleFromTemplate.ps1 -subscriptionId 'ada06e68-375e-4564-be3a-c6cacebf41c5' -resourceGroupName 'sentinel-prd' -workspaceName 'sentinel-prd' -githubToken 'ghp_ECgzFoyPsbSKrFoK5B2pOUmy4P0Rb3yd' -severity 'High','Medium' -tactic 'CredentialAccess'
     .EXAMPLE
         Run in report only mode
-        $rules = .\create-scheduledRuleFromTemplate.ps1 -subscriptionId 'ada06e68-375e-4564-be3a-c6cacebf41c5' -resourceGroupName 'sentinel-prd' -workspaceName 'sentinel-prd' -detectionFolderName 'ASimAuthentication','ASimProcess' -githubToken 'ghp_ECgzFoyPsbSKrFoK5B2pOUmy4P0Rb3yd' -reportOnly $true
+        $rules = .\create-scheduledRuleFromTemplate.ps1 -subscriptionId 'ada06e68-375e-4564-be3a-c6cacebf41c5' -resourceGroupName 'sentinel-prd' -workspaceName 'sentinel-prd' -detectionFolderName 'ASimAuthentication','ASimProcess' -githubToken 'ghp_ECgzFoyPsbSKrFoK5B2pOUmy4P0Rb3yd' -reportOnly
         
         $rules | Select name, severity, tactics, techniques, requiredDataConnectors, templateURL
     .NOTES
@@ -101,12 +107,24 @@ param(
     [string[]]$dataConnector,
 
     [Parameter(Mandatory=$false,
+    HelpMessage='Enter one or more dataconnector names separated by commas to filter on')]
+    [string[]]$dataType,
+
+    [Parameter(Mandatory=$false,
+    HelpMessage='Enter one or more dataconnector names separated by commas to filter on')]
+    [string[]]$queryFilter,
+
+    [Parameter(Mandatory=$false,
+    HelpMessage='Enter one or more tag names separated by commas to filter on')]
+    [string[]]$tag,
+
+    [Parameter(Mandatory=$false,
     HelpMessage='Specify if the rule will be created in an enabled state. By default this is set to true')]
     [boolean]$enable = $true,
 
     [Parameter(Mandatory=$false,
-    HelpMessage='Set to $true if you only want to report on alert rule templates that will be enabled')]
-    [boolean]$reportOnly = $false
+    HelpMessage='Specify if you only want to report on alert rule templates that will be enabled')]
+    [switch]$reportOnly
 )
 
 #Requires -Version 7.0
@@ -164,14 +182,16 @@ ForEach ($detectionFolder in $($detectionFolders | Select -ExpandProperty Name))
         $alertRuleTemplate = ConvertFrom-Yaml (Invoke-RestMethod -uri $yamlFile.download_url)
         
         If ($alertRuleTemplate.kind -like 'Scheduled'){
-            Write-Host ('Found Scheduled Rule Template: {0}, adding to index' -f $alertRuleTemplate.name) -ForegroundColor Green
+
+            Write-Verbose ('Found Scheduled Rule Template: {0}, adding to index' -f $alertRuleTemplate.name)
+
             $alertRuleTemplates += ([PSCustomObject]@{
                 id = $alertRuleTemplate.id
                 name = $alertRuleTemplate.name
                 kind = $alertRuleTemplate.kind
                 templateURL = $yamlFile.download_url
                 severity = $alertRuleTemplate.severity
-                requiredDataConnectors = $alertRuleTemplate.requiredDataConnectors -join ','
+                requiredDataConnectors = $alertRuleTemplate.requiredDataConnectors.connectorId -join ','
                 techniques = $alertRuleTemplate.relevantTechniques -join ','
                 tactics = $alertRuleTemplate.tactics -join ','
                 properties = ($alertRuleTemplate | Select-object -ExcludeProperty name, id, kind)
@@ -179,7 +199,6 @@ ForEach ($detectionFolder in $($detectionFolders | Select -ExpandProperty Name))
         }
     }
 }
-Write-Host ('Found a total of {0} Rule Templates from GitHub' -f $alertRuleTemplates.count) -ForegroundColor Cyan
 
 # This function is used to dynamically create an inclusive filter set when multiple filter parameters are defined
 function check-filterScript {
@@ -194,8 +213,8 @@ function check-filterScript {
     [scriptblock]::Create($newFilter)
 }
 
-# This function is used to compare filter parameters with rule template properties that are an object "List" type and contain multiple objects. 
-# These are present in relevantTechniques, tactics, and requiredDataConnectors properties
+# This function is used to compare filter parameters with rule template properties that are an object "List" or Object[] type and contain multiple objects. 
+# These are present in relevantTechniques, tactics, dataTypes, and requiredDataConnectors properties
 function match-Lists {
     param(
         [string[]]$filterParameter,
@@ -203,14 +222,18 @@ function match-Lists {
     )
     $matched = $false
 
-    $filterParameter | ForEach-Object{
-        if ($list.BinarySearch($_) -gt -1){
-            $matched = $true
+    if($list){
+        Write-Verbose $list.GetType().Name-Verbose
+        Write-Verbose ($list -join ',') -Verbose
+        $list | ForEach-Object{
+            if ($_ -in $filterParameter){
+                $matched = $true
+            }
         }
     }
 
     $matched
- }
+}
 
 # Build dynamic filters on rule severities, relevantTechniques, tactics, and data connectors if parameters are defined
 $filterScript = $null
@@ -224,7 +247,16 @@ If($tactics){
     $filterScript = check-filterScript -filterToAdd ('$(match-Lists -filterParameter $tactics -list $_.properties.tactics) -eq $true')
 }
 If($dataConnector){
-    $filterScript = check-filterScript -filterToAdd ('$(match-Lists -filterParameter $dataConnector -list $_.properties.requiredDataConnectors) -eq $true')
+    $filterScript = check-filterScript -filterToAdd ('$(match-Lists -filterParameter $dataConnector -list $_.properties.requiredDataConnectors.connectorId) -eq $true')
+}
+If($dataType){
+    $filterScript = check-filterScript -filterToAdd ('$(match-Lists -filterParameter $dataType -list $_.properties.requiredDataConnectors.dataTypes) -eq $true')
+}
+If($queryFilter){
+    $filterScript = check-filterScript -filterToAdd ('$($_.properties.query | Select-String $queryFilter) -ne $null')
+}
+If($tag){
+    $filterScript = check-filterScript -filterToAdd ('$(match-Lists -filterParameter $tag -list $_.properties.tags) -eq $true')
 }
 
 #Filter templates based on defined filter parameters
@@ -232,6 +264,8 @@ If ($filterScript){
     Write-Verbose ('Filters that will be applied: {0}' -f $filterScript)
     $alertRuleTemplates = $alertRuleTemplates | where -FilterScript $filterScript
 }
+
+Write-Host ('Found a total of {0} Rule Templates from GitHub' -f $alertRuleTemplates.count) -ForegroundColor Cyan
 
 # Find which rules need to be created that don't already exist
 $rulesToCreate = $alertRuleTemplates | Where id -notin $existingRules.AlertRuleTemplateName
@@ -311,14 +345,15 @@ If ($reportOnly -eq $false){
                 ruleName = $rule.properties.displayName
                 ruleid = $newRule.name
                 ruletype = $newRule.kind
-                created = If($outputErrorCode){$true}else{$false}
+                created = If($newRule.name){$true}else{$false}
                 errorCode = $outputErrorCode
                 errorMessage = $outputErrorMessage
+                properties = ($newRule | Select-object -ExcludeProperty name, id, kind)
             }
         }
         $outputObject 
         #Cleanup rule and error variables
-        Clear-Variable outputErrorMessage, outputErrorCode, outputObject
+        Clear-Variable outputErrorMessage, outputErrorCode, outputObject -ErrorAction SilentlyContinue
         $error.Clear()
     }
 }
