@@ -144,7 +144,7 @@ $sentinelGitHubPath = 'Detections'
 
 #Setup GitHubAuthentication
 [pscredential]$gitHubCred = New-Object System.Management.Automation.PSCredential ('dummy', $(ConvertTo-SecureString $githubToken -AsPlainText -Force))
-Set-GitHubConfiguration -DisableLogging
+Set-GitHubConfiguration -DisableLogging -DisableTelemetry
 Set-GitHubAuthentication -Credential $gitHubCred
 
 # Auth to Azure
@@ -223,8 +223,6 @@ function match-Lists {
     $matched = $false
 
     if($list){
-        Write-Verbose $list.GetType().Name-Verbose
-        Write-Verbose ($list -join ',') -Verbose
         $list | ForEach-Object{
             if ($_ -in $filterParameter){
                 $matched = $true
