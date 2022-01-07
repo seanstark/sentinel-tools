@@ -68,7 +68,7 @@ $rules | Where created -eq $true
 
 ```
 
-> Rules will created in an **enabled** state by default
+> Rules will be created in an **enabled** state by default
 
 > Note: `-githubToken` example is not a valid token
 
