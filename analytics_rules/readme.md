@@ -59,7 +59,8 @@ The script will check and install any missing modules. For reference the below i
 
 ## Running the Script
 Below are some examples on running the script.
-> Rules will created in an enabled state by default
+> Rules will created in an **enabled** state by default
+
 > Note: `-githubToken` example is not a valid token
 
 ### Create rules from all templates
