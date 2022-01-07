@@ -58,7 +58,9 @@ The script will check and install any missing modules. For reference the below i
 - Microsoft Sentinel Contributor 
 
 ## Running the Script
-Below are some examples on running the script.
+Below are some examples on running the script. In the examples below the script output is assinged to a variable $rules. 
+I would reccomend assigning the script output to variable to easily review the results as some rule creations may fail,
+
 > Rules will created in an **enabled** state by default
 
 > Note: `-githubToken` example is not a valid token

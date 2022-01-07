@@ -188,7 +188,7 @@ ForEach ($detectionFolder in $($detectionFolders | Select -ExpandProperty Name))
             $alertRuleTemplates += ([PSCustomObject]@{
                 id = $alertRuleTemplate.id
                 name = $alertRuleTemplate.name
-                kind = $alertRuleTemplate.kind
+                kind = 'Scheduled'
                 templateURL = $yamlFile.download_url
                 severity = $alertRuleTemplate.severity
                 requiredDataConnectors = $alertRuleTemplate.requiredDataConnectors.connectorId -join ','
@@ -343,7 +343,7 @@ If ($reportOnly -eq $false){
                 ruleName = $rule.properties.displayName
                 ruleid = $newRule.name
                 ruletype = $newRule.kind
-                created = If($newRule.name){$true}else{$false}
+                created = If($outputErrorCode -or $outputErrorMessage){$false}else{$true}
                 errorCode = $outputErrorCode
                 errorMessage = $outputErrorMessage
                 properties = ($newRule | Select-object -ExcludeProperty name, id, kind)
