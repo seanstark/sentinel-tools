@@ -17,23 +17,23 @@
 	+ [Filter by tags](#filter-by-tags)
 	
 ## Overview
-[**create-scheduledRuleFromTemplate.ps1**](/analytics_rules/create-scheduledRuleFromTemplate.ps1) is a powershell script you can leverage to import (create) multiple scheduled analytics rules from the [Sentinel Github rule template repository](https://github.com/Azure/Azure-Sentinel/tree/master/Detections)
+[**create-scheduledRuleFromTemplate.ps1**](/analytics_rules/create-scheduledRuleFromTemplate.ps1) is a PowerShell script you can leverage to import (create) multiple scheduled analytics rules from the [Sentinel Github rule template repository](https://github.com/Azure/Azure-Sentinel/tree/master/Detections)
 
-This script was written to account for current limitations when leveraging the **AzSentinel** or **Az.SecurityInsights** powershell modules. Most of which are related to an incomplete set of properties being resturned such as tactics and techniques from the API endpoints. 
+This script was written to account for current limitations when leveraging the **AzSentinel** or **Az.SecurityInsights** PowerShell modules. Most of which are related to an incomplete set of properties being returned such as tactics and techniques from the API endpoints. 
 
 ## Features
 
 - Create multiple scheduled analytics rules from rule templates
 - Filter rule templates on severity, tactics, techniques, tags, datatypes, queries, and data connectors
 - Run in report only mode to output templates based on the filters you defined
-- Create rules from templates in a enabled or disabled state
+- Create rules from templates in an enabled or disabled state
 
 ## Known Limitations
 
 - Associated tables in the rule query need to exist first for the rule to be created. Tables are generally created when you start ingesting data. If the table does not exist the rule creation will fail during the script run
-- YAML files in the github repo may have incorrect query column to entity mappings defined. The rule creation will fail during the script run. If you run across either sumbit an issue via github on the YAML file or fork the github repo and submit a pull request - https://github.com/Azure/Azure-Sentinel#contributing
+- YAML files in the github repo may have incorrect query column to entity mappings defined. The rule creation will fail during the script run. If you run across either submit an issue via github on the YAML file or fork the github repo and submit a pull request - https://github.com/Azure/Azure-Sentinel#contributing
 - A fair number of rule templates do not have values for required data connectors. Be aware when using the dataconnector filter parameter you may not get a complete list of rules that leverage associated tables
-- YAML file definitions continue to evolve, new attributes such as tags do not persist across all rule templates.
+- YAML file definitions continue to evolve, new attributes such as tags do not persist across all rule templates
 
 ## Configuration Requirements
 
@@ -42,7 +42,7 @@ You will need to setup a GitHub **personal access token** in order for the Power
 
 1. Navigate to https://github.com/settings/tokens/new
 2. Generate a new token with the public_repo scope
-3. I would also reccomend setting the expiration to 7 days
+3. I would also recommend setting the expiration to 7 days
 4. Copy the generated token value for use the **-githubToken** parameter
 
 > ![GitHub PAT](/images/github_pat.png)
@@ -58,8 +58,8 @@ The script will check and install any missing modules. For reference the below i
 - Microsoft Sentinel Contributor 
 
 ## Running the Script
-Below are some examples on running the script. In the examples below the script output is assinged to a variable $rules. 
-I would reccomend assigning the script output to a variable to easily review the results as some rule creations may fail.
+Below are some examples on running the script. In the examples below the script output is assigned to a variable $rules. 
+I would recommend assigning the script output to a variable to easily review the results as some rule creations may fail.
 
 ```powershell
 $rules | Where created -eq $false | Select ruleName, created, errorCode, errorMessage
