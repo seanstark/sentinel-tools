@@ -1,0 +1,19 @@
+let Price = 3;
+let billedSizeBySub = materialize (union withsource = TableName1 *
+| where _IsBillable == True
+| where _SubscriptionId contains "ada06e68-375e-4210-be3a-c6cacebf41c5"
+| summarize totalTableEntries = count(), tableSize = sum(_BilledSize), lastLogReceived = datetime_diff("second",now(), max(TimeGenerated)),
+    estimate = sumif(_BilledSize, _IsBillable==true)
+    by _SubscriptionId, ResourceGroup, TableName1, _IsBillable
+| extend SubscriptionId = iif(isempty(_SubscriptionId),'Non Subscription Data',_SubscriptionId)
+| project SubscriptionId, ResourceGroup = tolower(ResourceGroup), TableName1, _IsBillable, tableSize, ['Estimated Price'] =  (estimate/(1024*1024*1024)) * Price,totalTableEntries, lastLogReceived);
+billedSizeBySub
+| union
+    (billedSizeBySub 
+      | summarize resourceGroupCount = tostring(dcount(ResourceGroup)), tableCount = tostring(dcount(TableName1)), tableSize = sum(tableSize), ['Estimated Price'] = sum(['Estimated Price']), totalTableEntries = sum(totalTableEntries)
+    )
+| extend ResourceGroup = iif(isempty(ResourceGroup),resourceGroupCount,ResourceGroup)
+| extend TableName1 = iif(isempty(TableName1),tableCount,TableName1)
+| extend FinalTotals = iif(isempty(SubscriptionId),'Final Totals:','')
+| project FinalTotals, SubscriptionId, ResourceGroup, ['tableName'] = TableName1, _IsBillable, tableSize, ['Estimated Price'], totalTableEntries, lastLogReceived
+| order by ['Estimated Price'], totalTableEntries, FinalTotals asc
