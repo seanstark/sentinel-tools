@@ -10,6 +10,8 @@
 - [Running the Script](#running-the-script)
     + [Create rules from all templates](#create-rules-from-all-templates)
     + [Create rules from all templates in a disabled state](#create-rules-from-all-templates-in-a-disabled-state)
+    + [Create rules from all templates with "TI map" in the name](#create-rules-from-all-templates-with-"ti-map"-in-the-name)
+    + [Open a UI where you can further select specific rules to import](#open-a-ui-where-you-can-further-select-specific-rules-to-import)
     + [Run in report only mode](#run-in-report-only-mode)
     + [Filter by detection child folder name](#filter-by-detection-child-folder-name)
     + [Filter by severity of alert rule templates](#filter-by-severity-of-alert-rule-templates)
@@ -85,6 +87,11 @@ $rules = .\create-scheduledRuleFromTemplate.ps1 -subscriptionId 'ada06e68-375e-4
 ```powershell
 $rules = .\create-scheduledRuleFromTemplate.ps1 -subscriptionId 'ada06e68-375e-4564-be3a-c6cacebf41c5' -resourceGroupName 'sentinel-prd' -workspaceName 'sentinel-prd' -githubToken 'ghp_ECgzFoyPsbSKrFB2pTrEEOUmy4P0Rb3yd' -name '*TI map*
 ```
+### Open a UI where you can further select specific rules to import
+The below example will open an out-grid UI where you can further select specific rules to import
+```powershell
+$rules = .\create-scheduledRuleFromTemplate.ps1 -subscriptionId 'ada06e68-375e-4564-be3a-c6cacebf41c5' -resourceGroupName 'sentinel-prd' -workspaceName 'sentinel-prd' -githubToken 'ghp_ECgzFoyPsbSKrFoK5B2pOUmy4P0Rb3yd' -selectUI
+```
 ### Run in report only mode
 ```powershell
 $rules = .\create-scheduledRuleFromTemplate.ps1 -subscriptionId 'ada06e68-375e-4564-be3a-c6cacebf41c5' -resourceGroupName 'sentinel-prd' -workspaceName 'sentinel-prd' -githubToken 'ghp_ECgzFoyPsbSKrFoK5B2pOUmy4P0Rb3yd' -reportOnly
@@ -107,9 +114,4 @@ $rules = .\create-scheduledRuleFromTemplate.ps1 -subscriptionId 'ada06e68-375e-4
 The below example returns all templates tagged with Log4j
 ```powershell
 $rules = .\create-scheduledRuleFromTemplate.ps1 -subscriptionId 'ada06e68-375e-4564-be3a-c6cacebf41c5' -resourceGroupName 'sentinel-prd' -workspaceName 'sentinel-prd' -githubToken 'ghp_ECgzFoyPsbSKrFoK5B2pOUmy4P0Rb3yd' -tag 'Log4j'
-```
-### Open an out-grid UI where you can further select specific rules to import
-The below example will open an out-grid UI where you can further select specific rules to import
-```powershell
-$rules = .\create-scheduledRuleFromTemplate.ps1 -subscriptionId 'ada06e68-375e-4564-be3a-c6cacebf41c5' -resourceGroupName 'sentinel-prd' -workspaceName 'sentinel-prd' -githubToken 'ghp_ECgzFoyPsbSKrFoK5B2pOUmy4P0Rb3yd' -selectUI
 ```
