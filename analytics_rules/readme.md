@@ -17,23 +17,24 @@
 	+ [Filter by tags](#filter-by-tags)
 	
 ## Overview
-[**create-scheduledRuleFromTemplate.ps1**](/analytics_rules/create-scheduledRuleFromTemplate.ps1) is a PowerShell script you can leverage to import (create) multiple scheduled analytics rules from the [Sentinel Github rule template repository](https://github.com/Azure/Azure-Sentinel/tree/master/Detections)
+[**create-scheduledRuleFromTemplate.ps1**](/analytics_rules/create-scheduledRuleFromTemplate.ps1) is a PowerShell script you can leverage to import (create) multiple scheduled analytics rules from the [Sentinel Github rule template repository](https://github.com/Azure/Azure-Sentinel/tree/master/Detections) and from Analytics rules in the [Solutions folder](https://github.com/Azure/Azure-Sentinel/tree/master/Solutions)
 
 This script was written to account for current limitations when leveraging the **AzSentinel** or **Az.SecurityInsights** PowerShell modules. Most of which are related to an incomplete set of properties being returned such as tactics and techniques from the API endpoints. 
 
 ## Features
 
 - Create multiple scheduled analytics rules from rule templates
-- Filter rule templates on severity, tactics, techniques, tags, datatypes, queries, and data connectors
+- Filter rule templates on name, severity, tactics, techniques, tags, datatypes, queries, and data connectors
 - Run in report only mode to output templates based on the filters you defined
 - Create rules from templates in an enabled or disabled state
+- Open an out-gridview UI to further select specific rules to import
 
 ## Known Limitations
 
 - Associated tables in the rule query need to exist first for the rule to be created. Tables are generally created when you start ingesting data. If the table does not exist the rule creation will fail during the script run
 - YAML files in the github repo may have incorrect query column to entity mappings defined. The rule creation will fail during the script run. If you run across either submit an issue via github on the YAML file or fork the github repo and submit a pull request - https://github.com/Azure/Azure-Sentinel#contributing
 - A fair number of rule templates do not have values for required data connectors. Be aware when using the dataconnector filter parameter you may not get a complete list of rules that leverage associated tables
-- YAML file definitions continue to evolve, new attributes such as tags do not persist across all rule templates
+- YAML file definitions continue to evolve, new attributes such as tags do not persist across all rule templates. Be aware when using some of these filters you may not get an accurate result
 
 ## Configuration Requirements
 
@@ -80,13 +81,17 @@ $rules = .\create-scheduledRuleFromTemplate.ps1 -subscriptionId 'ada06e68-375e-4
 ```powershell
 $rules = .\create-scheduledRuleFromTemplate.ps1 -subscriptionId 'ada06e68-375e-4564-be3a-c6cacebf41c5' -resourceGroupName 'sentinel-prd' -workspaceName 'sentinel-prd' -githubToken 'ghp_ECgzFoyPsbSKrFB2pTrEEOUmy4P0Rb3yd' -enabled $false
 ```
+### Create rules from all templates with "TI map" in the name
+```powershell
+$rules = .\create-scheduledRuleFromTemplate.ps1 -subscriptionId 'ada06e68-375e-4564-be3a-c6cacebf41c5' -resourceGroupName 'sentinel-prd' -workspaceName 'sentinel-prd' -githubToken 'ghp_ECgzFoyPsbSKrFB2pTrEEOUmy4P0Rb3yd' -name '*TI map*
+```
 ### Run in report only mode
 ```powershell
 $rules = .\create-scheduledRuleFromTemplate.ps1 -subscriptionId 'ada06e68-375e-4564-be3a-c6cacebf41c5' -resourceGroupName 'sentinel-prd' -workspaceName 'sentinel-prd' -githubToken 'ghp_ECgzFoyPsbSKrFoK5B2pOUmy4P0Rb3yd' -reportOnly
 
 $rules | Select name, severity, tactics, techniques, requiredDataConnectors, templateURL
 ```
-### Filter by detection child folder name
+### Filter by detection or solution child folder Name
 ```powershell
  $rules = .\create-scheduledRuleFromTemplate.ps1 -subscriptionId 'ada06e68-375e-4564-be3a-c6cacebf41c5' -resourceGroupName 'sentinel-prd' -workspaceName 'sentinel-prd' -githubToken 'ghp_ECgzFoyPsbSKrFoK5B2EOUmy4P0Rb3yd' -detectionFolderName 'ASimAuthentication','ASimProcess'
 ```
@@ -98,10 +103,13 @@ $rules = .\create-scheduledRuleFromTemplate.ps1 -subscriptionId 'ada06e68-375e-4
 ```powershell
 $rules = .\create-scheduledRuleFromTemplate.ps1 -subscriptionId 'ada06e68-375e-4564-be3a-c6cacebf41c5' -resourceGroupName 'sentinel-prd' -workspaceName 'sentinel-prd' -githubToken 'ghp_ECgzFoyPsbSKrFoK5B2pOUmy4P0Rb3yd' -severity 'High','Medium'
 ```
-
 ### Filter by tags
 The below example returns all templates tagged with Log4j
 ```powershell
 $rules = .\create-scheduledRuleFromTemplate.ps1 -subscriptionId 'ada06e68-375e-4564-be3a-c6cacebf41c5' -resourceGroupName 'sentinel-prd' -workspaceName 'sentinel-prd' -githubToken 'ghp_ECgzFoyPsbSKrFoK5B2pOUmy4P0Rb3yd' -tag 'Log4j'
 ```
-
+### Open an out-grid UI where you can further select specific rules to import
+The below example will open an out-grid UI where you can further select specific rules to import
+```powershell
+$rules = .\create-scheduledRuleFromTemplate.ps1 -subscriptionId 'ada06e68-375e-4564-be3a-c6cacebf41c5' -resourceGroupName 'sentinel-prd' -workspaceName 'sentinel-prd' -githubToken 'ghp_ECgzFoyPsbSKrFoK5B2pOUmy4P0Rb3yd' -selectUI
+```

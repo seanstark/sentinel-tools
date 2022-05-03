@@ -19,6 +19,8 @@
         Specify the GitHub Access Personal Access Token you created. Refer to the steps in [] to configure this token correctly.
     .PARAMETER apiVersion
         Optionally you can specify the API version of the Microsoft.SecurityInsights/alertRules endpoint
+    .PARAMETER name
+        Optionally you can enter the name of an Analytic Rule to Filter on. This parameter supports the -like operator for filtering
     .PARAMETER severity
         Optionally you can enter one or more rule severities separated by commas to filter rule templates on
     .PARAMETER detectionFolderName
@@ -39,6 +41,8 @@
         Optionally you set the enable parameter to false to create rules but not enable them by default
     .PARAMETER reportOnly
         Optionally you can specify the reportOnly parameter to only report on what templates will be created
+    .PARAMETER selectUI
+        Optionally you can specify the selectUI parameter to show a UI to further select specific rules to import
 
     .EXAMPLE
         Create rules from all templates
@@ -47,7 +51,13 @@
         Create rules from all templates in a disabled state
         $rules = .\create-scheduledRuleFromTemplate.ps1 -subscriptionId 'ada06e68-375e-4564-be3a-c6cacebf41c5' -resourceGroupName 'sentinel-prd' -workspaceName 'sentinel-prd' -githubToken 'ghp_ECgzFoyPsbSKrFB2pTrEEOUmy4P0Rb3yd' -enabled $false
     .EXAMPLE
-        Filter by detection child folder name
+        Create rules from all templates with "TI map" in the name
+        $rules = .\create-scheduledRuleFromTemplate.ps1 -subscriptionId 'ada06e68-375e-4564-be3a-c6cacebf41c5' -resourceGroupName 'sentinel-prd' -workspaceName 'sentinel-prd' -githubToken 'ghp_ECgzFoyPsbSKrFB2pTrEEOUmy4P0Rb3yd' -name '*TI map*
+    .EXAMPLE
+        The below example will open an out-grid UI where you can further select specific rules to import
+        $rules = .\create-scheduledRuleFromTemplate.ps1 -subscriptionId 'ada06e68-375e-4564-be3a-c6cacebf41c5' -resourceGroupName 'sentinel-prd' -workspaceName 'sentinel-prd' -githubToken 'ghp_ECgzFoyPsbSKrFoK5B2pOUmy4P0Rb3yd' -selectUI
+    .EXAMPLE
+        Filter by detection or solution child folder Name.
         $rules = .\create-scheduledRuleFromTemplate.ps1 -subscriptionId 'ada06e68-375e-4564-be3a-c6cacebf41c5' -resourceGroupName 'sentinel-prd' -workspaceName 'sentinel-prd' -githubToken 'ghp_ECgzFoyPsbSKrFoK5B2EOUmy4P0Rb3yd' -detectionFolderName 'ASimAuthentication','ASimProcess'
     .EXAMPLE
         Filter by severity of alert rule templates
@@ -87,6 +97,10 @@ param(
     [string]$apiVersion = '2021-10-01-preview',
 
     [Parameter(Mandatory=$false,
+    HelpMessage='Enter a name to filter on')]
+    [string]$name,
+
+    [Parameter(Mandatory=$false,
     HelpMessage='Enter one or more rule severities separated by commas to filter on')]
     [string[]]$severity,
 
@@ -124,7 +138,11 @@ param(
 
     [Parameter(Mandatory=$false,
     HelpMessage='Specify if you only want to report on alert rule templates that will be enabled')]
-    [switch]$reportOnly
+    [switch]$reportOnly,
+
+    [Parameter(Mandatory=$false,
+    HelpMessage='Open a UI to further select which Analytics Rules you want to import')]
+    [switch]$selectUI
 )
 
 #Requires -Version 7.0
@@ -140,7 +158,7 @@ ForEach ($module in $modulesToInstall){
 
 # Sentinel GitHub Repo URI and Analytic Rule Root Path
 $sentinelGitHuburi = 'https://github.com/Azure/Azure-Sentinel'
-$sentinelGitHubPath = 'Detections'
+$sentinelGitHubPaths = 'Detections','Solutions'
 
 #Setup GitHubAuthentication
 [pscredential]$gitHubCred = New-Object System.Management.Automation.PSCredential ('dummy', $(ConvertTo-SecureString $githubToken -AsPlainText -Force))
@@ -154,13 +172,23 @@ If(!(Get-AzContext)){
 }
 
 #Set context to the subscriptionid
-Set-AzContext -Subscription $subscriptionId | Out-Null
+Set-AzContext -Subscription $subscriptionId -WarningAction SilentlyContinue -ErrorAction SilentlyContinue | Out-Null
 
 #Get the current Bearer Token
 $azToken = (Get-AzAccessToken).Token
 
 # Get all anlaytics rules from github
-$detectionFolders = Get-GitHubContent -Uri $sentinelGitHuburi -Path $sentinelGitHubPath -MediaType Object | Select -ExpandProperty entries | Where type -like 'dir' | Select name
+$detectionFolders = @()
+ForEach ($sentinelGitHubPath in $sentinelGitHubPaths){
+    If ($sentinelGitHubPath -like 'Solutions'){
+        $solutions = Get-GitHubContent -Uri $sentinelGitHuburi -Path 'Solutions' -MediaType Object | Select -ExpandProperty entries | Where type -like 'dir' | Select name
+        ForEach ($solution in $solutions.name){
+            $detectionFolders += Get-GitHubContent -Uri $sentinelGitHuburi -Path "Solutions/$solution" -MediaType Object | Select -ExpandProperty entries | Where-Object {$_.type -like 'dir' -and $_.name -like 'Analytic Rules'} | Select @{Name = 'name'; Expression = {$solution}}, path
+        }
+    }else{
+        $detectionFolders += Get-GitHubContent -Uri $sentinelGitHuburi -Path $sentinelGitHubPath -MediaType Object | Select -ExpandProperty entries | Where type -like 'dir' | Select name, path
+    }
+}
 
 # Filter on specific detection folders if detectionFolderName parameter is defined
 If($detectionFolderName){
@@ -168,14 +196,14 @@ If($detectionFolderName){
 }
 
 # Get all created by template analytic rules in Sentinel
-$existingRules = Get-AzSentinelAlertRule -resourceGroupName $resourceGroupName -workspaceName $workspaceName | where AlertRuleTemplateName -ne $null
+$existingRules = Get-AzSentinelAlertRule -resourceGroupName $resourceGroupName -workspaceName $workspaceName | Where-Object kind -like 'Scheduled'
 
 # Iterate through each detection folder in github and build an array of psobjects of the yaml files
 Write-Host 'Iterating through each detection folder to build an index of each analytic rule template. This will take a few minutes..' -ForegroundColor Yellow
 $alertRuleTemplates = @()
-ForEach ($detectionFolder in $($detectionFolders | Select -ExpandProperty Name)){
+ForEach ($detectionFolder in $($detectionFolders | Select -ExpandProperty path)){
 
-    $yamlFiles = Get-GitHubContent -Uri $sentinelGitHuburi -Path "$sentinelGitHubPath\$detectionFolder" -MediaType Object | Select -ExpandProperty entries | Where name -Like '*.yaml'
+    $yamlFiles = Get-GitHubContent -Uri $sentinelGitHuburi -Path $detectionFolder -MediaType Object | Select -ExpandProperty entries | Where name -Like '*.yaml'
 
     ForEach ($yamlFile in $yamlFiles){
 
@@ -190,6 +218,7 @@ ForEach ($detectionFolder in $($detectionFolders | Select -ExpandProperty Name))
                 name = $alertRuleTemplate.name
                 kind = 'Scheduled'
                 templateURL = $yamlFile.download_url
+                templateFolder = $detectionFolder
                 severity = $alertRuleTemplate.severity
                 requiredDataConnectors = $alertRuleTemplate.requiredDataConnectors.connectorId -join ','
                 techniques = $alertRuleTemplate.relevantTechniques -join ','
@@ -238,6 +267,9 @@ $filterScript = $null
 If($severity){
     $filterScript = check-filterScript -filterToAdd ('$_.properties.severity -in {0}' -f $severity)
 }
+If($name){
+    $filterScript = check-filterScript -filterToAdd ('$_.name -like "{0}"' -f $name)
+}
 If($techniques){
     $filterScript = check-filterScript -filterToAdd ('$(match-Lists -filterParameter $techniques -list $_.properties.relevantTechniques) -eq $true')
 }
@@ -266,7 +298,14 @@ If ($filterScript){
 Write-Host ('Found a total of {0} Rule Templates from GitHub' -f $alertRuleTemplates.count) -ForegroundColor Cyan
 
 # Find which rules need to be created that don't already exist
-$rulesToCreate = $alertRuleTemplates | Where id -notin $existingRules.AlertRuleTemplateName
+$rulesToCreate = $alertRuleTemplates | Where-object {$_.id -notin $existingRules.AlertRuleTemplateName -and $_.name -notin $existingRules.DisplayName}
+
+#Open the selection UI to further select specific rules to import
+if ($selectUI){
+    Write-Host ('Opening UI for Rule Selection' -f $rulesToCreate.count) -ForegroundColor Cyan
+    $rulesToCreate = $rulesToCreate | Out-GridView -PassThru -Title 'Select Rules to be Imported (For Multi-Select use CTRL)' | Select * 
+}
+ 
 Write-Host ('Found a total of {0} Rule Templates to Enable' -f $rulesToCreate.count) -ForegroundColor Cyan
 
 If ($reportOnly){
@@ -338,6 +377,7 @@ If ($reportOnly -eq $false){
         }catch{
             $outputErrorMessage = ($PSItem.ErrorDetails | ConvertFrom-Json).error.message
             $outputErrorCode = ($PSItem.ErrorDetails | ConvertFrom-Json).error.code
+            Write-Host "Error Creating Rule: $outputErrorMessage" -ForegroundColor Red
         }finally{
             $outputObject = New-Object PSObject -Property @{
                 ruleName = $rule.properties.displayName
