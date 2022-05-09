@@ -1,0 +1,50 @@
+"properties": {
+    "dataSources": {
+        "windowsEventLogs": [
+            {
+                "streams": [
+                    "Microsoft-WindowsEvent"
+                ],
+                "xPathQueries": [
+                    "replacewithwindowsEvents"
+                ],
+                "name": "windowsEvents"
+            },
+            {
+                "streams": [
+                    "Microsoft-SecurityEvent"
+                ],
+                "xPathQueries": [
+					"replacewithsecurityEvents"
+                ],
+                "name": "securityEvents"
+            },
+        ]
+    },
+    "destinations": {
+        "logAnalytics": [
+            {
+                "workspaceResourceId": "workspaceIdVar",
+                "name": "DataCollectionEvent"
+            }
+        ]
+    },
+    "dataFlows": [
+        {
+            "streams": [
+                "Microsoft-WindowsEvent"
+            ],
+            "destinations": [
+                "DataCollectionEvent"
+            ]
+        },
+        {
+            "streams": [
+                "Microsoft-SecurityEvent"
+            ],
+            "destinations": [
+                "DataCollectionEvent"
+            ]
+        }
+    ]
+}
