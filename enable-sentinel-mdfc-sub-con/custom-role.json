@@ -1,0 +1,25 @@
+{
+    "id": "/providers/Microsoft.Authorization/roleDefinitions/46e686a4-16b0-401b-945d-e83196987077",
+    "properties": {
+        "roleName": "Microsoft Sentinel Defender for Cloud Connector Contributor",
+        "description": "Microsoft Sentinel Defender for Cloud Connector Contributor",
+        "assignableScopes": [
+            "/providers/Microsoft.Management/managementGroups/869d26a0-a8cb-4068-aba6-c3284b615873"
+        ],
+        "permissions": [
+            {
+                "actions": [
+                    "Microsoft.Security/register/action",
+                    "Microsoft.Security/*/read",
+                    "Microsoft.Resources/subscriptions/read",
+                    "Microsoft.SecurityInsights/dataConnectors/read",
+                    "Microsoft.SecurityInsights/dataConnectors/write",
+                    "Microsoft.Security/settings/write"
+                ],
+                "notActions": [],
+                "dataActions": [],
+                "notDataActions": []
+            }
+        ]
+    }
+}
