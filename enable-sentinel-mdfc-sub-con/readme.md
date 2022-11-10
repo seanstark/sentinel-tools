@@ -1,6 +1,8 @@
 
 # Sentinel Defender for Cloud Data Connector At Scale
 
+> :warning: **Work In Progress**
+
 ## Requirements
 
 - The custom role described in [Create a Custom Role](##create-a-custom-role)
