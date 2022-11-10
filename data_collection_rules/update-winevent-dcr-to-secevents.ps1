@@ -23,6 +23,19 @@ param(
     [string]$newTable = 'Microsoft-SecurityEvent'
 )
 
+$requiredModules = 'Az.Accounts'
+$availableModules = Get-Module -ListAvailable -Name $requiredModules
+$modulesToInstall = $requiredModules | where-object {$_ -notin $availableModules.Name}
+ForEach ($module in $modulesToInstall){
+    Write-Host "Installing Missing PowerShell Module: $module" -ForegroundColor Yellow
+    Install-Module $module -force
+}
+
+If(!(Get-AzContext)){
+    Write-Host ('Connecting to Azure Subscription: {0}' -f $subscriptionId) -ForegroundColor Yellow
+    Connect-AzAccount -Subscription $subscriptionId | Out-Null
+}
+
 $uri = ('https://management.azure.com/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Insights/dataCollectionRules/{2}?api-version={3}' -f $subscriptionId, $resourceGroup, $ruleName, $apiVersion)
 
 #Get Data Collection Rule
