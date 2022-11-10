@@ -1,6 +1,27 @@
 <#
+ .DESCRIPTION
+    This script will update data collection rule data streams destinations
+
+ .PARAMETER subscriptionId
+    Specify the subscriptionID GUID where your data collection rule resides
+
+ .PARAMETER resourceGroup
+    Specify the Resource Group Name where your data collection rule resides
+
+ .PARAMETER ruleName
+    Specify the data collection rule name
+
+.PARAMETER apiVersion
+    Optionally you can specify the api version to use for Microsoft.Insights/dataCollectionRules
+
+.PARAMETER currentDataStream
+    Optionally you can specify the current rule data stream name. This configured to Microsoft-Event by default
+
+.PARAMETER newDataStream
+    Optionally you can specify the data stream name to update to. This configured to Microsoft-SecurityEvent by default
+
  .EXAMPLE
- .\update-dcrdatastream.ps1 -subscriptionId 'ada06e68-375e-4210-be3a-c6cacebf41c5' -resourceGroup 'sentinel-dcrs' -ruleName 'windows-events'
+    .\update-dcrdatastream.ps1 -subscriptionId 'ada06e68-375e-4210-be3a-c6cacebf41c5' -resourceGroup 'sentinel-dcrs' -ruleName 'windows-events'
 #>
 
 param(
