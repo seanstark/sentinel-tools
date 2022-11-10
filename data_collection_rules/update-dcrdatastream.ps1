@@ -1,6 +1,6 @@
 <#
  .EXAMPLE
- .\update-winevent-dcr-to-secevents.ps1 -subscriptionId 'ada06e68-375e-4210-be3a-c6cacebf41c5' -resourceGroup 'sentinel-dcrs' -ruleName 'windows-events'
+ .\update-dcrdatastream.ps1 -subscriptionId 'ada06e68-375e-4210-be3a-c6cacebf41c5' -resourceGroup 'sentinel-dcrs' -ruleName 'windows-events'
 #>
 
 param(
