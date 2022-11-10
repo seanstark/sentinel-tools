@@ -22,7 +22,6 @@ You just need to specify the -currentTable and -newTable parameters. (These are 
 ``` 
 .\update-winevent-dcr-to-secevents.ps1 -subscriptionId 'ada06dfd8-375e-df10-be3a-c6cacebf41c5' ` 
 -resourceGroup 'sentinel-dcrs' -ruleName 'windows-events'
-
 ```
 3. Verify the DCR
   * If needed you can check the data collection rule stream via the Azure Portal
