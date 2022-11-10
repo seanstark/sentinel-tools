@@ -17,10 +17,10 @@ param(
     [string]$apiVersion = '2021-09-01-preview',
 
     [Parameter(Mandatory=$false)]
-    [string]$currentTable = 'Microsoft-Event',
+    [string]$currentDataStream = 'Microsoft-Event',
 
     [Parameter(Mandatory=$false)]
-    [string]$newTable = 'Microsoft-SecurityEvent'
+    [string]$newDataStream = 'Microsoft-SecurityEvent'
 )
 
 $requiredModules = 'Az.Accounts'
@@ -42,8 +42,7 @@ $uri = ('https://management.azure.com/subscriptions/{0}/resourceGroups/{1}/provi
 $dcr = (Invoke-AzRestMethod -Uri $uri).content | ConvertFrom-Json -Depth 20
 
 # Update Data Collection Rule Data Flow Streams from Microsoft-Event to Microsoft-SecurityEvent
-($dcr.properties.dataFlows | Where streams -like $currentTable).streams = @($newTable)
+($dcr.properties.dataFlows | Where streams -like $currentDataStream).streams = @($newDataStream)
 
 # Update the DCR
 Invoke-AzRestMethod -Uri $uri -Method PUT -Payload ($dcr | ConvertTo-Json -Depth 20)
-
