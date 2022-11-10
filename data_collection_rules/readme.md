@@ -10,7 +10,7 @@ Check out [my policy repo](https://github.com/seanstark/Azure-Policy/tree/main/p
 ## update-winevent-dcr-to-secevents.ps1
 This script will update a data collection rule to send events to the SecurityEvents Table. 
 This was created since the Azure Monitor UI in the Azure Portal currently does not support this for windows based event collection.
-To note this script can technically be used for any use case in updating the data flows (destination tables) with a DCR. 
+> Technically this can be used for any use case in updating the data flows (destination tables) with a DCR. 
 You just need to specify the -currentTable and -newTable parameters. (These are not table names, but refer to data streams)
 
 ### Usage
