@@ -60,10 +60,10 @@ If(!(Get-AzContext)){
 $uri = ('https://management.azure.com/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Insights/dataCollectionRules/{2}?api-version={3}' -f $subscriptionId, $resourceGroup, $ruleName, $apiVersion)
 
 #Get Data Collection Rule
-$dcr = (Invoke-AzRestMethod -Uri $uri).content | ConvertFrom-Json -Depth 20
+$dcr = (Invoke-AzRestMethod -Uri $uri).content
 
 # Update Data Collection Rule Data Flow Streams from Microsoft-Event to Microsoft-SecurityEvent
-($dcr.properties.dataFlows | Where streams -like $currentDataStream).streams = @($newDataStream)
+$newDCR = $dcr.replace(('"streams":["{0}"]' -f $currentDataStream), ('"streams":["{0}"]' -f $newDataStream))
 
 # Update the DCR
-Invoke-AzRestMethod -Uri $uri -Method PUT -Payload ($dcr | ConvertTo-Json -Depth 20)
+Invoke-AzRestMethod -Uri $uri -Method PUT -Payload $newDCR
