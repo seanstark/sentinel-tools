@@ -35,6 +35,6 @@ You just need to specify the -currentDataStream and -newDataStream parameters. (
 
       ![dcr-view](/images/dcr-view.png)
 
-  3. Select JSON View and verify the stream(s) have been udpated
+  3. Select JSON View and verify the stream(s) have been updated
 
       ![dcr-json](/images/dcr-json.png)
