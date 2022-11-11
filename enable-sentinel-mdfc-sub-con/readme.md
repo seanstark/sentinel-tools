@@ -35,7 +35,10 @@ There is no need to assign the built-in roles that provide more permissions than
 Most of the logic leverages the System Managed Identity to perform tasks. However if you plan on sending email notifications you will need to authorize the Office 365 Outlook connector.
 
 ### Assign the Role to the Logic App System Managed Identity
-If you can't use the custom role you will need to assign the System Managed Identity the Security Admin and Microsoft Sentinel Contributor. In the example below the role is assigned at the root managment group level. 
+- If you would like to test the logic app first on a subset of subscriptions only assign the role to that scope
+- If you can't use the custom role you will need to assign the System Managed Identity the Security Admin and Microsoft Sentinel Contributor. 
+- In the example below the role is assigned at the root managment group level. 
+- I would reccomend waiting 15 minutes after assigning the role before executing your first run of the logic
 
 ### Working with Parameters
 
