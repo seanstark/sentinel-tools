@@ -1,923 +1,982 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.0",
-    "metadata": {
-        "title": "",
-        "description": "",
-        "prerequisites": "",
-    "postDeployment": [],
-    "prerequisitesDeployTemplateFile": "",
-    "lastUpdateTime": "",
-"entities": [],
-"tags": [],
-"support": {
-"tier": "community",
-"armtemplate": "Generated from https://github.com/Azure/Azure-Sentinel/tree/master/Tools/Playbook-ARM-Template-Generator"
-},
-"author": {
-"name": ""
-}
-},
-"parameters": {
-"PlaybookName": {
-"defaultValue": "sentinel-autoconnect-defenderforcloud",
-"type": "string"
-},
-"emailRecipients": {
-"type": "string",
-"metadata": {
-    "description": "Enter value for emailRecipients"
-}
-},
-"excludedSubscriptions": {
-"type": "string",
-"metadata": {
-    "description": "Enter value for excludedSubscriptions"
-}
-},
-"sendEmail": {
-"type": "string",
-"metadata": {
-    "description": "Enter value for sendEmail"
-}
-}
-},
-"variables": {
-"ArmConnectionName": "[concat('Arm-', parameters('PlaybookName'))]",
-"AzureloganalyticsdatacollectorConnectionName": "[concat('Azureloganalyticsdatacollector-', parameters('PlaybookName'))]",
-"Office365ConnectionName": "[concat('Office365-', parameters('PlaybookName'))]"
-},
-"resources": [
-{
-"properties": {
-    "provisioningState": "Succeeded",
-    "state": "Enabled",
-    "definition": {
-        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
-        "contentVersion": "1.0.0.0",
-        "parameters": {
-            "$connections": {
-            "defaultValue": {},
-            "type": "Object"
-        },
-        "emailRecipients": {
-            "type": "string",
-            "defaultValue": "[parameters('emailRecipients')]"
-        },
-        "excludedSubscriptions": {
-            "type": "string",
-            "defaultValue": "[parameters('excludedSubscriptions')]"
-        },
-        "sendEmail": {
-            "type": "string",
-            "defaultValue": "[parameters('sendEmail')]"
-        }
-    },
-    "triggers": {
-        "Recurrence": {
-            "recurrence": {
-                "frequency": "Hour",
-                "interval": 24
-            },
-            "evaluatedRecurrence": {
-                "frequency": "Hour",
-                "interval": 24
-            },
-            "type": "Recurrence",
-        "inputs": {}
-    }
-},
-"actions": {
-    "Check_for_Excluded_Subscriptions": {
-        "actions": {
-            "Filter_out_excluded_subscriptions": {
-            "runAfter": {},
-            "type": "Query",
-            "inputs": {
-                "from": "@body('Parse_Subscription_List')",
-                "where": "@not(contains(parameters('excludedSubscriptions'), item()?['subscriptionId']))"
-            }
-        },
-        "Set_variable_-__subscriptionsToCheck_(excluded_filtered)": {
-            "runAfter": {
-                "Filter_out_excluded_subscriptions": [
-                    "Succeeded"
-                ]
-            },
-            "type": "SetVariable",
-            "inputs": {
-                "name": "subscriptionsToCheck",
-                "value": "@body('Filter_out_excluded_subscriptions')"
-            }
-        }
-    },
-    "runAfter": {
-        "Parse_Subscription_List": [
-            "Succeeded"
-        ]
-    },
-    "else": {
-        "actions": {
-            "Set_variable_-_subscriptionsToCheck": {
-            "runAfter": {},
-            "type": "SetVariable",
-            "inputs": {
-                "name": "subscriptionsToCheck",
-                "value": "@body('Parse_Subscription_List')"
-            }
-        }
-    }
-},
-"expression": {
-    "and": [
-        {
-            "greaterOrEquals": [
-                "@length(parameters('excludedSubscriptions'))",
-                1
-            ]
-        }
-    ]
-},
-"type": "If"
-},
-"Check_for_Output": {
-"actions": {
-    "Condition_-_Send_Email": {
-        "actions": {
-            "Create_HTML_table_": {
-            "runAfter": {},
-            "type": "Table",
-            "inputs": {
-                "columns": [
-                    {
-                        "header": "Subscription",
-                        "value": "@split(item()?['id'],'/')[2]"
-                    },
-                    {
-                        "header": "Type",
-                        "value": "@item()?['type']"
-                    },
-                    {
-                        "header": "Setting",
-                        "value": "@item()?['kind']"
-                    },
-                    {
-                        "header": "Properties",
-                        "value": "@item()?['properties']"
-                    }
-                ],
-                "format": "HTML",
-                "from": "@variables('taskOutput')"
-            }
-        },
-        "Send_an_email_(V2)": {
-            "runAfter": {
-                "Create_HTML_table_": [
-                    "Succeeded"
-                ]
-            },
-            "type": "ApiConnection",
-            "inputs": {
-                "body": {
-                    "Body": "<p><strong>The following subscriptions were connected to Microsoft Sentinel via the Defender for Cloud Data Connector</strong><br>\n<br>\n@{body('Create_HTML_table_')}</p>",
-                    "Importance": "Normal",
-                    "Subject": "Defender for Cloud Connector Automation Results",
-                    "To": "@parameters('emailRecipients')"
-                },
-                "host": {
-                    "connection": {
-                        "name": "@parameters('$connections')['office365']['connectionId']"
-                    }
-                },
-                "method": "post",
-                "path": "/v2/Mail"
-            }
-        }
-    },
-    "runAfter": {
-        "Send_to_Log_Analytics": [
-            "Succeeded"
-        ]
-    },
-    "expression": {
-        "and": [
-            {
-                "equals": [
-                    "@parameters('sendEmail')",
-                    true
-                ]
-            }
-        ]
-    },
-    "type": "If"
-},
-"Send_to_Log_Analytics": {
-    "foreach": "@variables('taskOutput')",
-    "actions": {
-        "Send_Data": {
-        "runAfter": {},
-        "type": "ApiConnection",
-        "inputs": {
-            "body": "@{items('Send_to_Log_Analytics')}",
-            "headers": {
-                "Log-Type": "DefenderForCloudDataConnector",
-                "time-generated-field": "@variables('RunTime')"
-            },
-            "host": {
-                "connection": {
-                    "name": "@parameters('$connections')['azureloganalyticsdatacollector']['connectionId']"
-                }
-            },
-            "method": "post",
-            "path": "/api/logs"
-        }
-    }
-},
-"runAfter": {},
-"type": "Foreach"
-}
-},
-"runAfter": {
-"Check_for_valid_list_of_Subscriptions_-_Enable_Bi-Directional_Alert_Sync": [
-"Succeeded"
-],
-"Check_for_valid_list_of_Subscriptions_-_Enable_Data_Connector_Group": [
-"Succeeded"
-],
-"Check_for_valid_list_of_Subscriptions_-_Register_Subscriptions_with_Defender": [
-"Succeeded"
-]
-},
-"expression": {
-"and": [
-{
-"greaterOrEquals": [
-    "@length(variables('taskOutput'))",
-    1
-]
-}
-]
-},
-"type": "If"
-},
-"Check_for_valid_list_of_Subscriptions_-_Enable_Bi-Directional_Alert_Sync": {
-"actions": {
-"Enable_Bi-Directional_Alert_Sync": {
-"foreach": "@variables('subscriptionsToCheck')",
-"actions": {
-"Check_Alert_Sync_Settings": {
-"actions": {},
-"runAfter": {
-    "Set_variable_-_alertSyncEnabled": [
-        "Succeeded"
-    ]
-},
-"else": {
-    "actions": {
-        "Append_to_array_variable": {
-            "runAfter": {
-                "Enable_Alert_Sync": [
-                    "Succeeded"
-                ]
-            },
-            "type": "AppendToArrayVariable",
-            "inputs": {
-                "name": "taskOutput",
-                "value": "@body('Enable_Alert_Sync')"
-            }
-        },
-        "Enable_Alert_Sync": {
-        "runAfter": {},
-        "type": "Http",
-        "inputs": {
-            "authentication": {
-                "type": "ManagedServiceIdentity"
-            },
-            "body": {
-                "kind": "AlertSyncSettings",
-                "properties": {
-                    "enabled": true
-                }
-            },
-            "method": "PUT",
-            "queries": {
-                "api-version": "2021-06-01"
-            },
-            "uri": "https://management.azure.com/subscriptions/@{items('Enable_Bi-Directional_Alert_Sync')?['subscriptionID']}/providers/Microsoft.Security/settings/Sentinel"
-        }
-    }
-}
-},
-"expression": {
-"and": [
-    {
-        "equals": [
-            "@variables('alertSyncEnabled')",
-            "@string(true)"
-        ]
-    }
-]
-},
-"type": "If"
-},
-"Check_for_Alert_Sync_Settings": {
-"runAfter": {},
-"type": "Http",
-"inputs": {
-"authentication": {
-"type": "ManagedServiceIdentity"
-},
-"method": "GET",
-"queries": {
-"api-version": "2021-06-01"
-},
-"uri": "https://management.azure.com/subscriptions/@{items('Enable_Bi-Directional_Alert_Sync')?['subscriptionID']}/providers/Microsoft.Security/settings/Sentinel"
-}
-},
-"Set_variable_-_alertSyncEnabled": {
-"runAfter": {
-"Check_for_Alert_Sync_Settings": [
-"Succeeded"
-]
-},
-"type": "SetVariable",
-"inputs": {
-"name": "alertSyncEnabled",
-"value": "@{body('Check_for_Alert_Sync_Settings')?['properties']?['enabled']}"
-}
-}
-},
-"runAfter": {},
-"type": "Foreach"
-}
-},
-"runAfter": {
-"Check_for_Excluded_Subscriptions": [
-"Succeeded"
-]
-},
-"expression": {
-"and": [
-{
-"greaterOrEquals": [
-"@length(variables('subscriptionsToCheck'))",
-1
-]
-}
-]
-},
-"type": "If"
-},
-"Check_for_valid_list_of_Subscriptions_-_Enable_Data_Connector_Group": {
-"actions": {
-"Check_for_Subscriptions_to_Enable": {
-"actions": {
-"Enable_disconnected_Subscriptions": {
-"foreach": "@body('Filter_Subscriptions_Not_Connected')",
-"actions": {
-"Append_to_array_variable_2": {
-"runAfter": {
-"Enable_the_Data_Connector": [
-    "Succeeded"
-]
-},
-"type": "AppendToArrayVariable",
-"inputs": {
-"name": "taskOutput",
-"value": "@body('Enable_the_Data_Connector')"
-}
-},
-"Enable_the_Data_Connector": {
-"runAfter": {},
-"type": "Http",
-"inputs": {
-"authentication": {
-"type": "ManagedServiceIdentity"
-},
-"body": {
-"id": null,
-"kind": "AzureSecurityCenter",
-"properties": {
-    "dataTypes": {
-        "alerts": {
-            "state": "enabled"
-        }
-    },
-    "subscriptionId": "@items('Enable_disconnected_Subscriptions')?['subscriptionID']"
-}
-},
-"method": "PUT",
-"queries": {
-"api-version": "2021-10-01-preview"
-},
-"uri": "https://management.azure.com/subscriptions/@{variables('sentinel-subscriptionid')}/resourceGroups/@{variables('sentinel-resourcegroupname')}/providers/Microsoft.OperationalInsights/workspaces/@{variables('sentinel-workspacename')}/providers/Microsoft.SecurityInsights/dataConnectors/@{guid()}"
-}
-}
-},
-"runAfter": {},
-"type": "Foreach"
-}
-},
-"runAfter": {
-"Filter_Subscriptions_Not_Connected": [
-"Succeeded"
-]
-},
-"expression": {
-"and": [
-{
-"greaterOrEquals": [
-"@length(body('Filter_Subscriptions_Not_Connected'))",
-1
-]
-}
-]
-},
-"type": "If"
-},
-"Filter_Subscriptions_Not_Connected": {
-"runAfter": {
-"Parse_Enabled_Subscription_Ids": [
-"Succeeded"
-]
-},
-"type": "Query",
-"inputs": {
-"from": "@variables('subscriptionsToCheck')",
-"where": "@not(contains(body('Parse_Enabled_Subscription_Ids'), item()))"
-}
-},
-"Get_All_Data_Connectors": {
-"runAfter": {},
-"type": "ApiConnection",
-"inputs": {
-"host": {
-"connection": {
-"name": "@parameters('$connections')['arm']['connectionId']"
-}
-},
-"method": "get",
-"path": "sentinel-prd/',variables('sentinel-workspacename'),'/providers/Microsoft.SecurityInsights/dataConnectors')}",
-"queries": {
-"x-ms-api-version": "2021-09-01-preview"
-}
-}
-},
-"Parse_Data_Connector_JSON": {
-"runAfter": {
-"Get_All_Data_Connectors": [
-"Succeeded"
-]
-},
-"type": "ParseJson",
-"inputs": {
-"content": "@body('Get_All_Data_Connectors')",
-"schema": {
-"properties": {
-"value": {
-"items": {
-"properties": {
-"etag": {
-"type": "string"
-},
-"id": {
-"type": "string"
-},
-"kind": {
-"type": "string"
-},
-"name": {
-"type": "string"
-},
-"properties": {
-"properties": {
-"dataTypes": {
-    "properties": {
-        "alerts": {
-            "properties": {
-                "state": {
-                    "type": "string"
-                }
-            },
-            "type": "object"
-        }
-    },
-    "type": "object"
-},
-"subscriptionId": {
-    "type": "string"
-}
-},
-"type": "object"
-},
-"type": {
-"type": "string"
-}
-},
-"required": [
-"id",
-"name",
-"etag",
-"type",
-"kind",
-"properties"
-],
-"type": "object"
-},
-"type": "array"
-}
-},
-"type": "object"
-}
-}
-},
-"Parse_Enabled_Subscription_Ids": {
-"runAfter": {
-"Return_Defender_for_Cloud_Data_Connectors": [
-"Succeeded"
-]
-},
-"type": "Select",
-"inputs": {
-"from": "@body('Return_Defender_for_Cloud_Data_Connectors')",
-"select": {
-"subscriptionID": "@item()?['properties']?['subscriptionId']"
-}
-}
-},
-"Return_Defender_for_Cloud_Data_Connectors": {
-"runAfter": {
-"Parse_Data_Connector_JSON": [
-"Succeeded"
-]
-},
-"type": "Query",
-"inputs": {
-"from": "@body('Parse_Data_Connector_JSON')?['value']",
-"where": "@equals(item()?['kind'], 'AzureSecurityCenter')"
-}
-}
-},
-"runAfter": {
-"Check_for_Excluded_Subscriptions": [
-"Succeeded"
-]
-},
-"expression": {
-"and": [
-{
-"greaterOrEquals": [
-"@length(variables('subscriptionsToCheck'))",
-1
-]
-}
-]
-},
-"type": "If"
-},
-"Check_for_valid_list_of_Subscriptions_-_Register_Subscriptions_with_Defender": {
-"actions": {
-"Register_Subscriptions_with_Defender_for_Cloud": {
-"foreach": "@variables('subscriptionsToCheck')",
-"actions": {
-"Check_for_Microsoft.Security_Resource_Provider_Registration": {
-"runAfter": {},
-"type": "Http",
-"inputs": {
-"authentication": {
-"type": "ManagedServiceIdentity"
-},
-"method": "GET",
-"queries": {
-"api-version": "2021-04-01"
-},
-"uri": "https://management.azure.com/subscriptions/@{items('Register_Subscriptions_with_Defender_for_Cloud')?['subscriptionID']}/providers/Microsoft.Security"
-}
-},
-"Check_for_Registered_Resource_Provider": {
-"actions": {
-"Append_to_array_variable_3": {
-"runAfter": {
-"Register_resource_provider_-_Microsoft.Security": [
-"Succeeded"
-]
-},
-"type": "AppendToArrayVariable",
-"inputs": {
-"name": "taskOutput",
-"value": "@body('Register_resource_provider_-_Microsoft.Security')"
-}
-},
-"Register_resource_provider_-_Microsoft.Security": {
-"runAfter": {},
-"type": "ApiConnection",
-"inputs": {
-"host": {
-"connection": {
-"name": "@parameters('$connections')['arm']['connectionId']"
-}
-},
-"method": "post",
-"path": "/subscriptions/@{encodeURIComponent(items('Register_Subscriptions_with_Defender_for_Cloud')?['subscriptionID'])}/providers/@{encodeURIComponent('Microsoft.Security')}/register",
-"queries": {
-"x-ms-api-version": "2016-06-01"
-}
-}
-}
-},
-"runAfter": {
-"Check_for_Microsoft.Security_Resource_Provider_Registration": [
-"Succeeded"
-]
-},
-"expression": {
-"and": [
-{
-"not": {
-"equals": [
-"@body('Check_for_Microsoft.Security_Resource_Provider_Registration')?['registrationState']",
-"Registered"
-]
-}
-}
-]
-},
-"type": "If"
-}
-},
-"runAfter": {},
-"type": "Foreach"
-}
-},
-"runAfter": {
-"Check_for_Excluded_Subscriptions": [
-"Succeeded"
-]
-},
-"expression": {
-"and": [
-{
-"greaterOrEquals": [
-"@length(variables('subscriptionsToCheck'))",
-1
-]
-}
-]
-},
-"type": "If"
-},
-"Initialize_Variable_-_Run_Time": {
-"runAfter": {},
-"type": "InitializeVariable",
-"inputs": {
-"variables": [
-{
-"name": "RunTime",
-"type": "string",
-"value": "@{utcNow()}"
-}
-]
-}
-},
-"Initialize_Variable_-__new-connected-subscriptions": {
-"runAfter": {
-"Initialize_variable_-_taskOutput": [
-"Succeeded"
-]
-},
-"type": "InitializeVariable",
-"inputs": {
-"variables": [
-{
-"name": "new-connected-subscriptions",
-"type": "array"
-}
-]
-}
-},
-"Initialize_Variable_-_sentinel-resourcegroupname": {
-"runAfter": {
-"Initialize_Variable_-_sentinel-workspacename": [
-"Succeeded"
-]
-},
-"type": "InitializeVariable",
-"inputs": {
-"variables": [
-{
-"name": "sentinel-resourcegroupname",
-"type": "String",
-"value": "sentinel-prd"
-}
-]
-}
-},
-"Initialize_Variable_-_sentinel-subscriptionid": {
-"runAfter": {
-"Initialize_Variable_-_Run_Time": [
-"Succeeded"
-]
-},
-"type": "InitializeVariable",
-"inputs": {
-"variables": [
-{
-"name": "sentinel-subscriptionid",
-"type": "String",
-"value": "ada06e68-375e-4210-be3a-c6cacebf41c5"
-}
-]
-}
-},
-"Initialize_Variable_-_sentinel-workspacename": {
-"runAfter": {
-"Initialize_Variable_-_sentinel-subscriptionid": [
-"Succeeded"
-]
-},
-"type": "InitializeVariable",
-"inputs": {
-"variables": [
-{
-"name": "sentinel-workspacename",
-"type": "String",
-"value": "sentinel-prd"
-}
-]
-}
-},
-"Initialize_variable_-_alertSyncEnabled": {
-"runAfter": {
-"Initialize_variable_-_subscriptionsToCheck": [
-"Succeeded"
-]
-},
-"type": "InitializeVariable",
-"inputs": {
-"variables": [
-{
-"name": "alertSyncEnabled",
-"type": "string"
-}
-]
-}
-},
-"Initialize_variable_-_subscriptionsToCheck": {
-"runAfter": {
-"Initialize_Variable_-__new-connected-subscriptions": [
-"Succeeded"
-]
-},
-"type": "InitializeVariable",
-"inputs": {
-"variables": [
-{
-"name": "subscriptionsToCheck",
-"type": "array"
-}
-]
-}
-},
-"Initialize_variable_-_taskOutput": {
-"runAfter": {
-"Initialize_Variable_-_sentinel-resourcegroupname": [
-"Succeeded"
-]
-},
-"type": "InitializeVariable",
-"inputs": {
-"variables": [
-{
-"name": "taskOutput",
-"type": "array"
-}
-]
-}
-},
-"List_subscriptions": {
-"runAfter": {
-"Initialize_variable_-_alertSyncEnabled": [
-"Succeeded"
-]
-},
-"type": "ApiConnection",
-"inputs": {
-"host": {
-"connection": {
-"name": "@parameters('$connections')['arm']['connectionId']"
-}
-},
-"method": "get",
-"path": "/subscriptions",
-"queries": {
-"x-ms-api-version": "2016-06-01"
-}
-}
-},
-"Parse_Subscription_List": {
-"runAfter": {
-"List_subscriptions": [
-"Succeeded"
-]
-},
-"type": "Select",
-"inputs": {
-"from": "@body('List_subscriptions')?['value']",
-"select": {
-"subscriptionID": "@item()?['subscriptionId']"
-}
-}
-}
-},
-"outputs": {}
-},
-"parameters": {
-"$connections": {
-"value": {
-"arm": {
-"connectionId": "[resourceId('Microsoft.Web/connections', variables('ArmConnectionName'))]",
-"connectionName": "[variables('ArmConnectionName')]",
-"id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Arm')]",
-"connectionProperties": {
-"authentication": {
-"type": "ManagedServiceIdentity"
-}
-}
-},
-"azureloganalyticsdatacollector": {
-"connectionId": "[resourceId('Microsoft.Web/connections', variables('AzureloganalyticsdatacollectorConnectionName'))]",
-"connectionName": "[variables('AzureloganalyticsdatacollectorConnectionName')]",
-"id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Azureloganalyticsdatacollector')]"
-},
-"office365": {
-"connectionId": "[resourceId('Microsoft.Web/connections', variables('Office365ConnectionName'))]",
-"connectionName": "[variables('Office365ConnectionName')]",
-"id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Office365')]"
-}
-}
-}
-}
-},
-"name": "[parameters('PlaybookName')]",
-"type": "Microsoft.Logic/workflows",
-"location": "[resourceGroup().location]",
-"tags": {
-"LogicAppsCategory": "security",
-"hidden-SentinelTemplateName": "sentinel-autoconnect-defenderforcloud",
-"hidden-SentinelTemplateVersion": "1.0"
-},
-"identity": {
-"type": "SystemAssigned"
-},
-"apiVersion": "2017-07-01",
-"dependsOn": [
-"[resourceId('Microsoft.Web/connections', variables('ArmConnectionName'))]",
-"[resourceId('Microsoft.Web/connections', variables('AzureloganalyticsdatacollectorConnectionName'))]",
-"[resourceId('Microsoft.Web/connections', variables('Office365ConnectionName'))]"
-]
-},
-{
-"type": "Microsoft.Web/connections",
-"apiVersion": "2016-06-01",
-"name": "[variables('ArmConnectionName')]",
-"location": "[resourceGroup().location]",
-"kind": "V1",
-"properties": {
-"displayName": "[variables('ArmConnectionName')]",
-"customParameterValues": {},
-"parameterValueType": "Alternative",
-"api": {
-"id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Arm')]"
-}
-}
-},
-{
-"type": "Microsoft.Web/connections",
-"apiVersion": "2016-06-01",
-"name": "[variables('AzureloganalyticsdatacollectorConnectionName')]",
-"location": "[resourceGroup().location]",
-"kind": "V1",
-"properties": {
-"displayName": "[variables('AzureloganalyticsdatacollectorConnectionName')]",
-"customParameterValues": {},
-"api": {
-"id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Azureloganalyticsdatacollector')]"
-}
-}
-},
-{
-"type": "Microsoft.Web/connections",
-"apiVersion": "2016-06-01",
-"name": "[variables('Office365ConnectionName')]",
-"location": "[resourceGroup().location]",
-"kind": "V1",
-"properties": {
-"displayName": "[variables('Office365ConnectionName')]",
-"customParameterValues": {},
-"api": {
-"id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Office365')]"
-}
-}
-}
-]
+	"$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"metadata": {
+		"title": "",
+		"description": "",
+		"prerequisites": "",
+		"postDeployment": [],
+		"prerequisitesDeployTemplateFile": "",
+		"lastUpdateTime": "",
+		"entities": [],
+		"tags": [],
+		"support": {
+			"tier": "community",
+			"armtemplate": "Generated from https://github.com/Azure/Azure-Sentinel/tree/master/Tools/Playbook-ARM-Template-Generator"
+		},
+		"author": {
+			"name": ""
+		}
+	},
+	"parameters": {
+		"PlaybookName": {
+			"defaultValue": "sentinel-autoconnect-defenderforcloud",
+			"type": "string"
+		},
+		"emailRecipients": {
+			"type": "string",
+			"metadata": {
+				"description": "Enter value for emailRecipients"
+			}
+		},
+		"excludedSubscriptions": {
+			"type": "string",
+			"metadata": {
+				"description": "Enter value for excludedSubscriptions"
+			}
+		},
+		"logResults": {
+			"type": "string",
+			"metadata": {
+				"description": "Enter value for logResults"
+			}
+		},
+		"sendEmail": {
+			"type": "string",
+			"metadata": {
+				"description": "Enter value for sendEmail"
+			}
+		},
+		"sentinel-resourcegroupname": {
+			"type": "string",
+			"metadata": {
+				"description": "Enter value for sentinel-resourcegroupname"
+			}
+		},
+		"sentinel-subscriptionid": {
+			"type": "string",
+			"metadata": {
+				"description": "Enter value for sentinel-subscriptionid"
+			}
+		},
+		"sentinel-workspacename": {
+			"type": "string",
+			"metadata": {
+				"description": "Enter value for sentinel-workspacename"
+			}
+		}
+	},
+	"variables": {
+		"ArmConnectionName": "[concat('Arm-', parameters('PlaybookName'))]",
+		"AzureloganalyticsdatacollectorConnectionName": "[concat('Azureloganalyticsdatacollector-', parameters('PlaybookName'))]",
+		"Office365ConnectionName": "[concat('Office365-', parameters('PlaybookName'))]"
+	},
+	"resources": [
+		{
+			"properties": {
+				"provisioningState": "Succeeded",
+				"state": "Enabled",
+				"definition": {
+					"$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+					"contentVersion": "1.0.0.0",
+					"parameters": {
+						"$connections": {
+							"defaultValue": {},
+							"type": "Object"
+						},
+						"emailRecipients": {
+							"type": "string",
+							"defaultValue": "[parameters('emailRecipients')]"
+						},
+						"excludedSubscriptions": {
+							"type": "string",
+							"defaultValue": "[parameters('excludedSubscriptions')]"
+						},
+						"logResults": {
+							"type": "string",
+							"defaultValue": "[parameters('logResults')]"
+						},
+						"sendEmail": {
+							"type": "string",
+							"defaultValue": "[parameters('sendEmail')]"
+						},
+						"sentinel-resourcegroupname": {
+							"type": "string",
+							"defaultValue": "[parameters('sentinel-resourcegroupname')]"
+						},
+						"sentinel-subscriptionid": {
+							"type": "string",
+							"defaultValue": "[parameters('sentinel-subscriptionid')]"
+						},
+						"sentinel-workspacename": {
+							"type": "string",
+							"defaultValue": "[parameters('sentinel-workspacename')]"
+						}
+					},
+					"triggers": {
+						"Recurrence": {
+							"recurrence": {
+								"frequency": "Hour",
+								"interval": 12
+							},
+							"evaluatedRecurrence": {
+								"frequency": "Hour",
+								"interval": 12
+							},
+							"type": "Recurrence",
+							"inputs": {}
+						}
+					},
+					"actions": {
+						"Check_for_Excluded_Subscriptions": {
+							"actions": {
+								"Filter_out_excluded_subscriptions": {
+									"runAfter": {},
+									"type": "Query",
+									"inputs": {
+										"from": "@body('Parse_Subscription_List')",
+										"where": "@not(contains(parameters('excludedSubscriptions'), item()?['subscriptionId']))"
+									}
+								},
+								"Set_variable_-__subscriptionsToCheck_(excluded_filtered)": {
+									"runAfter": {
+										"Filter_out_excluded_subscriptions": [
+											"Succeeded"
+										]
+									},
+									"type": "SetVariable",
+									"inputs": {
+										"name": "subscriptionsToCheck",
+										"value": "@body('Filter_out_excluded_subscriptions')"
+									}
+								}
+							},
+							"runAfter": {
+								"Parse_Subscription_List": [
+									"Succeeded"
+								]
+							},
+							"else": {
+								"actions": {
+									"Set_variable_-_subscriptionsToCheck": {
+										"runAfter": {},
+										"type": "SetVariable",
+										"inputs": {
+											"name": "subscriptionsToCheck",
+											"value": "@body('Parse_Subscription_List')"
+										}
+									}
+								}
+							},
+							"expression": {
+								"and": [
+									{
+										"greaterOrEquals": [
+											"@length(parameters('excludedSubscriptions'))",
+											1
+										]
+									}
+								]
+							},
+							"type": "If"
+						},
+						"Check_for_Output": {
+							"actions": {
+								"Condition_-_Log_Results": {
+									"actions": {
+										"Send_to_Log_Analytics": {
+											"foreach": "@variables('taskOutput')",
+											"actions": {
+												"Send_Data": {
+													"runAfter": {},
+													"type": "ApiConnection",
+													"inputs": {
+														"body": "@{items('Send_to_Log_Analytics')}",
+														"headers": {
+															"Log-Type": "DefenderForCloudDataConnector",
+															"time-generated-field": "@variables('RunTime')"
+														},
+														"host": {
+															"connection": {
+																"name": "@parameters('$connections')['azureloganalyticsdatacollector']['connectionId']"
+															}
+														},
+														"method": "post",
+														"path": "/api/logs"
+													}
+												}
+											},
+											"runAfter": {},
+											"type": "Foreach"
+										}
+									},
+									"runAfter": {},
+									"expression": {
+										"and": [
+											{
+												"equals": [
+													"@parameters('logResults')",
+													true
+												]
+											}
+										]
+									},
+									"type": "If"
+								},
+								"Condition_-_Send_Email": {
+									"actions": {
+										"Create_HTML_table_": {
+											"runAfter": {},
+											"type": "Table",
+											"inputs": {
+												"columns": [
+													{
+														"header": "Subscription",
+														"value": "@split(item()?['id'],'/')[2]"
+													},
+													{
+														"header": "Type",
+														"value": "@item()?['type']"
+													},
+													{
+														"header": "Setting",
+														"value": "@item()?['kind']"
+													},
+													{
+														"header": "Properties",
+														"value": "@item()?['properties']"
+													}
+												],
+												"format": "HTML",
+												"from": "@variables('taskOutput')"
+											}
+										},
+										"Send_an_email_(V2)": {
+											"runAfter": {
+												"Create_HTML_table_": [
+													"Succeeded"
+												]
+											},
+											"type": "ApiConnection",
+											"inputs": {
+												"body": {
+													"Body": "<p><strong>The following subscriptions were connected to Microsoft Sentinel via the Defender for Cloud Data Connector</strong><br>\n<br>\n@{body('Create_HTML_table_')}</p>",
+													"Importance": "Normal",
+													"Subject": "Defender for Cloud Connector Automation Results",
+													"To": "@parameters('emailRecipients')"
+												},
+												"host": {
+													"connection": {
+														"name": "@parameters('$connections')['office365']['connectionId']"
+													}
+												},
+												"method": "post",
+												"path": "/v2/Mail"
+											}
+										}
+									},
+									"runAfter": {
+										"Condition_-_Log_Results": [
+											"Succeeded"
+										]
+									},
+									"expression": {
+										"and": [
+											{
+												"equals": [
+													"@parameters('sendEmail')",
+													true
+												]
+											}
+										]
+									},
+									"type": "If"
+								}
+							},
+							"runAfter": {
+								"Check_for_valid_list_of_Subscriptions_-_Enable_Bi-Directional_Alert_Sync": [
+									"Succeeded"
+								],
+								"Check_for_valid_list_of_Subscriptions_-_Enable_Data_Connector_Group": [
+									"Succeeded"
+								],
+								"Check_for_valid_list_of_Subscriptions_-_Register_Subscriptions_with_Defender": [
+									"Succeeded"
+								]
+							},
+							"expression": {
+								"and": [
+									{
+										"greaterOrEquals": [
+											"@length(variables('taskOutput'))",
+											1
+										]
+									}
+								]
+							},
+							"type": "If"
+						},
+						"Check_for_valid_list_of_Subscriptions_-_Enable_Bi-Directional_Alert_Sync": {
+							"actions": {
+								"Enable_Bi-Directional_Alert_Sync": {
+									"foreach": "@variables('subscriptionsToCheck')",
+									"actions": {
+										"Check_Alert_Sync_Settings": {
+											"actions": {},
+											"runAfter": {
+												"Set_variable_-_alertSyncEnabled": [
+													"Succeeded"
+												]
+											},
+											"else": {
+												"actions": {
+													"Append_to_array_variable": {
+														"runAfter": {
+															"Enable_Alert_Sync": [
+																"Succeeded"
+															]
+														},
+														"type": "AppendToArrayVariable",
+														"inputs": {
+															"name": "taskOutput",
+															"value": "@body('Enable_Alert_Sync')"
+														}
+													},
+													"Enable_Alert_Sync": {
+														"runAfter": {},
+														"type": "Http",
+														"inputs": {
+															"authentication": {
+																"type": "ManagedServiceIdentity"
+															},
+															"body": {
+																"kind": "AlertSyncSettings",
+																"properties": {
+																	"enabled": true
+																}
+															},
+															"method": "PUT",
+															"queries": {
+																"api-version": "2021-06-01"
+															},
+															"uri": "https://management.azure.com/subscriptions/@{items('Enable_Bi-Directional_Alert_Sync')?['subscriptionID']}/providers/Microsoft.Security/settings/Sentinel"
+														}
+													}
+												}
+											},
+											"expression": {
+												"and": [
+													{
+														"equals": [
+															"@variables('alertSyncEnabled')",
+															"@string(true)"
+														]
+													}
+												]
+											},
+											"type": "If"
+										},
+										"Check_for_Alert_Sync_Settings": {
+											"runAfter": {},
+											"type": "Http",
+											"inputs": {
+												"authentication": {
+													"type": "ManagedServiceIdentity"
+												},
+												"method": "GET",
+												"queries": {
+													"api-version": "2021-06-01"
+												},
+												"uri": "https://management.azure.com/subscriptions/@{items('Enable_Bi-Directional_Alert_Sync')?['subscriptionID']}/providers/Microsoft.Security/settings/Sentinel"
+											}
+										},
+										"Set_variable_-_alertSyncEnabled": {
+											"runAfter": {
+												"Check_for_Alert_Sync_Settings": [
+													"Succeeded"
+												]
+											},
+											"type": "SetVariable",
+											"inputs": {
+												"name": "alertSyncEnabled",
+												"value": "@{body('Check_for_Alert_Sync_Settings')?['properties']?['enabled']}"
+											}
+										}
+									},
+									"runAfter": {},
+									"type": "Foreach"
+								}
+							},
+							"runAfter": {
+								"Check_for_Excluded_Subscriptions": [
+									"Succeeded"
+								]
+							},
+							"expression": {
+								"and": [
+									{
+										"greaterOrEquals": [
+											"@length(variables('subscriptionsToCheck'))",
+											1
+										]
+									}
+								]
+							},
+							"type": "If"
+						},
+						"Check_for_valid_list_of_Subscriptions_-_Enable_Data_Connector_Group": {
+							"actions": {
+								"Check_for_Subscriptions_to_Enable": {
+									"actions": {
+										"Enable_disconnected_Subscriptions": {
+											"foreach": "@body('Filter_Subscriptions_Not_Connected')",
+											"actions": {
+												"Append_to_array_variable_2": {
+													"runAfter": {
+														"Enable_the_Data_Connector": [
+															"Succeeded"
+														]
+													},
+													"type": "AppendToArrayVariable",
+													"inputs": {
+														"name": "taskOutput",
+														"value": "@body('Enable_the_Data_Connector')"
+													}
+												},
+												"Enable_the_Data_Connector": {
+													"runAfter": {},
+													"type": "Http",
+													"inputs": {
+														"authentication": {
+															"type": "ManagedServiceIdentity"
+														},
+														"body": {
+															"id": null,
+															"kind": "AzureSecurityCenter",
+															"properties": {
+																"dataTypes": {
+																	"alerts": {
+																		"state": "enabled"
+																	}
+																},
+																"subscriptionId": "@items('Enable_disconnected_Subscriptions')?['subscriptionID']"
+															}
+														},
+														"method": "PUT",
+														"queries": {
+															"api-version": "2021-10-01-preview"
+														},
+														"uri": "https://management.azure.com/subscriptions/@{variables('sentinel-subscriptionid')}/resourceGroups/@{variables('sentinel-resourcegroupname')}/providers/Microsoft.OperationalInsights/workspaces/@{variables('sentinel-workspacename')}/providers/Microsoft.SecurityInsights/dataConnectors/@{guid()}"
+													}
+												}
+											},
+											"runAfter": {},
+											"type": "Foreach"
+										}
+									},
+									"runAfter": {
+										"Filter_Subscriptions_Not_Connected": [
+											"Succeeded"
+										]
+									},
+									"expression": {
+										"and": [
+											{
+												"greaterOrEquals": [
+													"@length(body('Filter_Subscriptions_Not_Connected'))",
+													1
+												]
+											}
+										]
+									},
+									"type": "If"
+								},
+								"Filter_Subscriptions_Not_Connected": {
+									"runAfter": {
+										"Parse_Enabled_Subscription_Ids": [
+											"Succeeded"
+										]
+									},
+									"type": "Query",
+									"inputs": {
+										"from": "@variables('subscriptionsToCheck')",
+										"where": "@not(contains(body('Parse_Enabled_Subscription_Ids'), item()))"
+									}
+								},
+								"Get_All_Data_Connectors": {
+									"runAfter": {},
+									"type": "ApiConnection",
+									"inputs": {
+										"host": {
+											"connection": {
+												"name": "@parameters('$connections')['arm']['connectionId']"
+											}
+										},
+										"method": "get",
+										"path": "/subscriptions/@{encodeURIComponent(variables('sentinel-subscriptionid'))}/resourcegroups/@{encodeURIComponent(variables('sentinel-resourcegroupname'))}/providers/@{encodeURIComponent('Microsoft.OperationalInsights')}/@{encodeURIComponent('/workspaces/',variables('sentinel-workspacename'),'/providers/Microsoft.SecurityInsights/dataConnectors')}",
+										"queries": {
+											"x-ms-api-version": "2021-10-01"
+										}
+									}
+								},
+								"Parse_Data_Connector_JSON": {
+									"runAfter": {
+										"Get_All_Data_Connectors": [
+											"Succeeded"
+										]
+									},
+									"type": "ParseJson",
+									"inputs": {
+										"content": "@body('Get_All_Data_Connectors')",
+										"schema": {
+											"properties": {
+												"value": {
+													"items": {
+														"properties": {
+															"etag": {
+																"type": "string"
+															},
+															"id": {
+																"type": "string"
+															},
+															"kind": {
+																"type": "string"
+															},
+															"name": {
+																"type": "string"
+															},
+															"properties": {
+																"properties": {
+																	"dataTypes": {
+																		"properties": {
+																			"alerts": {
+																				"properties": {
+																					"state": {
+																						"type": "string"
+																					}
+																				},
+																				"type": "object"
+																			}
+																		},
+																		"type": "object"
+																	},
+																	"subscriptionId": {
+																		"type": "string"
+																	}
+																},
+																"type": "object"
+															},
+															"type": {
+																"type": "string"
+															}
+														},
+														"required": [
+															"id",
+															"name",
+															"etag",
+															"type",
+															"kind",
+															"properties"
+														],
+														"type": "object"
+													},
+													"type": "array"
+												}
+											},
+											"type": "object"
+										}
+									}
+								},
+								"Parse_Enabled_Subscription_Ids": {
+									"runAfter": {
+										"Return_Defender_for_Cloud_Data_Connectors": [
+											"Succeeded"
+										]
+									},
+									"type": "Select",
+									"inputs": {
+										"from": "@body('Return_Defender_for_Cloud_Data_Connectors')",
+										"select": {
+											"subscriptionID": "@item()?['properties']?['subscriptionId']"
+										}
+									}
+								},
+								"Return_Defender_for_Cloud_Data_Connectors": {
+									"runAfter": {
+										"Parse_Data_Connector_JSON": [
+											"Succeeded"
+										]
+									},
+									"type": "Query",
+									"inputs": {
+										"from": "@body('Parse_Data_Connector_JSON')?['value']",
+										"where": "@equals(item()?['kind'], 'AzureSecurityCenter')"
+									}
+								}
+							},
+							"runAfter": {
+								"Check_for_Excluded_Subscriptions": [
+									"Succeeded"
+								]
+							},
+							"expression": {
+								"and": [
+									{
+										"greaterOrEquals": [
+											"@length(variables('subscriptionsToCheck'))",
+											1
+										]
+									}
+								]
+							},
+							"type": "If"
+						},
+						"Check_for_valid_list_of_Subscriptions_-_Register_Subscriptions_with_Defender": {
+							"actions": {
+								"Register_Subscriptions_with_Defender_for_Cloud": {
+									"foreach": "@variables('subscriptionsToCheck')",
+									"actions": {
+										"Check_for_Microsoft.Security_Resource_Provider_Registration": {
+											"runAfter": {},
+											"type": "Http",
+											"inputs": {
+												"authentication": {
+													"type": "ManagedServiceIdentity"
+												},
+												"method": "GET",
+												"queries": {
+													"api-version": "2021-04-01"
+												},
+												"uri": "https://management.azure.com/subscriptions/@{items('Register_Subscriptions_with_Defender_for_Cloud')?['subscriptionID']}/providers/Microsoft.Security"
+											}
+										},
+										"Check_for_Registered_Resource_Provider": {
+											"actions": {
+												"Append_to_array_variable_3": {
+													"runAfter": {
+														"Register_resource_provider_-_Microsoft.Security": [
+															"Succeeded"
+														]
+													},
+													"type": "AppendToArrayVariable",
+													"inputs": {
+														"name": "taskOutput",
+														"value": "@body('Register_resource_provider_-_Microsoft.Security')"
+													}
+												},
+												"Register_resource_provider_-_Microsoft.Security": {
+													"runAfter": {},
+													"type": "ApiConnection",
+													"inputs": {
+														"host": {
+															"connection": {
+																"name": "@parameters('$connections')['arm']['connectionId']"
+															}
+														},
+														"method": "post",
+														"path": "/subscriptions/@{encodeURIComponent(items('Register_Subscriptions_with_Defender_for_Cloud')?['subscriptionID'])}/providers/@{encodeURIComponent('Microsoft.Security')}/register",
+														"queries": {
+															"x-ms-api-version": "2016-06-01"
+														}
+													}
+												}
+											},
+											"runAfter": {
+												"Check_for_Microsoft.Security_Resource_Provider_Registration": [
+													"Succeeded"
+												]
+											},
+											"expression": {
+												"and": [
+													{
+														"not": {
+															"equals": [
+																"@body('Check_for_Microsoft.Security_Resource_Provider_Registration')?['registrationState']",
+																"Registered"
+															]
+														}
+													}
+												]
+											},
+											"type": "If"
+										}
+									},
+									"runAfter": {},
+									"type": "Foreach"
+								}
+							},
+							"runAfter": {
+								"Check_for_Excluded_Subscriptions": [
+									"Succeeded"
+								]
+							},
+							"expression": {
+								"and": [
+									{
+										"greaterOrEquals": [
+											"@length(variables('subscriptionsToCheck'))",
+											1
+										]
+									}
+								]
+							},
+							"type": "If"
+						},
+						"Initialize_Variable_-_Run_Time": {
+							"runAfter": {},
+							"type": "InitializeVariable",
+							"inputs": {
+								"variables": [
+									{
+										"name": "RunTime",
+										"type": "string",
+										"value": "@{utcNow()}"
+									}
+								]
+							}
+						},
+						"Initialize_Variable_-__new-connected-subscriptions": {
+							"runAfter": {
+								"Initialize_variable_-_taskOutput": [
+									"Succeeded"
+								]
+							},
+							"type": "InitializeVariable",
+							"inputs": {
+								"variables": [
+									{
+										"name": "new-connected-subscriptions",
+										"type": "array"
+									}
+								]
+							}
+						},
+						"Initialize_Variable_-_sentinel-resourcegroupname": {
+							"runAfter": {
+								"Initialize_Variable_-_sentinel-workspacename": [
+									"Succeeded"
+								]
+							},
+							"type": "InitializeVariable",
+							"inputs": {
+								"variables": [
+									{
+										"name": "sentinel-resourcegroupname",
+										"type": "String",
+										"value": "@parameters('sentinel-resourcegroupname')"
+									}
+								]
+							}
+						},
+						"Initialize_Variable_-_sentinel-subscriptionid": {
+							"runAfter": {
+								"Initialize_Variable_-_Run_Time": [
+									"Succeeded"
+								]
+							},
+							"type": "InitializeVariable",
+							"inputs": {
+								"variables": [
+									{
+										"name": "sentinel-subscriptionid",
+										"type": "String",
+										"value": "@parameters('sentinel-subscriptionid')"
+									}
+								]
+							}
+						},
+						"Initialize_Variable_-_sentinel-workspacename": {
+							"runAfter": {
+								"Initialize_Variable_-_sentinel-subscriptionid": [
+									"Succeeded"
+								]
+							},
+							"type": "InitializeVariable",
+							"inputs": {
+								"variables": [
+									{
+										"name": "sentinel-workspacename",
+										"type": "String",
+										"value": "@parameters('sentinel-workspacename')"
+									}
+								]
+							}
+						},
+						"Initialize_variable_-_alertSyncEnabled": {
+							"runAfter": {
+								"Initialize_variable_-_subscriptionsToCheck": [
+									"Succeeded"
+								]
+							},
+							"type": "InitializeVariable",
+							"inputs": {
+								"variables": [
+									{
+										"name": "alertSyncEnabled",
+										"type": "string"
+									}
+								]
+							}
+						},
+						"Initialize_variable_-_subscriptionsToCheck": {
+							"runAfter": {
+								"Initialize_Variable_-__new-connected-subscriptions": [
+									"Succeeded"
+								]
+							},
+							"type": "InitializeVariable",
+							"inputs": {
+								"variables": [
+									{
+										"name": "subscriptionsToCheck",
+										"type": "array"
+									}
+								]
+							}
+						},
+						"Initialize_variable_-_taskOutput": {
+							"runAfter": {
+								"Initialize_Variable_-_sentinel-resourcegroupname": [
+									"Succeeded"
+								]
+							},
+							"type": "InitializeVariable",
+							"inputs": {
+								"variables": [
+									{
+										"name": "taskOutput",
+										"type": "array"
+									}
+								]
+							}
+						},
+						"List_subscriptions": {
+							"runAfter": {
+								"Initialize_variable_-_alertSyncEnabled": [
+									"Succeeded"
+								]
+							},
+							"type": "ApiConnection",
+							"inputs": {
+								"host": {
+									"connection": {
+										"name": "@parameters('$connections')['arm']['connectionId']"
+									}
+								},
+								"method": "get",
+								"path": "/subscriptions",
+								"queries": {
+									"x-ms-api-version": "2016-06-01"
+								}
+							}
+						},
+						"Parse_Subscription_List": {
+							"runAfter": {
+								"List_subscriptions": [
+									"Succeeded"
+								]
+							},
+							"type": "Select",
+							"inputs": {
+								"from": "@body('List_subscriptions')?['value']",
+								"select": {
+									"subscriptionID": "@item()?['subscriptionId']"
+								}
+							}
+						}
+					},
+					"outputs": {}
+				},
+				"parameters": {
+					"$connections": {
+						"value": {
+							"arm": {
+								"connectionId": "[resourceId('Microsoft.Web/connections', variables('ArmConnectionName'))]",
+								"connectionName": "[variables('ArmConnectionName')]",
+								"id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Arm')]",
+								"connectionProperties": {
+									"authentication": {
+										"type": "ManagedServiceIdentity"
+									}
+								}
+							},
+							"azureloganalyticsdatacollector": {
+								"connectionId": "[resourceId('Microsoft.Web/connections', variables('AzureloganalyticsdatacollectorConnectionName'))]",
+								"connectionName": "[variables('AzureloganalyticsdatacollectorConnectionName')]",
+								"id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Azureloganalyticsdatacollector')]"
+							},
+							"office365": {
+								"connectionId": "[resourceId('Microsoft.Web/connections', variables('Office365ConnectionName'))]",
+								"connectionName": "[variables('Office365ConnectionName')]",
+								"id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Office365')]"
+							}
+						}
+					}
+				}
+			},
+			"name": "[parameters('PlaybookName')]",
+			"type": "Microsoft.Logic/workflows",
+			"location": "[resourceGroup().location]",
+			"tags": {
+				"Costcode": "3141592654",
+				"Environment": "Prod",
+				"LogicAppsCategory": "security",
+				"Maintenance": "Tue:04:00-Tue:04:30",
+				"hidden-SentinelTemplateName": "sentinel-autoconnect-defenderforcloud",
+				"hidden-SentinelTemplateVersion": "1.0"
+			},
+			"identity": {
+				"type": "SystemAssigned"
+			},
+			"apiVersion": "2017-07-01",
+			"dependsOn": [
+				"[resourceId('Microsoft.Web/connections', variables('ArmConnectionName'))]",
+				"[resourceId('Microsoft.Web/connections', variables('AzureloganalyticsdatacollectorConnectionName'))]",
+				"[resourceId('Microsoft.Web/connections', variables('Office365ConnectionName'))]"
+			]
+		},
+		{
+			"type": "Microsoft.Web/connections",
+			"apiVersion": "2016-06-01",
+			"name": "[variables('ArmConnectionName')]",
+			"location": "[resourceGroup().location]",
+			"kind": "V1",
+			"properties": {
+				"displayName": "[variables('ArmConnectionName')]",
+				"customParameterValues": {},
+				"parameterValueType": "Alternative",
+				"api": {
+					"id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Arm')]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Web/connections",
+			"apiVersion": "2016-06-01",
+			"name": "[variables('AzureloganalyticsdatacollectorConnectionName')]",
+			"location": "[resourceGroup().location]",
+			"kind": "V1",
+			"properties": {
+				"displayName": "[variables('AzureloganalyticsdatacollectorConnectionName')]",
+				"customParameterValues": {},
+				"api": {
+					"id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Azureloganalyticsdatacollector')]"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Web/connections",
+			"apiVersion": "2016-06-01",
+			"name": "[variables('Office365ConnectionName')]",
+			"location": "[resourceGroup().location]",
+			"kind": "V1",
+			"properties": {
+				"displayName": "[variables('Office365ConnectionName')]",
+				"customParameterValues": {},
+				"api": {
+					"id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Office365')]"
+				}
+			}
+		}
+	]
 }
