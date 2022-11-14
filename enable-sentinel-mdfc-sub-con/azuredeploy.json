@@ -25,44 +25,56 @@
 		},
 		"emailRecipients": {
 			"type": "string",
+			"defaultValue": "",
 			"metadata": {
-				"description": "Enter value for emailRecipients"
+				"description": "Email Addresses to send notifications to. Semi-colon seperated values"
 			}
 		},
 		"excludedSubscriptions": {
-			"type": "string",
+			"type": "array",
+			"defaultValue": [""],
 			"metadata": {
-				"description": "Enter value for excludedSubscriptions"
+				"description": "Exclude subscriptions from being enabled"
 			}
 		},
 		"logResults": {
 			"type": "string",
+			"defaultValue": "True",
+			    "allowedValues": [
+					"True",
+					"False"
+				],
 			"metadata": {
-				"description": "Enter value for logResults"
+				"description": "Specify True or False to log results to you sentinel workspace"
 			}
 		},
 		"sendEmail": {
 			"type": "string",
+			"defaultValue": "False",
+			"allowedValues": [
+					"True",
+					"False"
+				],
 			"metadata": {
-				"description": "Enter value for sendEmail"
+				"description": "Specify True or False to send email notifications"
 			}
 		},
 		"sentinel-resourcegroupname": {
 			"type": "string",
 			"metadata": {
-				"description": "Enter value for sentinel-resourcegroupname"
+				"description": "Specify the resource group name where the Sentinel Workspace Resides"
 			}
 		},
 		"sentinel-subscriptionid": {
 			"type": "string",
 			"metadata": {
-				"description": "Enter value for sentinel-subscriptionid"
+				"description": "Specify the Subscription ID the Sentinel Workspace Resides"
 			}
 		},
 		"sentinel-workspacename": {
 			"type": "string",
 			"metadata": {
-				"description": "Enter value for sentinel-workspacename"
+				"description": "Specify the Sentinel Workspace name"
 			}
 		}
 	},
@@ -89,7 +101,7 @@
 							"defaultValue": "[parameters('emailRecipients')]"
 						},
 						"excludedSubscriptions": {
-							"type": "string",
+							"type": "array",
 							"defaultValue": "[parameters('excludedSubscriptions')]"
 						},
 						"logResults": {
