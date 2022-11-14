@@ -1,7 +1,7 @@
 
 # Microsoft Sentinel Defender for Cloud Data Connector At Scale
 
-> :warning: **Work In Progress**
+> :warning: **Work In Progress** :warning: 
 
 This workflow will enable the Microsoft Defender for Cloud data connector in Microsoft Sentinel automatically for all subscriptions you have the logic app scoped to. Refer to the Logic App Overview for more details.
 
