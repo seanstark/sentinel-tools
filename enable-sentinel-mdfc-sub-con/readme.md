@@ -13,6 +13,8 @@ This workflow will enable the Microsoft Defender for Cloud data connector in Mic
   - [Assign the Role to the Logic App System Managed Identity](#assign-the-role-to-the-logic-app-system-managed-identity)
 - [Working with Parameters](#working-with-parameters)
 - [Logic App Overview](#logic-app-overview)
+  -  [Credentials Used](#credentials-used)
+  -  [Workflow](#workflow)
 
 ## Requirements
 
@@ -27,7 +29,9 @@ There is no need to assign the built-in roles that provide more permissions than
 
 1. Follow the steps outline in [Create or update Azure custom roles using the Azure portal](https://learn.microsoft.com/en-us/azure/role-based-access-control/custom-roles-portal#start-from-scratch)
 
-2. For the role definition use the [custom role defintion](https://github.com/seanstark/sentinel-tools/blob/main/enable-sentinel-mdfc-sub-con/custom-role.json)
+3. For the name I reccomend using **Microsoft Sentinel Defender for Cloud Connector Contributor**
+
+4. For the role definition use the [custom role defintion](https://github.com/seanstark/sentinel-tools/blob/main/enable-sentinel-mdfc-sub-con/custom-role.json)
 
 ### Deploy the Logic App
 
@@ -60,6 +64,16 @@ There are several parameters you can update in the logic app
 | sentinel-workspacename | The workspace name of Sentinel | string | ``` sentinel-wrk-prd ``` |
 
 ## Logic App Overview
+
+### Credentials Used
+|  Credential    |   Type       | Use Case    |
+|----------------|--------------|-------------|
+| Logic App System Managed Identity | System Managed Identity | Get Azure Subscriptions, Defender for Cloud Settings, Sentinel Data Connectors. Put Defender for Cloud Settings, Enable Bi-Directional Incident Sync, Create the Sentinel Data Connector, Register the Microsoft.Security Resource Provider
+| Log Analytics API Key | Workspace Shared Key | Log Results to a custom table in your Sentinel Workspace |
+| Azure AD Account | User | Sending Email Notifications after execution, graph api permissions to an Office 365 Mailbox |
+
+### Workflow 
+
 The Logic app runs on a re-occuring schedule every 12 hours by default. The overall sequence of events are as follows.
 
 1. Trigger every 12 hours
