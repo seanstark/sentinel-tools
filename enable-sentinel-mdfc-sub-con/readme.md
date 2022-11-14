@@ -35,6 +35,8 @@ There is no need to assign the built-in roles that provide more permissions than
 
 ### Deploy the Logic App
 
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fseanstark%2Fsentinel-tools%2Fmain%2Fenable-sentinel-mdfc-sub-con%2Fazuredeploy.json)
+
 ### Authorize Permissions
 Most of the logic leverages the System Managed Identity to perform tasks. However if you plan on sending email notifications you will need to authorize the Office 365 Outlook connector.
 
@@ -42,7 +44,16 @@ Most of the logic leverages the System Managed Identity to perform tasks. Howeve
 - If you would like to test the logic app first on a subset of subscriptions only assign the role to that scope
 - If you can't use the custom role you will need to assign the System Managed Identity the Security Admin and Microsoft Sentinel Contributor. 
 - In the example below the role is assigned at the root managment group level. 
-- I would reccomend waiting 15 minutes after assigning the role before executing your first run of the logic
+- I would reccomend waiting 15 minutes after assigning the role before executing your first run of the logic. 
+
+1. Navigate to [Azure Management Groups](https://azmg.cmd.ms/)
+2. Select your **Tenant Root Group**
+3. Select **Access Control (IAM)**
+4. Select **Add** > **Add Role Assignment**
+5. Select the custom role you created earlier (Microsoft Sentinel Defender for Cloud Connector Contributor)
+6. Under the **Members** tab select **Managed Identity**
+7. Click Select **Members** and select the Logic App Managed Identity
+8. Click **Next** > **Review + Assign**
 
 ### Working with Parameters
 
