@@ -79,8 +79,8 @@
 		}
 	},
 	"variables": {
-		"ArmConnectionName": "[concat('Arm-', parameters('PlaybookName'))]",
-		"AzureloganalyticsdatacollectorConnectionName": "[concat('Azureloganalyticsdatacollector-', parameters('PlaybookName'))]",
+		"ArmConnectionName": "[concat('arm-', parameters('PlaybookName'))]",
+		"AzureloganalyticsdatacollectorConnectionName": "[concat('loganalyticsdatacollector-', parameters('PlaybookName'))]",
 		"Office365ConnectionName": "[concat('Office365-', parameters('PlaybookName'))]"
 	},
 	"resources": [
@@ -973,6 +973,10 @@
 				"customParameterValues": {},
 				"api": {
 					"id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Azureloganalyticsdatacollector')]"
+				},
+				"parameterValues": {
+					"username": "[reference(resourceId(parameters('sentinel-resourcegroupname'), 'Microsoft.OperationalInsights/workspaces/', parameters('sentinel-workspacename')), '2022-10-01').customerId]",
+					"password": "[listKeys(resourceId(parameters('sentinel-resourcegroupname'), 'Microsoft.OperationalInsights/workspaces/', parameters('sentinel-workspacename')), '2022-10-01').primarySharedKey]"
 				}
 			}
 		},
