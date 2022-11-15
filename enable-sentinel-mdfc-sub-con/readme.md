@@ -11,6 +11,7 @@ This workflow will enable the Microsoft Defender for Cloud data connector in Mic
   - [Deploy the Logic App](#deploy-the-logic-app)
   - [Authorize Permissions](#authorize-permissions)
   - [Assign the Role to the Logic App System Managed Identity](#assign-the-role-to-the-logic-app-system-managed-identity)
+  - [Enable the Logic App](#enable-the-logic-app)
 - [Working with Parameters](#working-with-parameters)
 - [Logic App Overview](#logic-app-overview)
   -  [Credentials Used](#credentials-used)
@@ -43,6 +44,12 @@ There is no need to assign the built-in roles that provide more permissions than
 ### Authorize Permissions
 Most of the logic leverages the System Managed Identity to perform tasks. However if you plan on sending email notifications you will need to authorize the Office 365 Outlook connector.
 
+1. Navigate to the Logic App in the Azure Portal
+2. Select API connections on the left hand side
+3. Select the Office365-<logic app name> api connection
+4. Select Edit API connection
+5. Select Authorize and complete the authorization process
+
 ### Assign the Role to the Logic App System Managed Identity
 - If you would like to test the logic app first on a subset of subscriptions only assign the role to that scope
 - If you can't use the custom role you will need to assign the System Managed Identity the Security Admin and Microsoft Sentinel Contributor. 
@@ -57,6 +64,10 @@ Most of the logic leverages the System Managed Identity to perform tasks. Howeve
 6. Under the **Members** tab select **Managed Identity**
 7. Click Select **Members** and select the Logic App Managed Identity
 8. Click **Next** > **Review + Assign**
+
+### Enable the Logic App
+1. From the Logic App Overview pane, select Enable in the top menu bar
+2. If you would like to run the logic immediately you can select Run Trigger
 
 ### Working with Parameters
 
@@ -105,6 +116,6 @@ The Logic app runs on a re-occuring schedule every 12 hours by default. The over
 - The Logic App won't present any errors when the system managed identity doesn't have permissions to list subscriptions in the tenant.
 - Ensure the system managed identity is assign the custom role and applied to either management group or subscription scopes.
 - Ensure the Logic API Connections are properly authorized
-- Ensure the loganalyticsdatacollector-<playbook-name> API connection has the correct workspaceid and workspace shared key
+- Ensure the loganalyticsdatacollector-<logic app name> API connection has the correct workspaceid and workspace shared key
 
 
