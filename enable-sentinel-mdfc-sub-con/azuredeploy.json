@@ -39,10 +39,10 @@
 		},
 		"logResults": {
 			"type": "string",
-			"defaultValue": "True",
+			"defaultValue": "true",
 			    "allowedValues": [
-					"True",
-					"False"
+					"true",
+					"false"
 				],
 			"metadata": {
 				"description": "Specify True or False to log results to you sentinel workspace"
@@ -50,10 +50,10 @@
 		},
 		"sendEmail": {
 			"type": "string",
-			"defaultValue": "False",
+			"defaultValue": "false",
 			"allowedValues": [
-					"True",
-					"False"
+					"true",
+					"false"
 				],
 			"metadata": {
 				"description": "Specify True or False to send email notifications"
