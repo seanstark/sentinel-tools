@@ -15,6 +15,7 @@ This workflow will enable the Microsoft Defender for Cloud data connector in Mic
 - [Logic App Overview](#logic-app-overview)
   -  [Credentials Used](#credentials-used)
   -  [Workflow](#workflow)
+- [Common Issues](#common-issues)
 
 ## Requirements
 
@@ -97,5 +98,11 @@ The Logic app runs on a re-occuring schedule every 12 hours by default. The over
 8. Optional - Log results to Log Analytics
 9. Optional - Send an email notificaiton 
 
+## Troubleshooting
+
+- The Logic App won't present any errors when the system managed identity doesn't have permissions to list subscriptions in the tenant.
+- Ensure the system managed identity is assign the custom role and applied to either management group or subscription scopes.
+- Ensure the Logic API Connections are properly authorized
+- Ensure the loganalyticsdatacollector-<playbook-name> API connection has the correct workspaceid and workspace shared key
 
 
