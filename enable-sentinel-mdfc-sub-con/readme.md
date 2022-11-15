@@ -10,6 +10,10 @@ This workflow will enable the Microsoft Defender for Cloud data connector in Mic
 - Leverage a workbook to track and audit connector changes
 - Send Email Notifications
 
+> TLDR Version
+
+> [Step 1 - Deploy Custom Role](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fseanstark%2Fsentinel-tools%2Fmain%2Fenable-sentinel-mdfc-sub-con%2FcustomRoleDeploy.json) ---> [Step 2 - Deploy Logic App](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fseanstark%2Fsentinel-tools%2Fmain%2Fenable-sentinel-mdfc-sub-con%2FcustomRoleDeploy.json) ---> [Step 3 - Deploy Workbook](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fseanstark%2Fsentinel-tools%2Fmain%2Fenable-sentinel-mdfc-sub-con%2FdefenderForCloudConnectorCoverage.json)
+
 > ----
 
 - [Requirements](#requirements)
@@ -117,6 +121,7 @@ To fully leverage this workbook you will need to enable logging within the Logic
 ## Logic App Overview
 
 ### Credentials Used
+
 |  Credential    |   Type       | Use Case    |
 |----------------|--------------|-------------|
 | Logic App System Managed Identity | System Managed Identity | Get Azure Subscriptions, Defender for Cloud Settings, Sentinel Data Connectors. Put Defender for Cloud Settings, Enable Bi-Directional Incident Sync, Create the Sentinel Data Connector, Register the Microsoft.Security Resource Provider
