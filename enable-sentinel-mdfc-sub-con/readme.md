@@ -46,7 +46,7 @@ Most of the logic leverages the System Managed Identity to perform tasks. Howeve
 
 1. Navigate to the Logic App in the Azure Portal
 2. Select API connections on the left hand side
-3. Select the Office365-<logic app name> api connection
+3. Select the Office365-'logic app name' api connection
 4. Select Edit API connection
 5. Select Authorize and complete the authorization process
 
@@ -116,6 +116,6 @@ The Logic app runs on a re-occuring schedule every 12 hours by default. The over
 - The Logic App won't present any errors when the system managed identity doesn't have permissions to list subscriptions in the tenant.
 - Ensure the system managed identity is assign the custom role and applied to either management group or subscription scopes.
 - Ensure the Logic API Connections are properly authorized
-- Ensure the loganalyticsdatacollector-<logic app name> API connection has the correct workspaceid and workspace shared key
+- Ensure the loganalyticsdatacollector-'logic app name' API connection has the correct workspaceid and workspace shared key
 
 
