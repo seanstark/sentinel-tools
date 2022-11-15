@@ -13,6 +13,7 @@ This workflow will enable the Microsoft Defender for Cloud data connector in Mic
   - [Assign the Role to the Logic App System Managed Identity](#assign-the-role-to-the-logic-app-system-managed-identity)
   - [Enable the Logic App](#enable-the-logic-app)
 - [Working with Parameters](#working-with-parameters)
+- [Workbook](#workbook)
 - [Logic App Overview](#logic-app-overview)
   -  [Credentials Used](#credentials-used)
   -  [Workflow](#workflow)
@@ -87,6 +88,11 @@ There are several parameters you can update in the logic app
 | sentinel-resourcegroupname | The reource group name where Sentinel Resides | string | ``` sentinel-prd ``` |
 | sentinel-subscriptionid | The subscription ID where Sentinel resides | string | ``` ada06e68-375e-4210-b43a-c6fgdcebf41c5 ``` |
 | sentinel-workspacename | The workspace name of Sentinel | string | ``` sentinel-wrk-prd ``` |
+
+## Workbook
+To fully leverage this workbook you will to enable logging within the Logic App by setting the logResults parameter to True
+
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fseanstark%2Fsentinel-tools%2Fmain%2Fenable-sentinel-mdfc-sub-con%2FdefenderForCloudConnectorCoverage.json)
 
 ## Logic App Overview
 
