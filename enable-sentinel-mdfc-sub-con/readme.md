@@ -125,15 +125,19 @@ To fully leverage this workbook you will need to enable logging within the Logic
 
 The Logic app runs on a re-occuring schedule every 12 hours by default. The overall sequence of events are as follows.
 
-1. Trigger every 12 hours
-2. Initialize Variables
-3. List all Subscriptions in the Tenant.
-4. Optional - Filter out Excluded Subscriptions you have defined
-5. Enable Bi-Directional Alert Sync from Defender for Cloud
-6. Register the Microsoft.Security resource prodiver on the Subscription
-7. Enable the Data Connector for the subscription
-8. Optional - Log results to Log Analytics
-9. Optional - Send an email notificaiton 
+```mermaid
+flowchart TD
+    A[Trigger Every 12 Hours] -->|Initialize Variables| B(List all Subscriptions)-->|Filter Out Excluded Subscriptions|B
+    B --> C[Enable Bi-Directional Alert Sync]
+    B --> D[Register Microsoft.Security Resource Prodiver]
+    B --> E[Enable the Data Connector]
+    E --> F[Get all Data Connectors] -->|Filter Connected Subscriptions| G(Create the Connector)
+    C --> H[Check for Output]
+    D --> H[Check for Output]
+    G --> H[Check for Output]
+    H --> I{Log Results} --> |true| J[Send to Sentinel]
+    H --> K{Send Email} --> |true| L[Send to Email]
+```
 
 ## Troubleshooting
 
