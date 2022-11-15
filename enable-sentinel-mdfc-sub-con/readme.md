@@ -125,19 +125,7 @@ To fully leverage this workbook you will need to enable logging within the Logic
 
 The Logic app runs on a re-occuring schedule every 12 hours by default. The overall sequence of events are as follows.
 
-```mermaid
-flowchart TD
-    A[Trigger Every 12 Hours] -->|Initialize Variables| B(List all Subscriptions)-->|Filter Out Excluded Subscriptions|B
-    B --> C[Enable Bi-Directional Alert Sync]
-    B --> D[Register Microsoft.Security Resource Prodiver]
-    B --> E[Enable the Data Connector]
-    E --> F[Get all Data Connectors] -->|Filter Connected Subscriptions| G(Create the Connector)
-    C --> H[Check for Output]
-    D --> H[Check for Output]
-    G --> H[Check for Output]
-    H --> I{Log Results} --> |true| J[Send to Sentinel]
-    H --> K{Send Email} --> |true| L[Send to Email]
-```
+![](logic-app.svg)
 
 ## Troubleshooting
 
