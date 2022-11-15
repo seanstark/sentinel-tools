@@ -1,0 +1,185 @@
+@startuml
+!$defaultBg = '#d9dadb'
+!$borderColor = '#999a9b'
+!$darkColor = '#494a4b'
+skinparam ActivityDiamondBackgroundColor $defaultBg
+skinparam ActivityDiamondBorderColor $borderColor
+skinparam ActivityBorderColor $borderColor
+skinparam ArrowColor $darkColor
+skinparam ActivityBarColor $darkColor
+skinparam ActivityStartColor $darkColor
+skinparam ActivityEndColor $darkColor
+start
+fork
+:Recurrence;
+endfork
+#eadef8:<i>InitializeVariable</i>
+Initialize Variable - Run Time;
+#eadef8:<i>InitializeVariable</i>
+Initialize Variable - sentinel-subscriptionid;
+#eadef8:<i>InitializeVariable</i>
+Initialize Variable - sentinel-workspacename;
+#eadef8:<i>InitializeVariable</i>
+Initialize Variable - sentinel-resourcegroupname;
+#eadef8:<i>InitializeVariable</i>
+Initialize variable - taskOutput;
+#eadef8:<i>InitializeVariable</i>
+Initialize Variable -  new-connected-subscriptions;
+#eadef8:<i>InitializeVariable</i>
+Initialize variable - subscriptionsToCheck;
+#eadef8:<i>InitializeVariable</i>
+Initialize variable - alertSyncEnabled;
+#c4e2ff:<i>ApiConnection</i>
+List subscriptions;
+:<i>Select</i>
+Parse Subscription List;
+if (Check for Excluded Subscriptions) then (yes)
+            :<i>Query</i>
+Filter out excluded subscriptions;
+#eadef8:<i>SetVariable</i>
+Set variable -  subscriptionsToCheck (excluded filtered);
+
+        else (no)
+            #eadef8:<i>SetVariable</i>
+Set variable - subscriptionsToCheck;
+
+        endif
+        fork
+if (Check for valid list of Subscriptions - Enable Bi-Directional Alert Sync) then (yes)
+            while (Enable Bi-Directional Alert Sync)
+#d9eced:<i>Http</i>
+Check for Alert Sync Settings;
+#eadef8:<i>SetVariable</i>
+Set variable - alertSyncEnabled;
+if (Check Alert Sync Settings) then (yes)
+            
+        else (no)
+            #d9eced:<i>Http</i>
+Enable Alert Sync;
+:<i>AppendToArrayVariable</i>
+Append to array variable;
+
+        endif
+        endwhile
+
+        else (no)
+            
+        endif
+        if (Check for Output) then (yes)
+            if (Condition - Log Results) then (yes)
+            while (Send to Log Analytics)
+#c4e2ff:<i>ApiConnection</i>
+Send Data;
+endwhile
+
+        else (no)
+            
+        endif
+        if (Condition - Send Email) then (yes)
+            :<i>Table</i>
+Create HTML table;
+#c4e2ff:<i>ApiConnection</i>
+Send an email (V2);
+
+        else (no)
+            
+        endif
+        
+        else (no)
+            
+        endif
+        forkagain
+if (Check for valid list of Subscriptions - Enable Data Connector Group) then (yes)
+            #c4e2ff:<i>ApiConnection</i>
+Get All Data Connectors;
+:<i>ParseJson</i>
+Parse Data Connector JSON;
+:<i>Query</i>
+Return Defender for Cloud Data Connectors;
+:<i>Select</i>
+Parse Enabled Subscription Ids;
+:<i>Query</i>
+Filter Subscriptions Not Connected;
+if (Check for Subscriptions to Enable) then (yes)
+            while (Enable disconnected Subscriptions)
+#d9eced:<i>Http</i>
+Enable the Data Connector;
+:<i>AppendToArrayVariable</i>
+Append to array variable 2;
+endwhile
+
+        else (no)
+            
+        endif
+        
+        else (no)
+            
+        endif
+        if (Check for Output) then (yes)
+            if (Condition - Log Results) then (yes)
+            while (Send to Log Analytics)
+#c4e2ff:<i>ApiConnection</i>
+Send Data;
+endwhile
+
+        else (no)
+            
+        endif
+        if (Condition - Send Email) then (yes)
+            :<i>Table</i>
+Create HTML table;
+#c4e2ff:<i>ApiConnection</i>
+Send an email (V2);
+
+        else (no)
+            
+        endif
+        
+        else (no)
+            
+        endif
+        forkagain
+if (Check for valid list of Subscriptions - Register Subscriptions with Defender) then (yes)
+            while (Register Subscriptions with Defender for Cloud)
+#d9eced:<i>Http</i>
+Check for Microsoft.Security Resource Provider Registration;
+if (Check for Registered Resource Provider) then (yes)
+            #c4e2ff:<i>ApiConnection</i>
+Register resource provider - Microsoft.Security;
+:<i>AppendToArrayVariable</i>
+Append to array variable 3;
+
+        else (no)
+            
+        endif
+        endwhile
+
+        else (no)
+            
+        endif
+        if (Check for Output) then (yes)
+            if (Condition - Log Results) then (yes)
+            while (Send to Log Analytics)
+#c4e2ff:<i>ApiConnection</i>
+Send Data;
+endwhile
+
+        else (no)
+            
+        endif
+        if (Condition - Send Email) then (yes)
+            :<i>Table</i>
+Create HTML table;
+#c4e2ff:<i>ApiConnection</i>
+Send an email (V2);
+
+        else (no)
+            
+        endif
+        
+        else (no)
+            
+        endif
+        endfork
+stop
+@enduml
