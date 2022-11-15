@@ -3,7 +3,14 @@
 
 > :warning: **Work In Progress** :warning: 
 
-This workflow will enable the Microsoft Defender for Cloud data connector in Microsoft Sentinel automatically for all subscriptions you have the logic app scoped to. Refer to the Logic App Overview for more details.
+This workflow will enable the Microsoft Defender for Cloud data connector in Microsoft Sentinel automatically for all subscriptions you have the logic app scoped to. The solution also provides the ability to:
+
+- Exclude Subscriptions
+- Log results to your Sentinel Workspace
+- Leverage a workbook to track and audit connector changes
+- Send Email Notifications
+
+> ----
 
 - [Requirements](#requirements)
 - [Setup and Configuration](#setup-and-configuration)
@@ -17,18 +24,22 @@ This workflow will enable the Microsoft Defender for Cloud data connector in Mic
 - [Logic App Overview](#logic-app-overview)
   -  [Credentials Used](#credentials-used)
   -  [Workflow](#workflow)
-- [Common Issues](#common-issues)
+- [Troubleshooting](#troubleshooting)
 
 ## Requirements
 
 - The custom role described in [Create a Custom Role](##create-a-custom-role)
 - Rights to assign the role and scope to either subscriptions or management groups
+- Rights to complete the deployment, Log Analytics Contributor, Microsoft Sentinel Contributor, and Contributor.
+- Rights to create a custom role at the desired scope, such as Owner or User Access Administrator
 
 ## Setup and Configuration
 
 ### Create a Custom Role
 I highly reccomend creating the custom role to follow the principle of least privilege. 
 There is no need to assign the built-in roles that provide more permissions than required. 
+
+> You will need permissions to create custom roles at the management group level, such as Owner or User Access Administrator
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fseanstark%2Fsentinel-tools%2Fmain%2Fenable-sentinel-mdfc-sub-con%2FcustomRoleDeploy.json)
 
@@ -42,7 +53,7 @@ There is no need to assign the built-in roles that provide more permissions than
 
 ### Deploy the Logic App
 
-> ℹ️: The Logic App will be deployed in a disabled state by default
+> The Logic App will be deployed in a disabled state by default
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fseanstark%2Fsentinel-tools%2Fmain%2Fenable-sentinel-mdfc-sub-con%2Fazuredeploy.json)
 
