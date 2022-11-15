@@ -36,6 +36,8 @@ There is no need to assign the built-in roles that provide more permissions than
 
 ### Deploy the Logic App
 
+> ℹ️: The Logic App will be deployed in a disabled state by default
+
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fseanstark%2Fsentinel-tools%2Fmain%2Fenable-sentinel-mdfc-sub-con%2Fazuredeploy.json)
 
 ### Authorize Permissions
