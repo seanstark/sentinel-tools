@@ -108,7 +108,7 @@ There are several parameters you can update in the logic app
 | sentinel-workspacename | The workspace name of Sentinel | string | ``` sentinel-wrk-prd ``` |
 
 ## Workbook
-To fully leverage this workbook you will need to enable logging within the Logic App by setting the **logResults** parameter to **true**
+To fully leverage this workbook you will need to enable logging within the Logic App by setting the **logResults** parameter to **true**. You will also need to ensure Azure Activity logs are being sent to your Sentinel workspace.
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fseanstark%2Fsentinel-tools%2Fmain%2Fenable-sentinel-mdfc-sub-con%2FdefenderForCloudConnectorCoverage.json)
 
