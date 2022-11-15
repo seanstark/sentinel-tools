@@ -45,7 +45,7 @@ There is no need to assign the built-in roles that provide more permissions than
 
 **Manual Steps**
 
-1. Follow the steps outline in [Create or update Azure custom roles using the Azure portal](https://learn.microsoft.com/en-us/azure/role-based-access-control/custom-roles-portal#start-from-scratch)
+1. Follow the steps outlined in [Create or update Azure custom roles using the Azure portal](https://learn.microsoft.com/en-us/azure/role-based-access-control/custom-roles-portal#start-from-scratch)
 
 3. For the name I reccomend using **Microsoft Sentinel Defender for Cloud Connector Contributor**
 
@@ -65,12 +65,13 @@ Most of the logic leverages the System Managed Identity to perform tasks. Howeve
 3. Select the Office365-'logic app name' api connection
 4. Select Edit API connection
 5. Select Authorize and complete the authorization process
+6. Make sure to click Save
 
 ### Assign the Role to the Logic App System Managed Identity
-- If you would like to test the logic app first on a subset of subscriptions only assign the role to that scope
-- If you can't use the custom role you will need to assign the System Managed Identity the Security Admin and Microsoft Sentinel Contributor. 
-- In the example below the role is assigned at the root managment group level. 
-- I would reccomend waiting 15 minutes after assigning the role before executing your first run of the logic. 
+> - If you would like to test the logic app first on a subset of subscriptions only assign the role to that scope
+> - If you can't use the custom role you will need to assign the System Managed Identity the Security Admin and Microsoft Sentinel Contributor. 
+> - In the example below the role is assigned at the root managment group level. 
+> - I would reccomend waiting 15 minutes after assigning the role before executing your first run of the logic. 
 
 1. Navigate to [Azure Management Groups](https://azmg.cmd.ms/)
 2. Select your **Tenant Root Group**
@@ -82,30 +83,32 @@ Most of the logic leverages the System Managed Identity to perform tasks. Howeve
 8. Click **Next** > **Review + Assign**
 
 ### Enable the Logic App
-1. From the Logic App Overview pane, select Enable in the top menu bar
-2. If you would like to run the logic immediately you can select Run Trigger
+1. From the Logic App **Overview** pane, select **Enable** in the top menu bar
+2. If you would like to run the logic immediately you can select **Run Trigger**
 
 ### Working with Parameters
 
 There are several parameters you can update in the logic app
 
-1. Navigate to the Logic App in the Azure Portal and select Logic App Designer
-2. Select Parameters
+1. Navigate to the Logic App in the Azure Portal and select **Logic App Designer**
+2. Select **Parameters**
 3. Update the parameter according to the table below
-4. Make sure to the Save the Logic App
+4. Make sure to the **Save** the Logic App
+
+  > true or false values are case sensitive
 
 |  Parameter      |         Use Case             | Type |     Value Example            |
 |----------------|-------------------------------|------| -----------------------------|
 | emailRecipients | Email Addresses to send notifications to. Semi-colon seperated values | string | ``` user1@domain.com;dl@domain.com ``` |
 | excludedSubscriptions | Exclude subscriptions from being enabled | array | ``` ["ada06e68-375e-4210-b43a-c6fgdcebf41c5","ada0dht8-375e-4210-be3a-c6cacebf41c5"] ``` |
-| logResults | Log results to your Sentinel Workspace | boolean | ``` true or false ``` |
-| sendEmail | Send email notifications on subscriptions that were enabled | boolean | ``` true or false ``` |
+| logResults | Log results to your Sentinel Workspace | string | ``` true or false ``` |
+| sendEmail | Send email notifications on subscriptions that were enabled | string | ``` true or false ``` |
 | sentinel-resourcegroupname | The reource group name where Sentinel Resides | string | ``` sentinel-prd ``` |
 | sentinel-subscriptionid | The subscription ID where Sentinel resides | string | ``` ada06e68-375e-4210-b43a-c6fgdcebf41c5 ``` |
 | sentinel-workspacename | The workspace name of Sentinel | string | ``` sentinel-wrk-prd ``` |
 
 ## Workbook
-To fully leverage this workbook you will need to enable logging within the Logic App by setting the logResults parameter to True
+To fully leverage this workbook you will need to enable logging within the Logic App by setting the **logResults** parameter to **true**
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fseanstark%2Fsentinel-tools%2Fmain%2Fenable-sentinel-mdfc-sub-con%2FdefenderForCloudConnectorCoverage.json)
 
@@ -136,7 +139,7 @@ The Logic app runs on a re-occuring schedule every 12 hours by default. The over
 
 - The Logic App won't present any errors when the system managed identity doesn't have permissions to list subscriptions in the tenant.
 - Ensure the system managed identity is assign the custom role and applied to either management group or subscription scopes.
-- Ensure the Logic API Connections are properly authorized
-- Ensure the loganalyticsdatacollector-'logic app name' API connection has the correct workspaceid and workspace shared key
+- Ensure the Logic App API Connections are properly authorized
+- Ensure the loganalyticsdatacollector-'logic app name' API connection has the correct workspaceid and workspace shared key for logging results
 
 
