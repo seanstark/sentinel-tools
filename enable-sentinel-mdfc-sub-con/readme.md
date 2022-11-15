@@ -30,11 +30,15 @@ This workflow will enable the Microsoft Defender for Cloud data connector in Mic
 I highly reccomend creating the custom role to follow the principle of least privilege. 
 There is no need to assign the built-in roles that provide more permissions than required. 
 
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fseanstark%2Fsentinel-tools%2Fmain%2Fenable-sentinel-mdfc-sub-con%2FcustomRoleDeploy.json)
+
+**Manual Steps**
+
 1. Follow the steps outline in [Create or update Azure custom roles using the Azure portal](https://learn.microsoft.com/en-us/azure/role-based-access-control/custom-roles-portal#start-from-scratch)
 
 3. For the name I reccomend using **Microsoft Sentinel Defender for Cloud Connector Contributor**
 
-4. For the role definition use the [custom role defintion](https://github.com/seanstark/sentinel-tools/blob/main/enable-sentinel-mdfc-sub-con/custom-role.json)
+4. For the role definition use the [custom role defintion](https://github.com/seanstark/sentinel-tools/blob/main/enable-sentinel-mdfc-sub-con/custom-role.json) json
 
 ### Deploy the Logic App
 
