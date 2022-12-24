@@ -1,0 +1,1734 @@
+{
+  "version": "Notebook/1.0",
+  "items": [
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "loadType": "always",
+        "items": [
+          {
+            "type": 1,
+            "content": {
+              "json": "## Security Agent Workbook\n"
+            },
+            "name": "Title"
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "#### Workbook Global Filters"
+            },
+            "name": "text - 2"
+          },
+          {
+            "type": 9,
+            "content": {
+              "version": "KqlParameterItem/1.0",
+              "parameters": [
+                {
+                  "id": "130a5425-6a32-4eb5-bbf9-20e3813df8b4",
+                  "version": "KqlParameterItem/1.0",
+                  "name": "Subscription",
+                  "type": 6,
+                  "multiSelect": true,
+                  "quote": "'",
+                  "delimiter": ",",
+                  "typeSettings": {
+                    "additionalResourceOptions": [],
+                    "includeAll": false
+                  },
+                  "timeContext": {
+                    "durationMs": 86400000
+                  },
+                  "value": [
+                    "/subscriptions/ada06e68-375e-4210-be3a-c6cacebf41c5"
+                  ]
+                },
+                {
+                  "id": "f7d146f5-de38-4aeb-98c2-77a9b005c408",
+                  "version": "KqlParameterItem/1.0",
+                  "name": "workspaceType",
+                  "label": "Workspace Type",
+                  "type": 5,
+                  "isRequired": true,
+                  "typeSettings": {
+                    "additionalResourceOptions": [],
+                    "showDefault": false
+                  },
+                  "jsonData": "[\r\n    {\"value\": \"Alll\", \"selected\": true},\r\n    {\"value\": \"Microsoft Sentinel\"},\r\n    {\"value\": \"Defender for Cloud\"}\r\n]",
+                  "timeContext": {
+                    "durationMs": 86400000
+                  }
+                },
+                {
+                  "id": "290051bb-a82a-4234-8b86-af5df0b87f86",
+                  "version": "KqlParameterItem/1.0",
+                  "name": "Workspace",
+                  "type": 5,
+                  "isRequired": true,
+                  "typeSettings": {
+                    "resourceTypeFilter": {
+                      "microsoft.operationalinsights/workspaces": true
+                    },
+                    "additionalResourceOptions": [],
+                    "showDefault": false
+                  },
+                  "timeContext": {
+                    "durationMs": 86400000
+                  },
+                  "value": "/subscriptions/ada06e68-375e-4210-be3a-c6cacebf41c5/resourcegroups/sentinel-prd/providers/microsoft.operationalinsights/workspaces/sentinel-prd"
+                },
+                {
+                  "id": "f7dc6ced-9e43-4595-a2c6-fabd98d3a26c",
+                  "version": "KqlParameterItem/1.0",
+                  "name": "MachineType",
+                  "label": "Machine Type",
+                  "type": 2,
+                  "multiSelect": true,
+                  "quote": "'",
+                  "delimiter": ",",
+                  "typeSettings": {
+                    "additionalResourceOptions": [],
+                    "showDefault": false
+                  },
+                  "jsonData": "[\r\n\t{\"value\":\"Microsoft.Compute/virtualMachines\", \"label\":\"Azure Virtual Machines\"},\r\n\t{\"value\":\"microsoft.compute/virtualmachinescalesets\", \"label\":\"Azure Virtual Machine Scale Sets\"},\r\n\t{\"value\":\"microsoft.hybridcompute/machines\", \"label\":\"Azure Arc Machines\"}\r\n]",
+                  "timeContext": {
+                    "durationMs": 86400000
+                  }
+                },
+                {
+                  "id": "f8321a8b-90ac-43ae-a0fd-8f157e971808",
+                  "version": "KqlParameterItem/1.0",
+                  "name": "showHiddenObjects",
+                  "type": 10,
+                  "isRequired": true,
+                  "typeSettings": {
+                    "additionalResourceOptions": [],
+                    "showDefault": false
+                  },
+                  "jsonData": "[\r\n    { \"value\": \"True\", \"label\":\"Yes\"}, \r\n    { \"value\": \"False\", \"label\":\"No\", \"selected\":true }\r\n]"
+                },
+                {
+                  "id": "04829011-99d5-490e-8bf3-516a27d22b42",
+                  "version": "KqlParameterItem/1.0",
+                  "name": "machineTag",
+                  "label": "Machine Tags",
+                  "type": 2,
+                  "query": "Resources\r\n| where type =~ 'Microsoft.Compute/virtualMachines' or \r\ntype == \"microsoft.compute/virtualmachinescalesets\" or\r\ntype == \"microsoft.hybridcompute/machines\"\r\n| where isnotempty(tags)\r\n| project tags\r\n| mvexpand tags\r\n| extend tagKey = tostring(bag_keys(tags)[0])\r\n| distinct tagKey",
+                  "typeSettings": {
+                    "additionalResourceOptions": [],
+                    "showDefault": false
+                  },
+                  "queryType": 1,
+                  "resourceType": "microsoft.resourcegraph/resources",
+                  "value": "Environment"
+                },
+                {
+                  "id": "f1a97731-1029-4dbb-b1b7-cb2bc73e09ef",
+                  "version": "KqlParameterItem/1.0",
+                  "name": "machineTagValue",
+                  "label": "Tag Value",
+                  "type": 2,
+                  "isRequired": true,
+                  "query": "Resources\r\n| where type =~ 'Microsoft.Compute/virtualMachines' or \r\ntype == \"microsoft.compute/virtualmachinescalesets\" or\r\ntype == \"microsoft.hybridcompute/machines\"\r\n| where isnotempty(tags)\r\n| project tags\r\n| mvexpand tags\r\n| extend tagKey = tostring(bag_keys(tags)[0])\r\n| where tagKey == \"{machineTag}\"\r\n| extend tagValue = tostring(tags[tagKey])\r\n| distinct tagValue\r\n",
+                  "typeSettings": {
+                    "additionalResourceOptions": [],
+                    "showDefault": false
+                  },
+                  "queryType": 1,
+                  "resourceType": "microsoft.resourcegraph/resources",
+                  "value": "Prod"
+                },
+                {
+                  "id": "dd26bd17-eeaf-4aa9-a515-ed1ce9be0d71",
+                  "version": "KqlParameterItem/1.0",
+                  "name": "securityAgents",
+                  "type": 1,
+                  "isRequired": true,
+                  "isHiddenWhenLocked": true,
+                  "criteriaData": [
+                    {
+                      "criteriaContext": {
+                        "operator": "Default",
+                        "resultValType": "static",
+                        "resultVal": "\"Legacy Log Analytics\", \"Defender for Servers P2\", \"Azure Monitor Agent\", \"Defender for Endpoint\", \"Azure Guest Configuration\", \"Qualys\""
+                      }
+                    }
+                  ]
+                }
+              ],
+              "style": "above",
+              "queryType": 8
+            },
+            "name": "Global Filters"
+          },
+          {
+            "type": 11,
+            "content": {
+              "version": "LinkItem/1.0",
+              "style": "tabs",
+              "tabStyle": "bigger",
+              "links": [
+                {
+                  "id": "00081a76-3f0b-4aae-b959-69ea40df8c10",
+                  "cellValue": "Tab",
+                  "linkTarget": "parameter",
+                  "linkLabel": "Overview",
+                  "subTarget": "overview",
+                  "style": "link"
+                },
+                {
+                  "id": "7dcba471-e433-422e-8aae-22f6b7f4c009",
+                  "cellValue": "Tab",
+                  "linkTarget": "parameter",
+                  "linkLabel": "Agent Versions",
+                  "subTarget": "agentVersions",
+                  "style": "link"
+                },
+                {
+                  "id": "2f7f8aec-9b5c-4c67-b445-8bab8f03d014",
+                  "cellValue": "Tab",
+                  "linkTarget": "parameter",
+                  "linkLabel": "Connected Machines",
+                  "subTarget": "connectedMachines",
+                  "style": "link"
+                },
+                {
+                  "id": "c2313403-0c71-47d7-a2a3-94fbc2b5a20e",
+                  "cellValue": "Tab",
+                  "linkTarget": "parameter",
+                  "linkLabel": "Data Collection Rules",
+                  "subTarget": "dataCollectionRules",
+                  "style": "link"
+                }
+              ]
+            },
+            "name": "tab"
+          }
+        ],
+        "exportParameters": true
+      },
+      "name": "topSection"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "loadType": "always",
+        "items": [
+          {
+            "type": 1,
+            "content": {
+              "json": "This is a consolidated view of all agents. Some columns and values are only applicable to specific agent types. ",
+              "style": "info"
+            },
+            "name": "text - 8"
+          },
+          {
+            "type": 11,
+            "content": {
+              "version": "LinkItem/1.0",
+              "style": "tabs",
+              "links": [
+                {
+                  "id": "405f4fe4-a306-4506-ae80-7f37b8e58921",
+                  "cellValue": "agentView",
+                  "linkTarget": "parameter",
+                  "linkLabel": "All Agents",
+                  "subTarget": " *",
+                  "style": "link"
+                },
+                {
+                  "id": "bbff16c4-1980-4ef7-b3fc-bf45ecd33a1e",
+                  "cellValue": "agentView",
+                  "linkTarget": "parameter",
+                  "linkLabel": "Azure Monitor Agent",
+                  "subTarget": "Azure Monitor Agent",
+                  "style": "link"
+                },
+                {
+                  "id": "4acf1595-26d4-484a-a1d2-77c1e992569a",
+                  "cellValue": "agentView",
+                  "linkTarget": "parameter",
+                  "linkLabel": "Defender for Endpoint",
+                  "subTarget": "Defender for Endpoint",
+                  "style": "link"
+                },
+                {
+                  "id": "22350455-3d92-48b2-b1ae-51f58ad027fa",
+                  "cellValue": "agentView",
+                  "linkTarget": "parameter",
+                  "linkLabel": "Defender for Servers",
+                  "subTarget": "Defender for Servers P2",
+                  "style": "link"
+                },
+                {
+                  "id": "0bda4994-4c05-4b19-9644-aa7cda3bfa4d",
+                  "cellValue": "agentView",
+                  "linkTarget": "parameter",
+                  "linkLabel": "Guest Configuration",
+                  "subTarget": "Azure Guest Configuration",
+                  "style": "link"
+                },
+                {
+                  "id": "1fdc311a-214e-4924-98c6-021d8c4b419b",
+                  "cellValue": "agentView",
+                  "linkTarget": "parameter",
+                  "linkLabel": "Legacy Log Analytics",
+                  "subTarget": "Legacy Log Analytics",
+                  "style": "link"
+                }
+              ]
+            },
+            "name": "links - 6"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\r\n| where type == \"microsoft.operationsmanagement/solutions\"\r\n| where name has'Security' or name has 'SecurityCenterFree'\r\n| extend workspaceId = tolower(properties.workspaceResourceId)\r\n| distinct workspaceId",
+              "size": 4,
+              "title": "Defender for Cloud Workspaces",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources"
+            },
+            "customWidth": "50",
+            "conditionalVisibility": {
+              "parameterName": "showHiddenObjects",
+              "comparison": "isEqualTo",
+              "value": "True"
+            },
+            "name": "defenderForCloudWorkspaces"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\r\n| where type == \"microsoft.operationsmanagement/solutions\"\r\n| where name has'SecurityInsights'\r\n| extend workspaceId = tolower(properties.workspaceResourceId)\r\n| distinct workspaceId",
+              "size": 4,
+              "title": "Sentinel Workspaces",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources"
+            },
+            "customWidth": "50",
+            "conditionalVisibility": {
+              "parameterName": "showHiddenObjects",
+              "comparison": "isEqualTo",
+              "value": "True"
+            },
+            "name": "sentinelWorkspaces"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\r\n| where type contains \"microsoft.compute/virtualmachines/extensions\" or \r\ntype contains \"microsoft.hybridcompute/machines/extensions\" or\r\ntype contains \"microsoft.compute/virtualmachinescalesets/extensions\"\r\n| extend agent = iff(name =~ 'OmsAgentForLinux', 'Legacy Log Analytics', \r\n                        iff(name =~ \"MicrosoftMonitoringAgent\", 'Legacy Log Analytics',\r\n                        iff(name =~ \"AzureSecurityLinuxAgent\", 'Defender for Servers P2',\r\n                        iff(name =~ \"AzureSecurityWindowsAgent\", 'Defender for Servers P2',\r\n                        iff(name =~ \"AzureMonitorWindowsAgent\", 'Azure Monitor Agent',\r\n                        iff(name =~ \"AzureMonitorLinuxAgent\", 'Azure Monitor Agent',\r\n                        iff(name has \"MDE.\", 'Defender for Endpoint',\r\n                        iff(name startswith \"AzurePolicyfor\", 'Azure Guest Configuration',\r\n                        iff(name =~ \"LinuxAgent.AzureSecurityCenter\", 'Qualys',\r\n                        iff(name =~ \"WindowsAgent.AzureSecurityCenter\", 'Qualys',\r\n                    name))))))))))\r\n| where agent in ({securityAgents})\r\n| where agent matches regex \"{agentView}\"\r\n| extend autoUpgradeEnabled = properties.enableAutomaticUpgrade\r\n| extend installSucceeded = properties.provisioningState == 'Succeeded'\r\n| extend version = properties.typeHandlerVersion\r\n| extend azureResourceId = properties.settings.azureResourceId\r\n| extend vNextEnabled = properties.settings.vNextEnabled\r\n| extend statusMessage = properties.instanceView.status.message\r\n| extend statusLevel = properties.instanceView.status.level\r\n| extend statusMessage = properties.instanceView.status.message\r\n| extend statuscode = properties.instanceView.status.code\r\n| extend workspaceId = properties.settings.workspaceId\r\n| parse id with * \"/\" machineId \"/extensions/\" *\r\n| extend machineId =  strcat('/', tolower(machineId))",
+              "size": 4,
+              "showAnalytics": true,
+              "title": "All Extensions",
+              "showRefreshButton": true,
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources"
+            },
+            "customWidth": "50",
+            "conditionalVisibility": {
+              "parameterName": "showHiddenObjects",
+              "comparison": "isEqualTo",
+              "value": "True"
+            },
+            "name": "allExtensions"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "Resources\r\n| where type =~ 'Microsoft.Compute/virtualMachines' or \r\ntype == \"microsoft.compute/virtualmachinescalesets\" or\r\ntype == \"microsoft.hybridcompute/machines\"\r\n| extend id = tolower(id)\r\n| extend machineStatus = iff(\r\n                        type =~ 'Microsoft.Compute/virtualMachines', properties.extended.instanceView.powerState.displayStatus,\r\n                        iff(type == \"microsoft.compute/virtualmachinescalesets\", 'n/a',\r\n                        iff(type == \"microsoft.hybridcompute/machines\", properties.status,\r\n                        'uknown')))\r\n| extend osType = iff(\r\n                        type =~ 'Microsoft.Compute/virtualMachines', properties.storageProfile.osDisk.osType,\r\n                        iff(type == \"microsoft.compute/virtualmachinescalesets\", properties.virtualMachineProfile.storageProfile.osDisk.osType,\r\n                        iff(type == \"microsoft.hybridcompute/machines\", properties.osType,\r\n                        'uknown')))\r\n| extend osType = tolower(osType)\r\n| extend osComputerName = iff(\r\n                        type =~ 'Microsoft.Compute/virtualMachines', properties.extended.instanceView.computerName,\r\n                        iff(type == \"microsoft.compute/virtualmachinescalesets\", properties.virtualMachineProfile.osProfile.computerNamePrefix,\r\n                        iff(type == \"microsoft.hybridcompute/machines\", properties.machineFqdn,\r\n                        'uknown')))",
+              "size": 4,
+              "showAnalytics": true,
+              "title": "All Machines",
+              "showRefreshButton": true,
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources"
+            },
+            "customWidth": "50",
+            "conditionalVisibility": {
+              "parameterName": "showHiddenObjects",
+              "comparison": "isEqualTo",
+              "value": "True"
+            },
+            "name": "allmachines"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\r\n| where type contains \"microsoft.compute/virtualmachines/extensions\" or \r\ntype contains \"microsoft.hybridcompute/machines/extensions\" or\r\ntype contains \"microsoft.compute/virtualmachinescalesets/extensions\"\r\n| where name =~ 'OmsAgentForLinux' or name =~ 'MicrosoftMonitoringAgent'\r\n| extend workspaceId = tostring(properties.settings.workspaceId)\r\n| distinct workspaceId\r\n",
+              "size": 4,
+              "showAnalytics": true,
+              "title": "MMA Extenions Workspaces",
+              "showRefreshButton": true,
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources"
+            },
+            "customWidth": "50",
+            "conditionalVisibility": {
+              "parameterName": "showHiddenObjects",
+              "comparison": "isEqualTo",
+              "value": "True"
+            },
+            "name": "mmaExtWorkspaces"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\r\n| where type == \"microsoft.operationalinsights/workspaces\"\r\n| extend workspaceId = properties.customerId\r\n| project id, workspaceId, name",
+              "size": 4,
+              "showAnalytics": true,
+              "title": "Log Analytics Workspaces",
+              "showRefreshButton": true,
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources"
+            },
+            "customWidth": "50",
+            "conditionalVisibility": {
+              "parameterName": "showHiddenObjects",
+              "comparison": "isEqualTo",
+              "value": "True"
+            },
+            "name": "laWorkspaces"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "{\"version\":\"Merge/1.0\",\"merges\":[{\"id\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\",\"mergeType\":\"innerunique\",\"leftTable\":\"allmachines\",\"rightTable\":\"allExtensions\",\"leftColumn\":\"id\",\"rightColumn\":\"machineId\"}],\"projectRename\":[{\"originalName\":\"[allmachines].id\",\"mergedName\":\"id\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].name\",\"mergedName\":\"name\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].type\",\"mergedName\":\"type\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].tenantId\",\"mergedName\":\"tenantId\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].kind\",\"mergedName\":\"kind\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].location\",\"mergedName\":\"location\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].resourceGroup\",\"mergedName\":\"resourceGroup\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].subscriptionId\",\"mergedName\":\"subscriptionId\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].managedBy\",\"mergedName\":\"managedBy\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].apiVersion\",\"mergedName\":\"apiVersion\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].sku\",\"mergedName\":\"sku\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].plan\",\"mergedName\":\"plan\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].properties\",\"mergedName\":\"properties\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].tags\",\"mergedName\":\"tags\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].identity\",\"mergedName\":\"identity\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].zones\",\"mergedName\":\"zones\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].extendedLocation\",\"mergedName\":\"extendedLocation\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].systemData\",\"mergedName\":\"systemData\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].machineStatus\",\"mergedName\":\"machineStatus\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].osType\",\"mergedName\":\"osType\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].osComputerName\",\"mergedName\":\"osComputerName\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].id\",\"mergedName\":\"id1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].name\",\"mergedName\":\"name1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].type\",\"mergedName\":\"type1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].tenantId\",\"mergedName\":\"tenantId1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].kind\",\"mergedName\":\"kind1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].location\",\"mergedName\":\"location1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].resourceGroup\",\"mergedName\":\"resourceGroup1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].subscriptionId\",\"mergedName\":\"subscriptionId1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].managedBy\",\"mergedName\":\"managedBy1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].apiVersion\",\"mergedName\":\"apiVersion1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].sku\",\"mergedName\":\"sku1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].plan\",\"mergedName\":\"plan1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].properties\",\"mergedName\":\"properties1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].tags\",\"mergedName\":\"tags1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].identity\",\"mergedName\":\"identity1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].zones\",\"mergedName\":\"zones1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].extendedLocation\",\"mergedName\":\"extendedLocation1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].systemData\",\"mergedName\":\"systemData1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].agent\",\"mergedName\":\"agent\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].autoUpgradeEnabled\",\"mergedName\":\"autoUpgradeEnabled\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].installSucceeded\",\"mergedName\":\"installSucceeded\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].version\",\"mergedName\":\"version\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].azureResourceId\",\"mergedName\":\"azureResourceId\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].vNextEnabled\",\"mergedName\":\"vNextEnabled\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].statusMessage\",\"mergedName\":\"statusMessage\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].statusLevel\",\"mergedName\":\"statusLevel\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].statuscode\",\"mergedName\":\"statuscode\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].workspaceId\",\"mergedName\":\"workspaceId\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].machineId\",\"mergedName\":\"machineId\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].test\",\"mergedName\":\"test\",\"fromId\":\"unknown\"},{\"originalName\":\"[allExtensions].securityAgents\",\"mergedName\":\"securityAgents\",\"fromId\":\"unknown\"}]}",
+              "size": 1,
+              "queryType": 7,
+              "visualization": "piechart",
+              "tileSettings": {
+                "titleContent": {
+                  "columnMatch": "Agent",
+                  "formatter": 12,
+                  "formatOptions": {
+                    "min": 0,
+                    "palette": "blue"
+                  },
+                  "numberFormat": {
+                    "unit": 17,
+                    "options": {
+                      "style": "decimal"
+                    }
+                  }
+                },
+                "showBorder": false
+              },
+              "chartSettings": {
+                "xAxis": "Agent",
+                "yAxis": [
+                  "installSucceeded"
+                ],
+                "group": "agent",
+                "createOtherGroup": 0
+              }
+            },
+            "customWidth": "60",
+            "showPin": false,
+            "name": "allAgentsPie"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "{\"version\":\"Merge/1.0\",\"merges\":[{\"id\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\",\"mergeType\":\"innerunique\",\"leftTable\":\"allmachines\",\"rightTable\":\"allExtensions\",\"leftColumn\":\"id\",\"rightColumn\":\"machineId\"}],\"projectRename\":[{\"originalName\":\"[allmachines].id\",\"mergedName\":\"id\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].name\",\"mergedName\":\"name\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].type\",\"mergedName\":\"type\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].tenantId\",\"mergedName\":\"tenantId\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].kind\",\"mergedName\":\"kind\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].location\",\"mergedName\":\"location\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].resourceGroup\",\"mergedName\":\"resourceGroup\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].subscriptionId\",\"mergedName\":\"subscriptionId\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].managedBy\",\"mergedName\":\"managedBy\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].apiVersion\",\"mergedName\":\"apiVersion\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].sku\",\"mergedName\":\"sku\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].plan\",\"mergedName\":\"plan\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].properties\",\"mergedName\":\"properties\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].tags\",\"mergedName\":\"tags\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].identity\",\"mergedName\":\"identity\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].zones\",\"mergedName\":\"zones\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].extendedLocation\",\"mergedName\":\"extendedLocation\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].systemData\",\"mergedName\":\"systemData\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].machineStatus\",\"mergedName\":\"machineStatus\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].osType\",\"mergedName\":\"osType\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].osComputerName\",\"mergedName\":\"osComputerName\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].id\",\"mergedName\":\"id1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].name\",\"mergedName\":\"name1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].type\",\"mergedName\":\"type1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].tenantId\",\"mergedName\":\"tenantId1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].kind\",\"mergedName\":\"kind1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].location\",\"mergedName\":\"location1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].resourceGroup\",\"mergedName\":\"resourceGroup1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].subscriptionId\",\"mergedName\":\"subscriptionId1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].managedBy\",\"mergedName\":\"managedBy1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].apiVersion\",\"mergedName\":\"apiVersion1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].sku\",\"mergedName\":\"sku1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].plan\",\"mergedName\":\"plan1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].properties\",\"mergedName\":\"properties1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].tags\",\"mergedName\":\"tags1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].identity\",\"mergedName\":\"identity1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].zones\",\"mergedName\":\"zones1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].extendedLocation\",\"mergedName\":\"extendedLocation1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].systemData\",\"mergedName\":\"systemData1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].agent\",\"mergedName\":\"agent\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].autoUpgradeEnabled\",\"mergedName\":\"autoUpgradeEnabled\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].installSucceeded\",\"mergedName\":\"installSucceeded\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].version\",\"mergedName\":\"version\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].azureResourceId\",\"mergedName\":\"azureResourceId\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].vNextEnabled\",\"mergedName\":\"vNextEnabled\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].statusMessage\",\"mergedName\":\"statusMessage\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].statusLevel\",\"mergedName\":\"statusLevel\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].statuscode\",\"mergedName\":\"statuscode\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].workspaceId\",\"mergedName\":\"workspaceId\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].machineId\",\"mergedName\":\"machineId\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].test\",\"mergedName\":\"test\",\"fromId\":\"unknown\"},{\"originalName\":\"[allExtensions].securityAgents\",\"mergedName\":\"securityAgents\",\"fromId\":\"unknown\"}]}",
+              "size": 1,
+              "queryType": 7,
+              "visualization": "piechart",
+              "tileSettings": {
+                "titleContent": {
+                  "columnMatch": "Agent",
+                  "formatter": 12,
+                  "formatOptions": {
+                    "min": 0,
+                    "palette": "blue"
+                  },
+                  "numberFormat": {
+                    "unit": 17,
+                    "options": {
+                      "style": "decimal"
+                    }
+                  }
+                },
+                "showBorder": false
+              },
+              "chartSettings": {
+                "xAxis": "Agent",
+                "yAxis": [
+                  "autoUpgradeEnabled"
+                ],
+                "group": "agent",
+                "createOtherGroup": 0
+              }
+            },
+            "customWidth": "60",
+            "showPin": false,
+            "name": "allAgentsPie - Copy"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "{\"version\":\"Merge/1.0\",\"merges\":[{\"id\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\",\"mergeType\":\"leftanti\",\"leftTable\":\"allmachines\",\"rightTable\":\"allExtensions\",\"leftColumn\":\"id\",\"rightColumn\":\"machineId\"}],\"projectRename\":[{\"originalName\":\"[allmachines].id\",\"mergedName\":\"id\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].osType\",\"mergedName\":\"osType\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].osComputerName\",\"mergedName\":\"osComputerName\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].location\",\"mergedName\":\"location\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].subscriptionId\",\"mergedName\":\"subscriptionId\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].resourceGroup\",\"mergedName\":\"resourceGroup\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].name\"},{\"originalName\":\"[allmachines].type\"},{\"originalName\":\"[allmachines].tenantId\"},{\"originalName\":\"[allmachines].kind\"},{\"originalName\":\"[allmachines].managedBy\"},{\"originalName\":\"[allmachines].apiVersion\"},{\"originalName\":\"[allmachines].sku\"},{\"originalName\":\"[allmachines].plan\"},{\"originalName\":\"[allmachines].properties\"},{\"originalName\":\"[allmachines].tags\"},{\"originalName\":\"[allmachines].identity\"},{\"originalName\":\"[allmachines].zones\"},{\"originalName\":\"[allmachines].extendedLocation\"},{\"originalName\":\"[allmachines].systemData\"},{\"originalName\":\"[allmachines].machineStatus\"}]}",
+              "size": 1,
+              "title": "Computers Missing Agent(s)",
+              "showRefreshButton": true,
+              "showExportToExcel": true,
+              "queryType": 7,
+              "visualization": "table",
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "id",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "20ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "subscriptionId",
+                    "formatter": 13,
+                    "formatOptions": {
+                      "linkTarget": null,
+                      "showIcon": true
+                    }
+                  }
+                ],
+                "labelSettings": [
+                  {
+                    "columnId": "id",
+                    "label": "Name"
+                  },
+                  {
+                    "columnId": "osType",
+                    "label": "OS"
+                  },
+                  {
+                    "columnId": "osComputerName",
+                    "label": "HostName"
+                  },
+                  {
+                    "columnId": "location",
+                    "label": "Location"
+                  },
+                  {
+                    "columnId": "subscriptionId",
+                    "label": "Subscription"
+                  },
+                  {
+                    "columnId": "resourceGroup",
+                    "label": "Resource Group"
+                  }
+                ]
+              },
+              "tileSettings": {
+                "titleContent": {
+                  "columnMatch": "Agent",
+                  "formatter": 12,
+                  "formatOptions": {
+                    "min": 0,
+                    "palette": "blue"
+                  },
+                  "numberFormat": {
+                    "unit": 17,
+                    "options": {
+                      "style": "decimal"
+                    }
+                  }
+                },
+                "showBorder": false
+              },
+              "chartSettings": {
+                "xAxis": "osType",
+                "yAxis": [
+                  "agent"
+                ],
+                "group": null,
+                "createOtherGroup": 0,
+                "ySettings": {
+                  "numberFormatSettings": {
+                    "unit": 17,
+                    "options": {
+                      "style": "decimal",
+                      "useGrouping": false
+                    }
+                  }
+                }
+              }
+            },
+            "customWidth": "40",
+            "showPin": false,
+            "name": "computersMissingAgent"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "{\"version\":\"Merge/1.0\",\"merges\":[{\"id\":\"8f6a2440-625a-461e-85f6-36bdd6ebf11a\",\"mergeType\":\"innerunique\",\"leftTable\":\"allmachines\",\"rightTable\":\"allExtensions\",\"leftColumn\":\"id\",\"rightColumn\":\"machineId\"}],\"projectRename\":[{\"originalName\":\"[allmachines].id\",\"mergedName\":\"Name\",\"fromId\":\"8f6a2440-625a-461e-85f6-36bdd6ebf11a\"},{\"originalName\":\"[allmachines].osComputerName\",\"mergedName\":\"osComputerName\",\"fromId\":\"8f6a2440-625a-461e-85f6-36bdd6ebf11a\"},{\"originalName\":\"[allmachines].osType\",\"mergedName\":\"osType\",\"fromId\":\"8f6a2440-625a-461e-85f6-36bdd6ebf11a\"},{\"originalName\":\"[allmachines].machineStatus\",\"mergedName\":\"machineStatus\",\"fromId\":\"8f6a2440-625a-461e-85f6-36bdd6ebf11a\"},{\"originalName\":\"[allExtensions].agent\",\"mergedName\":\"Agent\",\"fromId\":\"8f6a2440-625a-461e-85f6-36bdd6ebf11a\"},{\"originalName\":\"[allExtensions].version\",\"mergedName\":\"Version\",\"fromId\":\"unknown\"},{\"originalName\":\"[allExtensions].autoUpgradeEnabled\",\"mergedName\":\"autoUpgradeEnabled\",\"fromId\":\"8f6a2440-625a-461e-85f6-36bdd6ebf11a\"},{\"originalName\":\"[allExtensions].installSucceeded\",\"mergedName\":\"installSucceeded\",\"fromId\":\"8f6a2440-625a-461e-85f6-36bdd6ebf11a\"},{\"originalName\":\"[allmachines].subscriptionId\",\"mergedName\":\"Subscription\",\"fromId\":\"8f6a2440-625a-461e-85f6-36bdd6ebf11a\"},{\"originalName\":\"[allmachines].resourceGroup\",\"mergedName\":\"resourceGroup\",\"fromId\":\"8f6a2440-625a-461e-85f6-36bdd6ebf11a\"},{\"originalName\":\"[allmachines].location\",\"mergedName\":\"location\",\"fromId\":\"8f6a2440-625a-461e-85f6-36bdd6ebf11a\"},{\"originalName\":\"[allExtensions].vNextEnabled\",\"mergedName\":\"Windows Unified Agent\",\"fromId\":\"8f6a2440-625a-461e-85f6-36bdd6ebf11a\"},{\"originalName\":\"[allExtensions].statusLevel\",\"mergedName\":\"agentStatusLevel\",\"fromId\":\"8f6a2440-625a-461e-85f6-36bdd6ebf11a\"},{\"originalName\":\"[allExtensions].statusMessage\",\"mergedName\":\"agentStatusMessage\",\"fromId\":\"8f6a2440-625a-461e-85f6-36bdd6ebf11a\"},{\"originalName\":\"[allExtensions].statuscode\",\"mergedName\":\"agentStatuscode\",\"fromId\":\"8f6a2440-625a-461e-85f6-36bdd6ebf11a\"},{\"originalName\":\"[allmachines].tenantId\",\"mergedName\":\"tenantId\",\"fromId\":\"8f6a2440-625a-461e-85f6-36bdd6ebf11a\"},{\"originalName\":\"[allExtensions].name\",\"mergedName\":\"realExtName\",\"fromId\":\"8f6a2440-625a-461e-85f6-36bdd6ebf11a\"},{\"originalName\":\"[allExtensions].test\",\"mergedName\":\"test\",\"fromId\":\"unknown\"},{\"originalName\":\"[allExtensions].securityAgents\",\"mergedName\":\"securityAgents\",\"fromId\":\"unknown\"},{\"originalName\":\"[allmachines].name\"},{\"originalName\":\"[allmachines].type\"},{\"originalName\":\"[allmachines].kind\"},{\"originalName\":\"[allmachines].apiVersion\"},{\"originalName\":\"[allmachines].managedBy\"},{\"originalName\":\"[allmachines].sku\"},{\"originalName\":\"[allmachines].plan\"},{\"originalName\":\"[allmachines].properties\"},{\"originalName\":\"[allmachines].tags\"},{\"originalName\":\"[allmachines].identity\"},{\"originalName\":\"[allmachines].zones\"},{\"originalName\":\"[allmachines].extendedLocation\"},{\"originalName\":\"[allmachines].systemData\"},{\"originalName\":\"[allExtensions].id\"},{\"originalName\":\"[allExtensions].type\"},{\"originalName\":\"[allExtensions].tenantId\"},{\"originalName\":\"[allExtensions].location\"},{\"originalName\":\"[allExtensions].kind\"},{\"originalName\":\"[allExtensions].resourceGroup\"},{\"originalName\":\"[allExtensions].subscriptionId\"},{\"originalName\":\"[allExtensions].managedBy\"},{\"originalName\":\"[allExtensions].apiVersion\"},{\"originalName\":\"[allExtensions].sku\"},{\"originalName\":\"[allExtensions].plan\"},{\"originalName\":\"[allExtensions].properties\"},{\"originalName\":\"[allExtensions].tags\"},{\"originalName\":\"[allExtensions].identity\"},{\"originalName\":\"[allExtensions].zones\"},{\"originalName\":\"[allExtensions].extendedLocation\"},{\"originalName\":\"[allExtensions].systemData\"},{\"originalName\":\"[allExtensions].azureResourceId\"},{\"originalName\":\"[allExtensions].workspaceId\"},{\"originalName\":\"[allExtensions].machineId\"}]}",
+              "size": 3,
+              "showRefreshButton": true,
+              "showExportToExcel": true,
+              "queryType": 7,
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "osComputerName",
+                    "formatter": 1
+                  },
+                  {
+                    "columnMatch": "realExtName",
+                    "formatter": 5
+                  },
+                  {
+                    "columnMatch": "Name",
+                    "formatter": 13,
+                    "formatOptions": {
+                      "linkColumn": "Name",
+                      "linkTarget": "Resource",
+                      "linkIsContextBlade": true,
+                      "showIcon": true,
+                      "customColumnWidthSetting": "22ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "osType",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "22ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "Agent",
+                    "formatter": 1,
+                    "tooltipFormat": {
+                      "tooltip": "[\"realExtName\"]"
+                    }
+                  },
+                  {
+                    "columnMatch": "Version",
+                    "formatter": 1
+                  },
+                  {
+                    "columnMatch": "autoUpgradeEnabled",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "==",
+                          "thresholdValue": "false",
+                          "representation": "2",
+                          "text": ""
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "success",
+                          "text": ""
+                        }
+                      ],
+                      "compositeBarSettings": {
+                        "labelText": "",
+                        "columnSettings": []
+                      },
+                      "customColumnWidthSetting": "18ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "installSucceeded",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "==",
+                          "thresholdValue": "0",
+                          "representation": "failed",
+                          "text": ""
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "success",
+                          "text": ""
+                        }
+                      ],
+                      "customColumnWidthSetting": "20ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "machineStatus",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "20ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "Subscription",
+                    "formatter": 13,
+                    "formatOptions": {
+                      "linkTarget": null,
+                      "showIcon": true,
+                      "customColumnWidthSetting": "15ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "resourceGroup",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "20ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "Windows Unified Agent",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "==",
+                          "thresholdValue": "true",
+                          "representation": "success",
+                          "text": ""
+                        },
+                        {
+                          "operator": "==",
+                          "thresholdValue": "false",
+                          "representation": "2",
+                          "text": ""
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "more",
+                          "text": ""
+                        }
+                      ],
+                      "customColumnWidthSetting": "20ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "agentStatusLevel",
+                    "formatter": 1
+                  },
+                  {
+                    "columnMatch": "agentStatusMessage",
+                    "formatter": 1
+                  },
+                  {
+                    "columnMatch": "agentStatuscode",
+                    "formatter": 1
+                  },
+                  {
+                    "columnMatch": "tenantId",
+                    "formatter": 1
+                  },
+                  {
+                    "columnMatch": "version",
+                    "formatter": 1
+                  },
+                  {
+                    "columnMatch": "Legacy Agent Workspace",
+                    "formatter": 13,
+                    "formatOptions": {
+                      "linkTarget": null,
+                      "showIcon": true
+                    }
+                  },
+                  {
+                    "columnMatch": "type",
+                    "formatter": 16,
+                    "formatOptions": {
+                      "showIcon": true,
+                      "customColumnWidthSetting": "20ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "statusMessage",
+                    "formatter": 1
+                  },
+                  {
+                    "columnMatch": "statusLevel",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Information",
+                          "representation": "1",
+                          "text": ""
+                        },
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Error",
+                          "representation": "3",
+                          "text": ""
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "more",
+                          "text": ""
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "columnMatch": "statuscode",
+                    "formatter": 1
+                  }
+                ],
+                "rowLimit": 1000,
+                "labelSettings": [
+                  {
+                    "columnId": "osComputerName",
+                    "label": "Hostname"
+                  },
+                  {
+                    "columnId": "osType",
+                    "label": "Operating System"
+                  },
+                  {
+                    "columnId": "machineStatus",
+                    "label": "Machine Status"
+                  },
+                  {
+                    "columnId": "autoUpgradeEnabled",
+                    "label": "Auto Upgrade"
+                  },
+                  {
+                    "columnId": "installSucceeded",
+                    "label": "Install Succeeded"
+                  },
+                  {
+                    "columnId": "resourceGroup",
+                    "label": "Resource Group"
+                  },
+                  {
+                    "columnId": "location",
+                    "label": "Region"
+                  },
+                  {
+                    "columnId": "agentStatusLevel",
+                    "label": "Agent Status"
+                  },
+                  {
+                    "columnId": "agentStatusMessage",
+                    "label": "Agent Status Message"
+                  },
+                  {
+                    "columnId": "agentStatuscode",
+                    "label": "Agent Status Code"
+                  },
+                  {
+                    "columnId": "tenantId",
+                    "label": "Tenant Id"
+                  },
+                  {
+                    "columnId": "realExtName",
+                    "label": "realExtName"
+                  }
+                ]
+              },
+              "sortBy": []
+            },
+            "showPin": false,
+            "name": "allMachinesAllAgents"
+          }
+        ],
+        "exportParameters": true
+      },
+      "conditionalVisibility": {
+        "parameterName": "Tab",
+        "comparison": "isEqualTo",
+        "value": "connectedMachines"
+      },
+      "name": "connectedMachines"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "items": [
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "Resources\r\n| where type =~ 'Microsoft.Compute/virtualMachines' or \r\ntype == \"microsoft.compute/virtualmachinescalesets\" or\r\ntype == \"microsoft.hybridcompute/machines\"\r\n| extend OS = iif(\r\n                    type =~ 'Microsoft.Compute/virtualMachines', properties.storageProfile.osDisk.osType,\r\n                    iff(type =~ \"microsoft.compute/virtualmachinescalesets\", properties.virtualMachineProfile.storageProfile.osDisk.osType,\r\n                    iff(type =~ \"microsoft.hybridcompute/machines\", properties.osName,\r\n                    'Uknown')))\r\n| summarize count() by tolower(OS)",
+              "size": 4,
+              "showAnalytics": true,
+              "title": "Operating Systems",
+              "showRefreshButton": true,
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "visualization": "tiles",
+              "tileSettings": {
+                "titleContent": {
+                  "formatter": 1
+                },
+                "leftContent": {
+                  "columnMatch": "count_",
+                  "formatter": 12,
+                  "formatOptions": {
+                    "palette": "orangeBlue"
+                  },
+                  "numberFormat": {
+                    "unit": 17,
+                    "options": {
+                      "style": "decimal",
+                      "useGrouping": false,
+                      "maximumFractionDigits": 2,
+                      "maximumSignificantDigits": 3
+                    }
+                  }
+                },
+                "rightContent": {
+                  "columnMatch": "Column1",
+                  "formatter": 1
+                },
+                "showBorder": false,
+                "size": "auto"
+              }
+            },
+            "customWidth": "30",
+            "name": "operatingSystems"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "Resources\r\n| where type =~ 'Microsoft.Compute/virtualMachines' or \r\ntype == \"microsoft.compute/virtualmachinescalesets\" or\r\ntype == \"microsoft.hybridcompute/machines\"\r\n| extend text = iff(\r\n                        type =~ 'Microsoft.Compute/virtualMachines', 'Azure Virtual Machines', \r\n                        iff(type =~ \"microsoft.compute/virtualmachinescalesets\", 'Azure Virtual Machine Scale Sets',\r\n                        iff(type == \"microsoft.hybridcompute/machines\", 'Azure Arc Machines',\r\n                    'Unknown')))\r\n| summarize Mcount = count() by text",
+              "size": 4,
+              "showAnalytics": true,
+              "title": "Machine Types",
+              "showRefreshButton": true,
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "visualization": "tiles",
+              "tileSettings": {
+                "titleContent": {
+                  "formatter": 1
+                },
+                "leftContent": {
+                  "columnMatch": "Mcount",
+                  "formatter": 12,
+                  "formatOptions": {
+                    "palette": "auto"
+                  },
+                  "numberFormat": {
+                    "unit": 17,
+                    "options": {
+                      "style": "decimal",
+                      "useGrouping": false
+                    }
+                  }
+                },
+                "rightContent": {
+                  "columnMatch": "text"
+                },
+                "showBorder": false,
+                "sortCriteriaField": "Mcount",
+                "sortOrderField": 2,
+                "size": "auto"
+              }
+            },
+            "customWidth": "70",
+            "name": "machineTypeQuery"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\r\n| where type == \"microsoft.operationsmanagement/solutions\"\r\n| extend workspaceId = tolower(properties.workspaceResourceId)\r\n| extend sname = split(name, '(')[0]\r\n| extend text = iff(\r\n                        sname =~ 'Security', 'Defender for Cloud', \r\n                        iff(sname =~ 'SecurityCenterFree', 'Defender for Cloud',\r\n                        iff(sname == \"SecurityInsights\", 'Microsoft Sentinel',\r\n                    'null')))\r\n| distinct workspaceId, text\r\n| where text != 'null'\r\n| summarize wscount = count() by text",
+              "size": 4,
+              "showAnalytics": true,
+              "title": "Number of Workspaces with Security",
+              "showRefreshButton": true,
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "visualization": "tiles",
+              "tileSettings": {
+                "titleContent": {
+                  "formatter": 1
+                },
+                "leftContent": {
+                  "columnMatch": "wscount",
+                  "formatter": 12,
+                  "formatOptions": {
+                    "palette": "hotCold"
+                  },
+                  "numberFormat": {
+                    "unit": 17,
+                    "options": {
+                      "style": "decimal",
+                      "maximumFractionDigits": 2,
+                      "maximumSignificantDigits": 3
+                    }
+                  }
+                },
+                "rightContent": {
+                  "columnMatch": "text"
+                },
+                "showBorder": false,
+                "sortCriteriaField": "text",
+                "sortOrderField": 1,
+                "size": "auto"
+              }
+            },
+            "customWidth": "40",
+            "name": "numberOfWorkspaces"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\r\n| where type contains \"microsoft.compute/virtualmachines/extensions\" or \r\ntype contains \"microsoft.hybridcompute/machines/extensions\" or\r\ntype contains \"microsoft.compute/virtualmachinescalesets/extensions\"\r\n| where name =~ 'OmsAgentForLinux' or name =~ 'MicrosoftMonitoringAgent'\r\n| where isnotempty(properties.settings.workspaceId)\r\n| distinct tostring(properties.settings.workspaceId)\r\n| extend text = 'Workspaces'\r\n| summarize wkcount = count() by text",
+              "size": 4,
+              "title": "Legacy Log Analytic Agent Workspaces",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "visualization": "tiles",
+              "tileSettings": {
+                "titleContent": {
+                  "formatter": 1
+                },
+                "leftContent": {
+                  "columnMatch": "wkcount",
+                  "formatter": 12,
+                  "formatOptions": {
+                    "min": 0,
+                    "palette": "blueDark"
+                  }
+                },
+                "rightContent": {
+                  "columnMatch": "text",
+                  "formatter": 1
+                },
+                "showBorder": false
+              }
+            },
+            "customWidth": "25",
+            "name": "legacyMMAWorkspaces"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\r\n| where type contains \"microsoft.compute/virtualmachines/extensions\" or \r\ntype contains \"microsoft.hybridcompute/machines/extensions\" or\r\ntype contains \"microsoft.compute/virtualmachinescalesets/extensions\"\r\n| where name =~ 'OmsAgentForLinux' or name =~ 'MicrosoftMonitoringAgent'\r\n| extend workspaceId = tostring(properties.settings.workspaceId)\r\n| extend text = iff(isempty(workspaceId), 'Not Reporting to a Workspace', 'Reporting to a Workspace')\r\n| summarize machineCount = count() by text",
+              "size": 4,
+              "showAnalytics": true,
+              "title": "Legacy Log Analytics Agents",
+              "showRefreshButton": true,
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "visualization": "tiles",
+              "tileSettings": {
+                "titleContent": {
+                  "formatter": 1
+                },
+                "leftContent": {
+                  "columnMatch": "machineCount",
+                  "formatter": 12,
+                  "formatOptions": {
+                    "palette": "auto"
+                  },
+                  "numberFormat": {
+                    "unit": 17,
+                    "options": {
+                      "maximumSignificantDigits": 3,
+                      "maximumFractionDigits": 2
+                    }
+                  }
+                },
+                "rightContent": {
+                  "columnMatch": "text",
+                  "formatter": 1
+                },
+                "showBorder": false,
+                "size": "auto"
+              }
+            },
+            "customWidth": "35",
+            "name": "legacyMMA"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\r\n| where type contains \"microsoft.compute/virtualmachines/extensions\" or \r\ntype contains \"microsoft.hybridcompute/machines/extensions\" or\r\ntype contains \"microsoft.compute/virtualmachinescalesets/extensions\"\r\n| extend agent = iff(name =~ 'OmsAgentForLinux', 'Legacy Log Analytics', \r\n                        iff(name =~ \"MicrosoftMonitoringAgent\", 'Legacy Log Analytics',\r\n                        iff(name =~ \"AzureSecurityLinuxAgent\", 'Defender for Servers P2',\r\n                        iff(name =~ \"AzureSecurityWindowsAgent\", 'Defender for Servers P2',\r\n                        iff(name =~ \"AzureMonitorWindowsAgent\", 'Azure Monitor Agent',\r\n                        iff(name =~ \"AzureMonitorLinuxAgent\", 'Azure Monitor Agent',\r\n                        iff(name has \"MDE.\", 'Defender for Endpoint',\r\n                        iff(name startswith \"AzurePolicyfor\", 'Azure Guest Configuration',\r\n                        iff(name =~ \"LinuxAgent.AzureSecurityCenter\", 'Qualys',\r\n                        iff(name =~ \"WindowsAgent.AzureSecurityCenter\", 'Qualys',\r\n                    name))))))))))\r\n| where agent in ({securityAgents})\r\n| summarize Mcount = count() by agent",
+              "size": 4,
+              "showAnalytics": true,
+              "title": "Agent Types",
+              "showRefreshButton": true,
+              "exportFieldName": "agent",
+              "exportParameterName": "agentTypeagent",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "visualization": "tiles",
+              "tileSettings": {
+                "titleContent": {
+                  "columnMatch": "agent",
+                  "formatter": 1
+                },
+                "leftContent": {
+                  "columnMatch": "Mcount",
+                  "formatter": 12,
+                  "formatOptions": {
+                    "palette": "auto"
+                  },
+                  "numberFormat": {
+                    "unit": 17,
+                    "options": {
+                      "maximumSignificantDigits": 3,
+                      "maximumFractionDigits": 2
+                    }
+                  }
+                },
+                "showBorder": false,
+                "sortCriteriaField": "Mcount",
+                "sortOrderField": 2,
+                "size": "auto"
+              },
+              "graphSettings": {
+                "type": 0,
+                "topContent": {
+                  "columnMatch": "agent",
+                  "formatter": 1
+                },
+                "centerContent": {
+                  "columnMatch": "Mcount",
+                  "formatter": 1,
+                  "numberFormat": {
+                    "unit": 17,
+                    "options": {
+                      "maximumSignificantDigits": 3,
+                      "maximumFractionDigits": 2
+                    }
+                  }
+                }
+              }
+            },
+            "name": "agentTypes"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\r\n| where type contains \"microsoft.compute/virtualmachines/extensions\" or \r\ntype contains \"microsoft.hybridcompute/machines/extensions\" or\r\ntype contains \"microsoft.compute/virtualmachinescalesets/extensions\"\r\n| extend agent = iff(name =~ 'OmsAgentForLinux', 'Legacy Log Analytics', \r\n                        iff(name =~ \"MicrosoftMonitoringAgent\", 'Legacy Log Analytics',\r\n                        iff(name =~ \"AzureSecurityLinuxAgent\", 'Defender for Servers P2',\r\n                        iff(name =~ \"AzureSecurityWindowsAgent\", 'Defender for Servers P2',\r\n                        iff(name =~ \"AzureMonitorWindowsAgent\", 'Azure Monitor Agent',\r\n                        iff(name =~ \"AzureMonitorLinuxAgent\", 'Azure Monitor Agent',\r\n                        iff(name has \"MDE.\", 'Defender for Endpoint',\r\n                        iff(name startswith \"AzurePolicyfor\", 'Azure Guest Configuration',\r\n                        iff(name startswith \"DependencyAgent\", 'Legacy Dependency Agent',\r\n                        iff(name has \"Qualys\", 'Qualys',\r\n                        iff(name has \"HybridWorkerExtension\", 'Azure Automation',\r\n                    name)))))))))))\r\n| where agent in ({securityAgents})\r\n| summarize agentCount = count(),\r\nuniqueVersions = dcount(tostring(properties.typeHandlerVersion)),\r\nautoUpgradeEnabled = countif(properties.enableAutomaticUpgrade == true), \r\nautoUpgradeDisabled = countif(properties.enableAutomaticUpgrade == false or isnotempty(properties.enableAutomaticUpgrade)),\r\ninstallSucceeded = countif(properties.provisioningState == 'Succeeded'),\r\ninstallFailed = countif(properties.provisioningState == 'Failed')\r\nby agent\r\n",
+              "size": 1,
+              "showAnalytics": true,
+              "title": "Agent Breakdown",
+              "showRefreshButton": true,
+              "showExportToExcel": true,
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "visualization": "table",
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "agent",
+                    "formatter": 1
+                  },
+                  {
+                    "columnMatch": "uniqueVersions",
+                    "formatter": 4,
+                    "formatOptions": {
+                      "palette": "purple",
+                      "customColumnWidthSetting": "30ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "autoUpgradeEnabled",
+                    "formatter": 4,
+                    "formatOptions": {
+                      "palette": "blue",
+                      "customColumnWidthSetting": "30ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "autoUpgradeDisabled",
+                    "formatter": 4,
+                    "formatOptions": {
+                      "palette": "orange",
+                      "customColumnWidthSetting": "30ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "installSucceeded",
+                    "formatter": 4,
+                    "formatOptions": {
+                      "palette": "green",
+                      "customColumnWidthSetting": "30ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "installFailed",
+                    "formatter": 4,
+                    "formatOptions": {
+                      "palette": "redBright",
+                      "customColumnWidthSetting": "20ch"
+                    }
+                  }
+                ],
+                "sortBy": [
+                  {
+                    "itemKey": "agent",
+                    "sortOrder": 1
+                  }
+                ],
+                "labelSettings": [
+                  {
+                    "columnId": "agent",
+                    "label": "Agent"
+                  },
+                  {
+                    "columnId": "agentCount",
+                    "label": "Count"
+                  },
+                  {
+                    "columnId": "uniqueVersions",
+                    "label": "Unique Versions Deployed"
+                  },
+                  {
+                    "columnId": "autoUpgradeEnabled",
+                    "label": "Auto Upgrade Enabled"
+                  },
+                  {
+                    "columnId": "autoUpgradeDisabled",
+                    "label": "Auto Upgrade Disabled"
+                  },
+                  {
+                    "columnId": "installSucceeded",
+                    "label": "Installation Succeeded"
+                  },
+                  {
+                    "columnId": "installFailed",
+                    "label": "Installation Failed"
+                  }
+                ]
+              },
+              "sortBy": [
+                {
+                  "itemKey": "agent",
+                  "sortOrder": 1
+                }
+              ],
+              "tileSettings": {
+                "titleContent": {
+                  "columnMatch": "acount",
+                  "formatter": 1
+                },
+                "subtitleContent": {
+                  "columnMatch": "agent",
+                  "numberFormat": {
+                    "unit": 17,
+                    "options": {
+                      "style": "decimal"
+                    }
+                  }
+                },
+                "leftContent": {
+                  "columnMatch": "agent",
+                  "formatter": 10,
+                  "formatOptions": {
+                    "palette": "blue",
+                    "compositeBarSettings": {
+                      "labelText": "",
+                      "columnSettings": [
+                        {
+                          "columnName": "acount",
+                          "color": "blue"
+                        },
+                        {
+                          "columnName": "autoUpgrade",
+                          "color": "blue"
+                        }
+                      ]
+                    }
+                  },
+                  "numberFormat": {
+                    "unit": 17,
+                    "options": {
+                      "style": "decimal",
+                      "maximumFractionDigits": 2,
+                      "maximumSignificantDigits": 3
+                    }
+                  }
+                },
+                "showBorder": false,
+                "size": "auto"
+              }
+            },
+            "name": "query - 5"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\r\n| where type == \"microsoft.compute/virtualmachines\" or type == \"microsoft.hybridcompute/machines\"\r\n| parse id with * \"machines/\" ComputerName\r\n| extend ComputerName = tolower(ComputerName)\r\n| join kind=leftouter (\r\nresources\r\n| where (type contains \"microsoft.hybridcompute/machines/extensions\" or type contains \"microsoft.compute/virtualmachines/extensions\") and (name == \"MicrosoftMonitoringAgent\" or name == \"OmsAgentForLinux\" or name == \"OMSAgentForLinux\")\r\n| parse id with * \"machines/\" ComputerName \"/\" *\r\n| extend ComputerName = tolower(ComputerName)\r\n| extend MMA = tostring(name)\r\n) on ComputerName\r\n| join kind=leftouter (\r\nresources\r\n| where (type contains \"microsoft.hybridcompute/machines/extensions\" or type contains \"microsoft.compute/virtualmachines/extensions\") and (name == \"AzureMonitorWindowsAgent\" or name == \"AzureMonitorLinuxAgent\")\r\n| parse id with * \"achines/\" ComputerName \"/\" *\r\n| extend ComputerName = tolower(ComputerName)\r\n| extend AMAgent = tostring(name)\r\n) on ComputerName\r\n| project id, name, ['type'], MMA, AMAgent, subscriptionId\r\n| union (\r\n    resources\r\n    | where type == \"microsoft.compute/virtualmachinescalesets\"\r\n    | project id, name, subscriptionId\r\n    | join kind=leftouter (\r\n    resources\r\n    | where type == \"microsoft.compute/virtualmachinescalesets\"\r\n    | extend extensionprofile = properties.virtualMachineProfile.extensionProfile\r\n    | extend extensions = extensionprofile.extensions\r\n    | mv-expand extensions\r\n    | extend extensiontype = extensions.properties.type\r\n    | where extensiontype in (\"MicrosoftMonitoringAgent\" )\r\n    | project id, name, MMA = extensiontype, subscriptionId\r\n    ) on name \r\n    | join kind=fullouter (\r\n    resources\r\n    | where type == \"microsoft.compute/virtualmachinescalesets\"\r\n    | extend extensionprofile = properties.virtualMachineProfile.extensionProfile\r\n    | extend extensions = extensionprofile.extensions\r\n    | mv-expand extensions\r\n    | extend extensiontype = extensions.properties.type\r\n    | where extensiontype in (\"AzureMonitorWindowsAgent\")\r\n    | project id, name, AMAgent = extensiontype, subscriptionId\r\n    ) on $left.name == $right.name\r\n    | extend ComputerName = iff(isempty(name), name1, name)\r\n    | extend id = iff(isempty(id), id1, id)\r\n    | extend subscriptionId = iff(isempty(subscriptionId), subscriptionId1, subscriptionId)\r\n    | project id, name = ComputerName, [\"type\"] = \"Virtual Machine Scale Sets\", MMA, AMAgent, subscriptionId\r\n)\r\n| extend VMType = case(type == \"microsoft.compute/virtualmachines\", \"Azure Virtual Machines\",\r\n                type == \"microsoft.hybridcompute/machines\", \"Arc-enabled Servers\", \r\n                type == \"Virtual Machine Scale Sets\", \"Virtual Machine Scale Sets\", \r\n                \"Other\")\r\n| extend MMA = iff(isnotempty(MMA_string), MMA_string, MMA_dynamic)\r\n| extend AMAgent = iff(isnotempty(AMAgent_string), AMAgent_string, AMAgent_dynamic)\r\n| summarize MachineCount = count(), \r\n            BothAgents = countif(isnotempty(MMA) and isnotempty(AMAgent)), \r\n            MMAOnly = countif(isnotempty(MMA) and isempty(AMAgent)), \r\n            AMAOnly = countif(isempty(MMA) and isnotempty(AMAgent)) \r\n            by subscriptionId, VMType\r\n| extend counts = pack_array(BothAgents, MMAOnly, AMAOnly)\r\n| extend migstatus = case(BothAgents != 0, \"In Progress\",\r\n                            AMAOnly != 0 and BothAgents == 0 and MMAOnly == 0, \"Completed\", \r\n                            AMAOnly != 0 and MMAOnly != 0, \"In Progress\",\r\n                            MMAOnly != 0 and BothAgents == 0, \"Not Started\", \"Not Started\")",
+              "size": 1,
+              "showAnalytics": true,
+              "title": "Logging Agent Summary and Migration Status",
+              "showRefreshButton": true,
+              "showExportToExcel": true,
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "visualization": "table",
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "subscriptionId",
+                    "formatter": 5
+                  },
+                  {
+                    "columnMatch": "VMType",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "30ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "MachineCount",
+                    "formatter": 1,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "20ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "BothAgents",
+                    "formatter": 4,
+                    "formatOptions": {
+                      "min": 0,
+                      "palette": "blue",
+                      "customColumnWidthSetting": "20ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "MMAOnly",
+                    "formatter": 4,
+                    "formatOptions": {
+                      "min": 0,
+                      "palette": "redBright",
+                      "customColumnWidthSetting": "25ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "AMAOnly",
+                    "formatter": 4,
+                    "formatOptions": {
+                      "min": 0,
+                      "palette": "green",
+                      "customColumnWidthSetting": "20ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "counts",
+                    "formatter": 22,
+                    "formatOptions": {
+                      "compositeBarSettings": {
+                        "labelText": "[\"migstatus\"]",
+                        "columnSettings": [
+                          {
+                            "columnName": "BothAgents",
+                            "color": "blue"
+                          },
+                          {
+                            "columnName": "MMAOnly",
+                            "color": "redBright"
+                          },
+                          {
+                            "columnName": "AMAOnly",
+                            "color": "green"
+                          }
+                        ]
+                      },
+                      "customColumnWidthSetting": "30ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "migstatus",
+                    "formatter": 5
+                  }
+                ],
+                "labelSettings": [
+                  {
+                    "columnId": "VMType",
+                    "label": "Resource Type"
+                  },
+                  {
+                    "columnId": "MachineCount",
+                    "label": "Resource Count"
+                  },
+                  {
+                    "columnId": "BothAgents",
+                    "label": "Both Agents"
+                  },
+                  {
+                    "columnId": "MMAOnly",
+                    "label": "Legacy Log Analytics"
+                  },
+                  {
+                    "columnId": "AMAOnly",
+                    "label": "AMA Only"
+                  },
+                  {
+                    "columnId": "counts",
+                    "label": "Migration Status"
+                  }
+                ]
+              }
+            },
+            "name": "agentmigrationtracker"
+          }
+        ]
+      },
+      "conditionalVisibility": {
+        "parameterName": "Tab",
+        "comparison": "isEqualTo",
+        "value": "overview"
+      },
+      "name": "overview"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "items": [
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\r\n| where type == \"microsoft.insights/datacollectionrules\"\r\n| extend RuleType = iff(isempty(kind),'Unknown', kind)\r\n| summarize count () by RuleType",
+              "size": 4,
+              "title": "Rule Types",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "visualization": "tiles",
+              "tileSettings": {
+                "titleContent": {
+                  "columnMatch": "RuleType",
+                  "formatter": 1
+                },
+                "leftContent": {
+                  "columnMatch": "count_",
+                  "formatter": 12,
+                  "formatOptions": {
+                    "palette": "auto"
+                  },
+                  "numberFormat": {
+                    "unit": 17,
+                    "options": {
+                      "maximumSignificantDigits": 3,
+                      "maximumFractionDigits": 2
+                    }
+                  }
+                },
+                "showBorder": true,
+                "size": "auto"
+              }
+            },
+            "name": "dcrTypes"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\r\n| where type == \"microsoft.insights/datacollectionrules\"",
+              "size": 0,
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources"
+            },
+            "name": "query - 1"
+          }
+        ]
+      },
+      "conditionalVisibility": {
+        "parameterName": "Tab",
+        "comparison": "isEqualTo",
+        "value": "dataCollectionRules"
+      },
+      "name": "dataCollectionRules"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "loadType": "always",
+        "items": [
+          {
+            "type": 9,
+            "content": {
+              "version": "KqlParameterItem/1.0",
+              "crossComponentResources": [
+                "/subscriptions/ada06e68-375e-4210-be3a-c6cacebf41c5"
+              ],
+              "parameters": [
+                {
+                  "id": "8e238a36-fc4c-4a98-976f-a53294c1db87",
+                  "version": "KqlParameterItem/1.0",
+                  "name": "topVmLocation",
+                  "type": 1,
+                  "isRequired": true,
+                  "query": "resources\r\n| where type =~ 'Microsoft.Compute/virtualMachines'\r\n| project location\r\n| top 1 by location",
+                  "timeContext": {
+                    "durationMs": 86400000
+                  },
+                  "queryType": 1
+                },
+                {
+                  "version": "KqlParameterItem/1.0",
+                  "name": "topVmSubscription",
+                  "type": 1,
+                  "isRequired": true,
+                  "query": "resources\r\n| where type =~ 'Microsoft.Compute/virtualMachines'\r\n| project location, subscriptionId\r\n| top 1 by location\r\n| project subscriptionId",
+                  "timeContext": {
+                    "durationMs": 86400000
+                  },
+                  "queryType": 1,
+                  "resourceType": "microsoft.resourcegraph/resources",
+                  "id": "9116ed8d-2865-469e-8f2d-e18814e804a4"
+                },
+                {
+                  "id": "5ce7b1ca-d6b7-43fa-b280-5caf5763adf6",
+                  "version": "KqlParameterItem/1.0",
+                  "name": "mdeLinuxLatestVersion",
+                  "type": 1,
+                  "isRequired": true,
+                  "query": "{\"version\":\"ARMEndpoint/1.0\",\"data\":null,\"headers\":[],\"method\":\"GET\",\"path\":\"/subscriptions/{topVmSubscription}/providers/Microsoft.Compute/locations/{topVmLocation}/publishers/Microsoft.Azure.AzureDefenderForServers/artifacttypes/vmextension/types/MDE.Linux/versions?\",\"urlParams\":[{\"key\":\"api-version\",\"value\":\"2022-08-01\"},{\"key\":\"$orderby\",\"value\":\"name desc\"},{\"key\":\"$top\",\"value\":\"1\"}],\"batchDisabled\":false,\"transformers\":[{\"type\":\"jsonpath\",\"settings\":{\"tablePath\":\"$[0].name\",\"columns\":[]}}]}",
+                  "timeContext": {
+                    "durationMs": 86400000
+                  },
+                  "queryType": 12
+                },
+                {
+                  "version": "KqlParameterItem/1.0",
+                  "name": "mdeWindowsLatestVersion",
+                  "type": 1,
+                  "isRequired": true,
+                  "query": "{\"version\":\"ARMEndpoint/1.0\",\"data\":null,\"headers\":[],\"method\":\"GET\",\"path\":\"/subscriptions/{topVmSubscription}/providers/Microsoft.Compute/locations/{topVmLocation}/publishers/Microsoft.Azure.AzureDefenderForServers/artifacttypes/vmextension/types/MDE.Linux/versions?\",\"urlParams\":[{\"key\":\"api-version\",\"value\":\"2022-08-01\"},{\"key\":\"$orderby\",\"value\":\"name desc\"},{\"key\":\"$top\",\"value\":\"1\"}],\"batchDisabled\":false,\"transformers\":[{\"type\":\"jsonpath\",\"settings\":{\"tablePath\":\"$[0].name\",\"columns\":[]}}]}",
+                  "timeContext": {
+                    "durationMs": 86400000
+                  },
+                  "queryType": 12,
+                  "id": "31ae95f4-8420-464b-8e7b-aeb94ed18dc8"
+                },
+                {
+                  "version": "KqlParameterItem/1.0",
+                  "name": "amaWindowsLatestVersion",
+                  "type": 1,
+                  "isRequired": true,
+                  "query": "{\"version\":\"ARMEndpoint/1.0\",\"data\":null,\"headers\":[],\"method\":\"GET\",\"path\":\"/subscriptions/{topVmSubscription}/providers/Microsoft.Compute/locations/{topVmLocation}/publishers/Microsoft.Azure.Monitor/artifacttypes/vmextension/types/AzureMonitorWindowsAgent/versions?\",\"urlParams\":[{\"key\":\"api-version\",\"value\":\"2022-08-01\"},{\"key\":\"$orderby\",\"value\":\"name desc\"},{\"key\":\"$top\",\"value\":\"1\"}],\"batchDisabled\":false,\"transformers\":[{\"type\":\"jsonpath\",\"settings\":{\"tablePath\":\"$[0].name\",\"columns\":[]}}]}",
+                  "timeContext": {
+                    "durationMs": 86400000
+                  },
+                  "queryType": 12,
+                  "id": "d0b248b2-4745-4ac4-ba92-960d45962870"
+                },
+                {
+                  "version": "KqlParameterItem/1.0",
+                  "name": "amaLinuxLatestVersion",
+                  "type": 1,
+                  "isRequired": true,
+                  "query": "{\"version\":\"ARMEndpoint/1.0\",\"data\":null,\"headers\":[],\"method\":\"GET\",\"path\":\"/subscriptions/{topVmSubscription}/providers/Microsoft.Compute/locations/{topVmLocation}/publishers/Microsoft.Azure.Monitor/artifacttypes/vmextension/types/AzureMonitorLinuxAgent/versions?\",\"urlParams\":[{\"key\":\"api-version\",\"value\":\"2022-08-01\"},{\"key\":\"$orderby\",\"value\":\"name desc\"},{\"key\":\"$top\",\"value\":\"1\"}],\"batchDisabled\":false,\"transformers\":[{\"type\":\"jsonpath\",\"settings\":{\"tablePath\":\"$[0].name\",\"columns\":[]}}]}",
+                  "timeContext": {
+                    "durationMs": 86400000
+                  },
+                  "queryType": 12,
+                  "id": "dfdd6b4b-b053-4a67-bf8e-2834d57c663e"
+                },
+                {
+                  "version": "KqlParameterItem/1.0",
+                  "name": "defenderWindowsLatestVersions",
+                  "type": 1,
+                  "isRequired": true,
+                  "query": "{\"version\":\"ARMEndpoint/1.0\",\"data\":null,\"headers\":[],\"method\":\"GET\",\"path\":\"/subscriptions/{topVmSubscription}/providers/Microsoft.Compute/locations/{topVmLocation}/publishers/Microsoft.Azure.Security.Monitoring/artifacttypes/vmextension/types/AzureSecurityWindowsAgent/versions?\",\"urlParams\":[{\"key\":\"api-version\",\"value\":\"2022-08-01\"},{\"key\":\"$orderby\",\"value\":\"name desc\"},{\"key\":\"$top\",\"value\":\"1\"}],\"batchDisabled\":false,\"transformers\":[{\"type\":\"jsonpath\",\"settings\":{\"tablePath\":\"$[0].name\",\"columns\":[]}}]}",
+                  "timeContext": {
+                    "durationMs": 86400000
+                  },
+                  "queryType": 12,
+                  "id": "cac9db84-fd9d-45e5-b9ec-12fedb716ce5"
+                },
+                {
+                  "version": "KqlParameterItem/1.0",
+                  "name": "defenderLinuxLatestVersion",
+                  "type": 1,
+                  "isRequired": true,
+                  "query": "{\"version\":\"ARMEndpoint/1.0\",\"data\":null,\"headers\":[],\"method\":\"GET\",\"path\":\"/subscriptions/{topVmSubscription}/providers/Microsoft.Compute/locations/{topVmLocation}/publishers/Microsoft.Azure.Security.Monitoring/artifacttypes/vmextension/types/AzureSecurityLinuxAgent/versions?\",\"urlParams\":[{\"key\":\"api-version\",\"value\":\"2022-08-01\"},{\"key\":\"$orderby\",\"value\":\"name desc\"},{\"key\":\"$top\",\"value\":\"1\"}],\"batchDisabled\":false,\"transformers\":[{\"type\":\"jsonpath\",\"settings\":{\"tablePath\":\"$[0].name\",\"columns\":[]}}]}",
+                  "timeContext": {
+                    "durationMs": 86400000
+                  },
+                  "queryType": 12,
+                  "id": "381179b3-b386-4800-bd37-fd21abdb919d"
+                },
+                {
+                  "version": "KqlParameterItem/1.0",
+                  "name": "guestConfigLinuxLatestVersion",
+                  "type": 1,
+                  "isRequired": true,
+                  "query": "{\"version\":\"ARMEndpoint/1.0\",\"data\":null,\"headers\":[],\"method\":\"GET\",\"path\":\"/subscriptions/{topVmSubscription}/providers/Microsoft.Compute/locations/{topVmLocation}/publishers/Microsoft.GuestConfiguration/artifacttypes/vmextension/types/ConfigurationforLinux/versions?\",\"urlParams\":[{\"key\":\"api-version\",\"value\":\"2022-08-01\"},{\"key\":\"$orderby\",\"value\":\"name desc\"},{\"key\":\"$top\",\"value\":\"1\"}],\"batchDisabled\":false,\"transformers\":[{\"type\":\"jsonpath\",\"settings\":{\"tablePath\":\"$[0].name\",\"columns\":[]}}]}",
+                  "timeContext": {
+                    "durationMs": 86400000
+                  },
+                  "queryType": 12,
+                  "id": "e377785d-bf9a-4bd5-a82a-ac5fe33ff9e4"
+                },
+                {
+                  "version": "KqlParameterItem/1.0",
+                  "name": "guestConfigWindowsLatestVersion",
+                  "type": 1,
+                  "isRequired": true,
+                  "query": "{\"version\":\"ARMEndpoint/1.0\",\"data\":null,\"headers\":[],\"method\":\"GET\",\"path\":\"/subscriptions/{topVmSubscription}/providers/Microsoft.Compute/locations/{topVmLocation}/publishers/Microsoft.GuestConfiguration/artifacttypes/vmextension/types/ConfigurationforWindows/versions?\",\"urlParams\":[{\"key\":\"api-version\",\"value\":\"2022-08-01\"},{\"key\":\"$orderby\",\"value\":\"name desc\"},{\"key\":\"$top\",\"value\":\"1\"}],\"batchDisabled\":false,\"transformers\":[{\"type\":\"jsonpath\",\"settings\":{\"tablePath\":\"$[0].name\",\"columns\":[]}}]}",
+                  "timeContext": {
+                    "durationMs": 86400000
+                  },
+                  "queryType": 12,
+                  "id": "9c50b860-9fbe-47a0-8a7e-0d2bdd6bfcb7"
+                },
+                {
+                  "version": "KqlParameterItem/1.0",
+                  "name": "mmaWindowsLatestVersion",
+                  "type": 1,
+                  "isRequired": true,
+                  "query": "{\"version\":\"ARMEndpoint/1.0\",\"data\":null,\"headers\":[],\"method\":\"GET\",\"path\":\"/subscriptions/{topVmSubscription}/providers/Microsoft.Compute/locations/{topVmLocation}/publishers/Microsoft.EnterpriseCloud.Monitoring/artifacttypes/vmextension/types/MicrosoftMonitoringAgent/versions?\",\"urlParams\":[{\"key\":\"api-version\",\"value\":\"2022-08-01\"},{\"key\":\"$orderby\",\"value\":\"name desc\"},{\"key\":\"$top\",\"value\":\"1\"}],\"batchDisabled\":false,\"transformers\":[{\"type\":\"jsonpath\",\"settings\":{\"tablePath\":\"$[0].name\",\"columns\":[]}}]}",
+                  "timeContext": {
+                    "durationMs": 86400000
+                  },
+                  "queryType": 12,
+                  "id": "28ec80e2-7364-4f88-b8e7-e65eedbdfb4b"
+                },
+                {
+                  "version": "KqlParameterItem/1.0",
+                  "name": "mmaLinuxLatestVersion",
+                  "type": 1,
+                  "isRequired": true,
+                  "query": "{\"version\":\"ARMEndpoint/1.0\",\"data\":null,\"headers\":[],\"method\":\"GET\",\"path\":\"/subscriptions/{topVmSubscription}/providers/Microsoft.Compute/locations/{topVmLocation}/publishers/Microsoft.EnterpriseCloud.Monitoring/artifacttypes/vmextension/types/OmsAgentForLinux/versions?\",\"urlParams\":[{\"key\":\"api-version\",\"value\":\"2022-08-01\"},{\"key\":\"$orderby\",\"value\":\"name desc\"},{\"key\":\"$top\",\"value\":\"1\"}],\"batchDisabled\":false,\"transformers\":[{\"type\":\"jsonpath\",\"settings\":{\"tablePath\":\"$[0].name\",\"columns\":[]}}]}",
+                  "timeContext": {
+                    "durationMs": 86400000
+                  },
+                  "queryType": 12,
+                  "id": "dba8f4d1-ef62-45cf-a752-819a6f1da18a"
+                },
+                {
+                  "version": "KqlParameterItem/1.0",
+                  "name": "qualysLinuxLatestVersion",
+                  "type": 1,
+                  "isRequired": true,
+                  "query": "{\"version\":\"ARMEndpoint/1.0\",\"data\":null,\"headers\":[],\"method\":\"GET\",\"path\":\"/subscriptions/{topVmSubscription}/providers/Microsoft.Compute/locations/{topVmLocation}/publishers/Qualys/artifacttypes/vmextension/types/LinuxAgent.AzureSecurityCenter/versions?\",\"urlParams\":[{\"key\":\"api-version\",\"value\":\"2022-08-01\"},{\"key\":\"$orderby\",\"value\":\"name desc\"},{\"key\":\"$top\",\"value\":\"1\"}],\"batchDisabled\":false,\"transformers\":[{\"type\":\"jsonpath\",\"settings\":{\"tablePath\":\"$[0].name\",\"columns\":[]}}]}",
+                  "timeContext": {
+                    "durationMs": 86400000
+                  },
+                  "queryType": 12,
+                  "id": "536ffc31-876c-4235-8ae5-ec9d5f37b3b0"
+                },
+                {
+                  "version": "KqlParameterItem/1.0",
+                  "name": "qualysWindowsLatestVersion",
+                  "type": 1,
+                  "isRequired": true,
+                  "query": "{\"version\":\"ARMEndpoint/1.0\",\"data\":null,\"headers\":[],\"method\":\"GET\",\"path\":\"/subscriptions/{topVmSubscription}/providers/Microsoft.Compute/locations/{topVmLocation}/publishers/Qualys/artifacttypes/vmextension/types/WindowsAgent.AzureSecurityCenter/versions?\",\"urlParams\":[{\"key\":\"api-version\",\"value\":\"2022-08-01\"},{\"key\":\"$orderby\",\"value\":\"name desc\"},{\"key\":\"$top\",\"value\":\"1\"}],\"batchDisabled\":false,\"transformers\":[{\"type\":\"jsonpath\",\"settings\":{\"tablePath\":\"$[0].name\",\"columns\":[]}}]}",
+                  "timeContext": {
+                    "durationMs": 86400000
+                  },
+                  "queryType": 12,
+                  "id": "94028af5-1733-4db3-9e56-932c73d45ea1"
+                }
+              ],
+              "style": "above",
+              "queryType": 1
+            },
+            "conditionalVisibility": {
+              "parameterName": "showHiddenObjects",
+              "comparison": "isEqualTo",
+              "value": "True"
+            },
+            "name": "parameters - 13"
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "- Latest Agent Versions are region specific. This view pulls the latest versions from virtual machines by the top region in your enivornment ({topVmLocation}). You can list all versions for a region via [az vm extension image list-versions](https://learn.microsoft.com/cli/azure/vm/extension/image?view=azure-cli-latest#az-vm-extension-image-list-versions)\r\n\r\n- Verison numbers don't always correlate to installed versions reported by the operating system or docs pages. These version numbers represent the extension version number",
+              "style": "info"
+            },
+            "name": "text - 2"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "{\"version\":\"1.0.0\",\"content\":\"[\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Legacy Log Analytics\\\",\\r\\n\\t\\t\\\"name\\\": \\\"OmsAgentForLinux\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Linux\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"{mmaLinuxLatestVersion}\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"https://learn.microsoft.com/azure/virtual-machines/extensions/oms-linux\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Legacy Log Analytics\\\",\\r\\n\\t\\t\\\"name\\\": \\\"MicrosoftMonitoringAgent\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Windows\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"{mmaWindowsLatestVersion}\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"https://learn.microsoft.com/en-us/azure/virtual-machines/extensions/oms-windows\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Defender for Servers P2\\\",\\r\\n\\t\\t\\\"name\\\": \\\"AzureSecurityLinuxAgent\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Linux\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"{defenderLinuxLatestVersion}\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"N/A\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Defender for Servers P2\\\",\\r\\n\\t\\t\\\"name\\\": \\\"AzureSecurityWindowsAgent\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Windows\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"{defenderWindowsLatestVersions}\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"N/A\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Azure Monitor Agent\\\",\\r\\n\\t\\t\\\"name\\\": \\\"AzureMonitorLinuxAgent\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Linux\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"{amaLinuxLatestVersion}\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"https://learn.microsoft.com/azure/azure-monitor/agents/azure-monitor-agent-extension-versions\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Azure Monitor Agent\\\",\\r\\n\\t\\t\\\"name\\\": \\\"AzureMonitorWindowsAgent\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Windows\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"{amaWindowsLatestVersion}\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"https://learn.microsoft.com/azure/azure-monitor/agents/azure-monitor-agent-extension-versions\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Defender for Endpoint\\\",\\r\\n\\t\\t\\\"name\\\": \\\"MDE.Linux\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Linux\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"{mdeLinuxLatestVersion}\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"https://learn.microsoft.com/microsoft-365/security/defender-endpoint/linux-whatsnew\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Defender for Endpoint\\\",\\r\\n\\t\\t\\\"name\\\": \\\"MDE.Windows\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Windows\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"{mdeWindowsLatestVersion}\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"https://learn.microsoft.com/microsoft-365/security/defender-endpoint/windows-whatsnew\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Azure Guest Configuration\\\",\\r\\n\\t\\t\\\"name\\\": \\\"AzurePolicyforLinux\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Linux\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"{guestConfigLinuxLatestVersion}\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"https://learn.microsoft.com/azure/governance/machine-configuration/agent-notes#release-notes\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Azure Guest Configuration\\\",\\r\\n\\t\\t\\\"name\\\": \\\"AzurePolicyforWindows\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Windows\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"{guestConfigWindowsLatestVersion}\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"https://learn.microsoft.com/azure/governance/machine-configuration/agent-notes#release-notes\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Qualys\\\",\\r\\n\\t\\t\\\"name\\\": \\\"LinuxAgent.AzureSecurityCenter\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Linux\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"{qualysLinuxLatestVersion}\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"N/A\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Qualys\\\",\\r\\n\\t\\t\\\"name\\\": \\\"WindowsAgent.AzureSecurityCenter\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Windows\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"{qualysWindowsLatestVersion}\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"N/A\\\"\\r\\n\\t}\\r\\n]\",\"transformers\":null}",
+              "size": 0,
+              "title": "Latest Agents ({topVmLocation})",
+              "showRefreshButton": true,
+              "showExportToExcel": true,
+              "queryType": 8,
+              "visualization": "table",
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "versionDocs",
+                    "formatter": 7,
+                    "formatOptions": {
+                      "linkTarget": "Url"
+                    }
+                  }
+                ],
+                "labelSettings": [
+                  {
+                    "columnId": "agent",
+                    "label": "Agent"
+                  },
+                  {
+                    "columnId": "name",
+                    "label": "Extension Name"
+                  },
+                  {
+                    "columnId": "os",
+                    "label": "Operating System"
+                  },
+                  {
+                    "columnId": "latestVersion",
+                    "label": "Latest Version"
+                  },
+                  {
+                    "columnId": "versionDocs",
+                    "label": "Release Notes"
+                  }
+                ]
+              }
+            },
+            "showPin": false,
+            "name": "agentMappings"
+          }
+        ],
+        "exportParameters": true
+      },
+      "conditionalVisibility": {
+        "parameterName": "Tab",
+        "comparison": "isEqualTo",
+        "value": "agentVersions"
+      },
+      "name": "agentVersions"
+    }
+  ],
+  "fallbackResourceIds": [
+    "/subscriptions/ada06e68-375e-4210-be3a-c6cacebf41c5/resourcegroups/sentinel-prd/providers/microsoft.operationalinsights/workspaces/sentinel-prd"
+  ],
+  "fromTemplateId": "sentinel-UserWorkbook",
+  "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+}
