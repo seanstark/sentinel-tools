@@ -108,7 +108,8 @@
                     "additionalResourceOptions": [],
                     "showDefault": false
                   },
-                  "jsonData": "[\r\n    { \"value\": \"True\", \"label\":\"Yes\"}, \r\n    { \"value\": \"False\", \"label\":\"No\", \"selected\":true }\r\n]"
+                  "jsonData": "[\r\n    { \"value\": \"True\", \"label\":\"Yes\"}, \r\n    { \"value\": \"False\", \"label\":\"No\", \"selected\":true }\r\n]",
+                  "value": "True"
                 },
                 {
                   "id": "04829011-99d5-490e-8bf3-516a27d22b42",
@@ -570,7 +571,6 @@
       "content": {
         "version": "NotebookGroup/1.0",
         "groupType": "editable",
-        "loadType": "always",
         "items": [
           {
             "type": 9,
@@ -1880,15 +1880,215 @@
             "name": "dcrTypes"
           },
           {
+            "type": 11,
+            "content": {
+              "version": "LinkItem/1.0",
+              "style": "tabs",
+              "links": [
+                {
+                  "id": "28713e9b-1a5f-41a5-80cc-e045fb8d5caa",
+                  "cellValue": "dcrTab",
+                  "linkTarget": "parameter",
+                  "linkLabel": "By Rule",
+                  "subTarget": "byRule",
+                  "style": "link",
+                  "linkIsContextBlade": true
+                },
+                {
+                  "id": "40802a92-1dc3-4e16-a219-c2355faeb971",
+                  "cellValue": "dcrTab",
+                  "linkTarget": "parameter",
+                  "linkLabel": "By Machine",
+                  "subTarget": "byMachine",
+                  "style": "link"
+                }
+              ]
+            },
+            "name": "links - 5"
+          },
+          {
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
-              "query": "resources\r\n| where type == \"microsoft.insights/datacollectionrules\"",
+              "query": "resources\r\n| where type == \"microsoft.insights/datacollectionrules\"\r\n| project id, name, type, kind, location, resourceGroup, subscriptionId, properties",
               "size": 0,
+              "showAnalytics": true,
+              "title": "Data Collection Rules",
+              "showRefreshButton": true,
+              "exportedParameters": [
+                {
+                  "fieldName": "subscriptionId",
+                  "parameterName": "dcrSubscriptionId",
+                  "parameterType": 1
+                },
+                {
+                  "fieldName": "resourceGroup",
+                  "parameterName": "dcrResourceGroup",
+                  "parameterType": 1
+                },
+                {
+                  "fieldName": "name",
+                  "parameterName": "dataCollectionRuleName",
+                  "parameterType": 1
+                }
+              ],
+              "showExportToExcel": true,
               "queryType": 1,
-              "resourceType": "microsoft.resourcegraph/resources"
+              "resourceType": "microsoft.resourcegraph/resources",
+              "visualization": "table",
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "name",
+                    "formatter": 5
+                  },
+                  {
+                    "columnMatch": "type",
+                    "formatter": 5
+                  }
+                ],
+                "sortBy": [
+                  {
+                    "itemKey": "resourceGroup",
+                    "sortOrder": 1
+                  }
+                ]
+              },
+              "sortBy": [
+                {
+                  "itemKey": "resourceGroup",
+                  "sortOrder": 1
+                }
+              ]
             },
-            "name": "query - 1"
+            "conditionalVisibility": {
+              "parameterName": "dcrTab",
+              "comparison": "isEqualTo",
+              "value": "byRule"
+            },
+            "name": "dataCollectionRules"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "{\"version\":\"ARMEndpoint/1.0\",\"data\":null,\"headers\":[],\"method\":\"GET\",\"path\":\"/subscriptions/{dcrSubscriptionId}/resourceGroups/{dcrResourceGroup}/providers/Microsoft.Insights/dataCollectionRules/{dataCollectionRuleName}/associations?\",\"urlParams\":[{\"key\":\"api-version\",\"value\":\"2021-09-01-preview\"}],\"batchDisabled\":false,\"transformers\":[{\"type\":\"jsonpath\",\"settings\":{\"tablePath\":\"$.value\",\"columns\":[{\"path\":\"id\",\"columnid\":\"Machine\",\"columnType\":\"string\",\"substringRegexMatch\":\"(\\\\/subscriptions.*)(\\\\/providers.*|Providers.*)\",\"substringReplace\":\"$1\"},{\"path\":\"properties.dataCollectionRuleId\",\"columnid\":\"dataCollectionRuleId\",\"columnType\":\"string\"}]}}]}",
+              "size": 4,
+              "title": "Data Collection Rule Associations",
+              "showRefreshButton": true,
+              "showExportToExcel": true,
+              "queryType": 12
+            },
+            "conditionalVisibility": {
+              "parameterName": "dcrTab",
+              "comparison": "isEqualTo",
+              "value": "byRule"
+            },
+            "name": "ruleAssociations"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "Resources\n| where type =~ 'Microsoft.Compute/virtualMachines' or \ntype == \"microsoft.compute/virtualmachinescalesets\" or\ntype == \"microsoft.hybridcompute/machines\"\n| extend text = iff(\n                        type =~ 'Microsoft.Compute/virtualMachines', 'Azure Virtual Machines', \n                        iff(type =~ \"microsoft.compute/virtualmachinescalesets\", 'Azure Virtual Machine Scale Sets',\n                        iff(type == \"microsoft.hybridcompute/machines\", 'Azure Arc Machines',\n                    'Unknown')))",
+              "size": 0,
+              "showAnalytics": true,
+              "showRefreshButton": true,
+              "exportedParameters": [
+                {
+                  "fieldName": "id",
+                  "parameterName": "dcrMachineId",
+                  "parameterType": 1
+                },
+                {
+                  "fieldName": "name",
+                  "parameterName": "dcrMachineName",
+                  "parameterType": 1
+                }
+              ],
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "gridSettings": {
+                "filter": true
+              }
+            },
+            "conditionalVisibility": {
+              "parameterName": "dcrTab",
+              "comparison": "isEqualTo",
+              "value": "byMachine"
+            },
+            "name": "allMachinesforDCR"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "{\"version\":\"ARMEndpoint/1.0\",\"data\":null,\"headers\":[],\"method\":\"GET\",\"path\":\"{dcrMachineId}/providers/Microsoft.Insights/dataCollectionRuleAssociations?\",\"urlParams\":[{\"key\":\"api-version\",\"value\":\"2021-09-01-preview\"}],\"batchDisabled\":false,\"transformers\":[{\"type\":\"jsonpath\",\"settings\":{\"tablePath\":\"$.value\",\"columns\":[{\"path\":\"properties.dataCollectionRuleId\",\"columnid\":\"dataCollectionRule\",\"columnType\":\"string\"},{\"path\":\"name\",\"columnid\":\"name\",\"columnType\":\"string\"},{\"path\":\"systemData.createdBy\",\"columnid\":\"createdBy\",\"columnType\":\"string\"},{\"path\":\"systemData.createdAt\",\"columnid\":\"createdAt\",\"columnType\":\"datetime\"},{\"path\":\"systemData.lastModifiedBy\",\"columnid\":\"lastModifiedBy\",\"columnType\":\"string\"},{\"path\":\"systemData.lastModifiedAt\",\"columnid\":\"lastModifiedAt\",\"columnType\":\"datetime\"}]}}]}",
+              "size": 0,
+              "title": "Data Collection Rules by {dcrMachineName}",
+              "showRefreshButton": true,
+              "showExportToExcel": true,
+              "queryType": 12,
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "dataCollectionRule",
+                    "formatter": 13,
+                    "formatOptions": {
+                      "linkTarget": "Resource",
+                      "linkIsContextBlade": true,
+                      "showIcon": true
+                    }
+                  },
+                  {
+                    "columnMatch": "createdAt",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "22ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "lastModifiedAt",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "22ch"
+                    }
+                  }
+                ],
+                "labelSettings": [
+                  {
+                    "columnId": "dataCollectionRule",
+                    "label": "Data Collection Rule"
+                  },
+                  {
+                    "columnId": "name",
+                    "label": "Name"
+                  },
+                  {
+                    "columnId": "createdBy",
+                    "label": "Created By"
+                  },
+                  {
+                    "columnId": "createdAt",
+                    "label": "Created Date"
+                  },
+                  {
+                    "columnId": "lastModifiedBy",
+                    "label": "Last Modified By"
+                  },
+                  {
+                    "columnId": "lastModifiedAt",
+                    "label": "Last Modified Date"
+                  }
+                ]
+              }
+            },
+            "conditionalVisibility": {
+              "parameterName": "dcrTab",
+              "comparison": "isEqualTo",
+              "value": "byMachine"
+            },
+            "name": "dcrbyVM"
           }
         ]
       },
