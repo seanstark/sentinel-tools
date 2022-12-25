@@ -213,12 +213,501 @@
       "name": "topSection"
     },
     {
+      "type": 9,
+      "content": {
+        "version": "KqlParameterItem/1.0",
+        "parameters": [
+          {
+            "id": "8e238a36-fc4c-4a98-976f-a53294c1db87",
+            "version": "KqlParameterItem/1.0",
+            "name": "topVmLocation",
+            "type": 1,
+            "isRequired": true,
+            "query": "resources\r\n| where type =~ 'Microsoft.Compute/virtualMachines'\r\n| project location\r\n| top 1 by location",
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "queryType": 1
+          },
+          {
+            "version": "KqlParameterItem/1.0",
+            "name": "topVmSubscription",
+            "type": 1,
+            "isRequired": true,
+            "query": "resources\r\n| where type =~ 'Microsoft.Compute/virtualMachines'\r\n| project location, subscriptionId\r\n| top 1 by location\r\n| project subscriptionId",
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "queryType": 1,
+            "resourceType": "microsoft.resourcegraph/resources",
+            "id": "9116ed8d-2865-469e-8f2d-e18814e804a4"
+          },
+          {
+            "id": "c350e495-da30-43f9-9448-e40d74112ea3",
+            "version": "KqlParameterItem/1.0",
+            "name": "selectVersionRegion",
+            "label": "Version Region",
+            "type": 8,
+            "description": "Select the Region to pull latest agent versions from",
+            "typeSettings": {
+              "additionalResourceOptions": [],
+              "includeAll": true
+            },
+            "value": null
+          },
+          {
+            "id": "403c3270-df33-4c68-b47d-f2c5b4804901",
+            "version": "KqlParameterItem/1.0",
+            "name": "selectedRegion",
+            "type": 1,
+            "isRequired": true,
+            "isHiddenWhenLocked": true,
+            "criteriaData": [
+              {
+                "criteriaContext": {
+                  "leftOperand": "selectVersionRegion",
+                  "operator": "is Empty",
+                  "rightValType": "param",
+                  "resultValType": "param",
+                  "resultVal": "topVmLocation"
+                }
+              },
+              {
+                "criteriaContext": {
+                  "operator": "Default",
+                  "resultValType": "param",
+                  "resultVal": "selectVersionRegion"
+                }
+              }
+            ]
+          },
+          {
+            "id": "5ce7b1ca-d6b7-43fa-b280-5caf5763adf6",
+            "version": "KqlParameterItem/1.0",
+            "name": "mdeLinuxLatestVersion",
+            "type": 2,
+            "isRequired": true,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "query": "{\"version\":\"ARMEndpoint/1.0\",\"data\":null,\"headers\":[],\"method\":\"GET\",\"path\":\"/subscriptions/{topVmSubscription}/providers/Microsoft.Compute/locations/{selectedRegion}/publishers/Microsoft.Azure.AzureDefenderForServers/artifacttypes/vmextension/types/MDE.Linux/versions?\",\"urlParams\":[{\"key\":\"api-version\",\"value\":\"2022-08-01\"}],\"batchDisabled\":false,\"transformers\":[{\"type\":\"jsonpath\",\"settings\":{\"tablePath\":\"$[*].name\",\"columns\":[]}}]}",
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::all"
+              ]
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "defaultValue": "value::all",
+            "queryType": 12
+          },
+          {
+            "id": "31ae95f4-8420-464b-8e7b-aeb94ed18dc8",
+            "version": "KqlParameterItem/1.0",
+            "name": "mdeWindowsLatestVersion",
+            "type": 2,
+            "isRequired": true,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "query": "{\"version\":\"ARMEndpoint/1.0\",\"data\":null,\"headers\":[],\"method\":\"GET\",\"path\":\"/subscriptions/{topVmSubscription}/providers/Microsoft.Compute/locations/{selectedRegion}/publishers/Microsoft.Azure.AzureDefenderForServers/artifacttypes/vmextension/types/MDE.Linux/versions?\",\"urlParams\":[{\"key\":\"api-version\",\"value\":\"2022-08-01\"}],\"batchDisabled\":false,\"transformers\":[{\"type\":\"jsonpath\",\"settings\":{\"tablePath\":\"$[*].name\",\"columns\":[]}}]}",
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::all"
+              ]
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "defaultValue": "value::all",
+            "queryType": 12
+          },
+          {
+            "id": "dfdd6b4b-b053-4a67-bf8e-2834d57c663e",
+            "version": "KqlParameterItem/1.0",
+            "name": "amaLinuxLatestVersion",
+            "type": 2,
+            "isRequired": true,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "query": "{\"version\":\"ARMEndpoint/1.0\",\"data\":null,\"headers\":[],\"method\":\"GET\",\"path\":\"/subscriptions/{topVmSubscription}/providers/Microsoft.Compute/locations/{selectedRegion}/publishers/Microsoft.Azure.Monitor/artifacttypes/vmextension/types/AzureMonitorLinuxAgent/versions?\",\"urlParams\":[{\"key\":\"api-version\",\"value\":\"2022-08-01\"}],\"batchDisabled\":false,\"transformers\":[{\"type\":\"jsonpath\",\"settings\":{\"tablePath\":\"$[*].name\",\"columns\":[]}}]}",
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::all"
+              ],
+              "showDefault": false
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "defaultValue": "value::all",
+            "queryType": 12
+          },
+          {
+            "id": "d0b248b2-4745-4ac4-ba92-960d45962870",
+            "version": "KqlParameterItem/1.0",
+            "name": "amaWindowsLatestVersion",
+            "type": 2,
+            "isRequired": true,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "query": "{\"version\":\"ARMEndpoint/1.0\",\"data\":null,\"headers\":[],\"method\":\"GET\",\"path\":\"/subscriptions/{topVmSubscription}/providers/Microsoft.Compute/locations/{selectedRegion}/publishers/Microsoft.Azure.Monitor/artifacttypes/vmextension/types/AzureMonitorWindowsAgent/versions?\",\"urlParams\":[{\"key\":\"api-version\",\"value\":\"2022-08-01\"}],\"batchDisabled\":false,\"transformers\":[{\"type\":\"jsonpath\",\"settings\":{\"tablePath\":\"$[*].name\",\"columns\":[]}}]}",
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::all"
+              ]
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "defaultValue": "value::all",
+            "queryType": 12
+          },
+          {
+            "id": "381179b3-b386-4800-bd37-fd21abdb919d",
+            "version": "KqlParameterItem/1.0",
+            "name": "defenderLinuxLatestVersion",
+            "type": 2,
+            "isRequired": true,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "query": "{\"version\":\"ARMEndpoint/1.0\",\"data\":null,\"headers\":[],\"method\":\"GET\",\"path\":\"/subscriptions/{topVmSubscription}/providers/Microsoft.Compute/locations/{selectedRegion}/publishers/Microsoft.Azure.Security.Monitoring/artifacttypes/vmextension/types/AzureSecurityLinuxAgent/versions?\",\"urlParams\":[{\"key\":\"api-version\",\"value\":\"2022-08-01\"}],\"batchDisabled\":false,\"transformers\":[{\"type\":\"jsonpath\",\"settings\":{\"tablePath\":\"$[*].name\",\"columns\":[]}}]}",
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::all"
+              ]
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "defaultValue": "value::all",
+            "queryType": 12
+          },
+          {
+            "id": "cac9db84-fd9d-45e5-b9ec-12fedb716ce5",
+            "version": "KqlParameterItem/1.0",
+            "name": "defenderWindowsLatestVersions",
+            "type": 2,
+            "isRequired": true,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "query": "{\"version\":\"ARMEndpoint/1.0\",\"data\":null,\"headers\":[],\"method\":\"GET\",\"path\":\"/subscriptions/{topVmSubscription}/providers/Microsoft.Compute/locations/{selectedRegion}/publishers/Microsoft.Azure.Security.Monitoring/artifacttypes/vmextension/types/AzureSecurityWindowsAgent/versions?\",\"urlParams\":[{\"key\":\"api-version\",\"value\":\"2022-08-01\"}],\"batchDisabled\":false,\"transformers\":[{\"type\":\"jsonpath\",\"settings\":{\"tablePath\":\"$[*].name\",\"columns\":[]}}]}",
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::all"
+              ]
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "defaultValue": "value::all",
+            "queryType": 12
+          },
+          {
+            "id": "e377785d-bf9a-4bd5-a82a-ac5fe33ff9e4",
+            "version": "KqlParameterItem/1.0",
+            "name": "guestConfigLinuxLatestVersion",
+            "type": 2,
+            "isRequired": true,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "query": "{\"version\":\"ARMEndpoint/1.0\",\"data\":null,\"headers\":[],\"method\":\"GET\",\"path\":\"/subscriptions/{topVmSubscription}/providers/Microsoft.Compute/locations/{selectedRegion}/publishers/Microsoft.GuestConfiguration/artifacttypes/vmextension/types/ConfigurationforLinux/versions?\",\"urlParams\":[{\"key\":\"api-version\",\"value\":\"2022-08-01\"}],\"batchDisabled\":false,\"transformers\":[{\"type\":\"jsonpath\",\"settings\":{\"tablePath\":\"$[*].name\",\"columns\":[]}}]}",
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::all"
+              ]
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "defaultValue": "value::all",
+            "queryType": 12
+          },
+          {
+            "id": "9c50b860-9fbe-47a0-8a7e-0d2bdd6bfcb7",
+            "version": "KqlParameterItem/1.0",
+            "name": "guestConfigWindowsLatestVersion",
+            "type": 2,
+            "isRequired": true,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "query": "{\"version\":\"ARMEndpoint/1.0\",\"data\":null,\"headers\":[],\"method\":\"GET\",\"path\":\"/subscriptions/{topVmSubscription}/providers/Microsoft.Compute/locations/{selectedRegion}/publishers/Microsoft.GuestConfiguration/artifacttypes/vmextension/types/ConfigurationforWindows/versions?\",\"urlParams\":[{\"key\":\"api-version\",\"value\":\"2022-08-01\"}],\"batchDisabled\":false,\"transformers\":[{\"type\":\"jsonpath\",\"settings\":{\"tablePath\":\"$[*].name\",\"columns\":[]}}]}",
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::all"
+              ]
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "defaultValue": "value::all",
+            "queryType": 12
+          },
+          {
+            "id": "28ec80e2-7364-4f88-b8e7-e65eedbdfb4b",
+            "version": "KqlParameterItem/1.0",
+            "name": "mmaWindowsLatestVersion",
+            "type": 2,
+            "isRequired": true,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "query": "{\"version\":\"ARMEndpoint/1.0\",\"data\":null,\"headers\":[],\"method\":\"GET\",\"path\":\"/subscriptions/{topVmSubscription}/providers/Microsoft.Compute/locations/{selectedRegion}/publishers/Microsoft.EnterpriseCloud.Monitoring/artifacttypes/vmextension/types/MicrosoftMonitoringAgent/versions?\",\"urlParams\":[{\"key\":\"api-version\",\"value\":\"2022-08-01\"}],\"batchDisabled\":false,\"transformers\":[{\"type\":\"jsonpath\",\"settings\":{\"tablePath\":\"$[*].name\",\"columns\":[]}}]}",
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::all"
+              ]
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "defaultValue": "value::all",
+            "queryType": 12
+          },
+          {
+            "id": "dba8f4d1-ef62-45cf-a752-819a6f1da18a",
+            "version": "KqlParameterItem/1.0",
+            "name": "mmaLinuxLatestVersion",
+            "type": 2,
+            "isRequired": true,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "query": "{\"version\":\"ARMEndpoint/1.0\",\"data\":null,\"headers\":[],\"method\":\"GET\",\"path\":\"/subscriptions/{topVmSubscription}/providers/Microsoft.Compute/locations/{selectedRegion}/publishers/Microsoft.EnterpriseCloud.Monitoring/artifacttypes/vmextension/types/OmsAgentForLinux/versions?\",\"urlParams\":[{\"key\":\"api-version\",\"value\":\"2022-08-01\"}],\"batchDisabled\":false,\"transformers\":[{\"type\":\"jsonpath\",\"settings\":{\"tablePath\":\"$[*].name\",\"columns\":[]}}]}",
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::all"
+              ]
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "defaultValue": "value::all",
+            "queryType": 12
+          },
+          {
+            "id": "536ffc31-876c-4235-8ae5-ec9d5f37b3b0",
+            "version": "KqlParameterItem/1.0",
+            "name": "qualysLinuxLatestVersion",
+            "type": 2,
+            "isRequired": true,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "query": "{\"version\":\"ARMEndpoint/1.0\",\"data\":null,\"headers\":[],\"method\":\"GET\",\"path\":\"/subscriptions/{topVmSubscription}/providers/Microsoft.Compute/locations/{selectedRegion}/publishers/Qualys/artifacttypes/vmextension/types/LinuxAgent.AzureSecurityCenter/versions?\",\"urlParams\":[{\"key\":\"api-version\",\"value\":\"2022-08-01\"}],\"batchDisabled\":false,\"transformers\":[{\"type\":\"jsonpath\",\"settings\":{\"tablePath\":\"$[*].name\",\"columns\":[]}}]}",
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::all"
+              ]
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "defaultValue": "value::all",
+            "queryType": 12
+          },
+          {
+            "id": "94028af5-1733-4db3-9e56-932c73d45ea1",
+            "version": "KqlParameterItem/1.0",
+            "name": "qualysWindowsLatestVersion",
+            "type": 2,
+            "isRequired": true,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "query": "{\"version\":\"ARMEndpoint/1.0\",\"data\":null,\"headers\":[],\"method\":\"GET\",\"path\":\"/subscriptions/{topVmSubscription}/providers/Microsoft.Compute/locations/{selectedRegion}/publishers/Qualys/artifacttypes/vmextension/types/WindowsAgent.AzureSecurityCenter/versions?\",\"urlParams\":[{\"key\":\"api-version\",\"value\":\"2022-08-01\"}],\"batchDisabled\":false,\"transformers\":[{\"type\":\"jsonpath\",\"settings\":{\"tablePath\":\"$[*].name\",\"columns\":[]}}]}",
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::all"
+              ]
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "defaultValue": "value::all",
+            "queryType": 12
+          }
+        ],
+        "style": "above",
+        "queryType": 12
+      },
+      "conditionalVisibility": {
+        "parameterName": "showHiddenObjects",
+        "comparison": "isEqualTo",
+        "value": "True"
+      },
+      "name": "parameters - 13"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "datatable(agent:string, version:string)\r\n[\r\n    \"mdeLinuxLatestVersion\", \"{mdeLinuxLatestVersion}\",\r\n    \"mdeWindowsLatestVersion\", \"{mdeWindowsLatestVersion}\",\r\n    \"amaLinuxLatestVersion\", \"{amaLinuxLatestVersion}\",\r\n    \"amaWindowsLatestVersion\", \"{amaWindowsLatestVersion}\",\r\n    \"defenderLinuxLatestVersion\", \"{defenderLinuxLatestVersion}\",\r\n    \"defenderWindowsLatestVersions\", \"{defenderWindowsLatestVersions}\",\r\n    \"guestConfigLinuxLatestVersion\", \"{guestConfigLinuxLatestVersion}\",\r\n    \"guestConfigWindowsLatestVersion\", \"{guestConfigWindowsLatestVersion}\",\r\n    \"mmaWindowsLatestVersion\", \"{mmaWindowsLatestVersion}\",\r\n    \"mmaLinuxLatestVersion\", \"{mmaLinuxLatestVersion}\",\r\n    \"qualysLinuxLatestVersion\", \"{qualysLinuxLatestVersion}\",\r\n    \"qualysWindowsLatestVersion\", \"{qualysWindowsLatestVersion}\",\r\n]\r\n| extend version = replace_regex(version, @\"(')\", @'')\r\n| extend version = todynamic(version)\r\n| mv-expand split(version, ',')\r\n| extend versionco = toint(replace_regex(tostring(version), @\"(\\.)\", @''))\r\n| extend version = tostring(version)\r\n| summarize arg_max(versionco, *) by agent\r\n",
+        "size": 4,
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "gridSettings": {
+          "sortBy": [
+            {
+              "itemKey": "version",
+              "sortOrder": 1
+            }
+          ]
+        },
+        "sortBy": [
+          {
+            "itemKey": "version",
+            "sortOrder": 1
+          }
+        ]
+      },
+      "conditionalVisibility": {
+        "parameterName": "showHiddenObjects",
+        "comparison": "isEqualTo",
+        "value": "Yes"
+      },
+      "name": "latestAgentVersions"
+    },
+    {
       "type": 12,
       "content": {
         "version": "NotebookGroup/1.0",
         "groupType": "editable",
         "loadType": "always",
         "items": [
+          {
+            "type": 9,
+            "content": {
+              "version": "KqlParameterItem/1.0",
+              "parameters": [
+                {
+                  "id": "da734701-07fe-4459-b1be-5258955772b4",
+                  "version": "KqlParameterItem/1.0",
+                  "name": "showLatestVersions",
+                  "label": "Latest Version Table",
+                  "type": 10,
+                  "isRequired": true,
+                  "typeSettings": {
+                    "additionalResourceOptions": [],
+                    "showDefault": false
+                  },
+                  "jsonData": "[\r\n    {\"value\": \"Show\"},\r\n    {\"value\": \"Hide\", \"selected\":true}\r\n]\r\n\r\n",
+                  "timeContext": {
+                    "durationMs": 86400000
+                  },
+                  "value": "Show"
+                }
+              ],
+              "style": "above",
+              "queryType": 0
+            },
+            "name": "parameters - 13"
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "- Latest Agent Versions are region specific. This view pulls the latest versions from virtual machines by the top region in your enivornment ({topVmLocation}). You can list all versions for a region via [az vm extension image list-versions](https://learn.microsoft.com/cli/azure/vm/extension/image?view=azure-cli-latest#az-vm-extension-image-list-versions)\r\n\r\n- Verison numbers don't always correlate to installed versions reported by the operating system or docs pages. These version numbers represent the extension version number",
+              "style": "info"
+            },
+            "conditionalVisibility": {
+              "parameterName": "showLatestVersions",
+              "comparison": "isEqualTo",
+              "value": "Show"
+            },
+            "name": "text - 2"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "{\"version\":\"1.0.0\",\"content\":\"[\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Legacy Log Analytics\\\",\\r\\n\\t\\t\\\"name\\\": \\\"OmsAgentForLinux\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Linux\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"mmaLinuxLatestVersion\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"https://learn.microsoft.com/azure/virtual-machines/extensions/oms-linux\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Legacy Log Analytics\\\",\\r\\n\\t\\t\\\"name\\\": \\\"MicrosoftMonitoringAgent\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Windows\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"mmaWindowsLatestVersion\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"https://learn.microsoft.com/en-us/azure/virtual-machines/extensions/oms-windows\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Defender for Servers P2\\\",\\r\\n\\t\\t\\\"name\\\": \\\"AzureSecurityLinuxAgent\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Linux\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"defenderLinuxLatestVersion\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"N/A\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Defender for Servers P2\\\",\\r\\n\\t\\t\\\"name\\\": \\\"AzureSecurityWindowsAgent\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Windows\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"defenderWindowsLatestVersions\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"N/A\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Azure Monitor Agent\\\",\\r\\n\\t\\t\\\"name\\\": \\\"AzureMonitorLinuxAgent\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Linux\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"amaLinuxLatestVersion\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"https://learn.microsoft.com/azure/azure-monitor/agents/azure-monitor-agent-extension-versions\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Azure Monitor Agent\\\",\\r\\n\\t\\t\\\"name\\\": \\\"AzureMonitorWindowsAgent\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Windows\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"amaWindowsLatestVersion\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"https://learn.microsoft.com/azure/azure-monitor/agents/azure-monitor-agent-extension-versions\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Defender for Endpoint\\\",\\r\\n\\t\\t\\\"name\\\": \\\"MDE.Linux\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Linux\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"mdeLinuxLatestVersion\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"https://learn.microsoft.com/microsoft-365/security/defender-endpoint/linux-whatsnew\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Defender for Endpoint\\\",\\r\\n\\t\\t\\\"name\\\": \\\"MDE.Windows\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Windows\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"mdeWindowsLatestVersion\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"https://learn.microsoft.com/microsoft-365/security/defender-endpoint/windows-whatsnew\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Azure Guest Configuration\\\",\\r\\n\\t\\t\\\"name\\\": \\\"AzurePolicyforLinux\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Linux\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"guestConfigLinuxLatestVersion\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"https://learn.microsoft.com/azure/governance/machine-configuration/agent-notes#release-notes\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Azure Guest Configuration\\\",\\r\\n\\t\\t\\\"name\\\": \\\"AzurePolicyforWindows\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Windows\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"guestConfigWindowsLatestVersion\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"https://learn.microsoft.com/azure/governance/machine-configuration/agent-notes#release-notes\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Qualys\\\",\\r\\n\\t\\t\\\"name\\\": \\\"LinuxAgent.AzureSecurityCenter\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Linux\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"qualysLinuxLatestVersion\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"N/A\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Qualys\\\",\\r\\n\\t\\t\\\"name\\\": \\\"WindowsAgent.AzureSecurityCenter\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Windows\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"qualysWindowsLatestVersion\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"N/A\\\"\\r\\n\\t}\\r\\n]\",\"transformers\":null}",
+              "size": 0,
+              "title": "Latest Agents ({topVmLocation})",
+              "showRefreshButton": true,
+              "showExportToExcel": true,
+              "queryType": 8,
+              "visualization": "table",
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "versionDocs",
+                    "formatter": 7,
+                    "formatOptions": {
+                      "linkTarget": "Url"
+                    }
+                  }
+                ],
+                "labelSettings": [
+                  {
+                    "columnId": "agent",
+                    "label": "Agent"
+                  },
+                  {
+                    "columnId": "name",
+                    "label": "Extension Name"
+                  },
+                  {
+                    "columnId": "os",
+                    "label": "Operating System"
+                  },
+                  {
+                    "columnId": "latestVersion",
+                    "label": "Latest Version"
+                  },
+                  {
+                    "columnId": "versionDocs",
+                    "label": "Release Notes"
+                  }
+                ]
+              }
+            },
+            "customWidth": "50",
+            "conditionalVisibility": {
+              "parameterName": "showHiddenObjects",
+              "comparison": "isEqualTo",
+              "value": "Yes"
+            },
+            "showPin": false,
+            "name": "agentMappings"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "{\"version\":\"Merge/1.0\",\"merges\":[{\"id\":\"8649e01f-e083-492b-bcbf-f13cccadd72a\",\"mergeType\":\"innerunique\",\"leftTable\":\"agentMappings\",\"rightTable\":\"latestAgentVersions\",\"leftColumn\":\"latestVersion\",\"rightColumn\":\"agent\"}],\"projectRename\":[{\"originalName\":\"[agentMappings].agent\",\"mergedName\":\"Agent\",\"fromId\":\"8649e01f-e083-492b-bcbf-f13cccadd72a\"},{\"originalName\":\"[agentMappings].name\",\"mergedName\":\"Extension Name\",\"fromId\":\"8649e01f-e083-492b-bcbf-f13cccadd72a\"},{\"originalName\":\"[agentMappings].os\",\"mergedName\":\"Operating System\",\"fromId\":\"8649e01f-e083-492b-bcbf-f13cccadd72a\"},{\"originalName\":\"[latestAgentVersions].version\",\"mergedName\":\"Latest Version\",\"fromId\":\"8649e01f-e083-492b-bcbf-f13cccadd72a\"},{\"originalName\":\"[agentMappings].versionDocs\",\"mergedName\":\"Release Notes\",\"fromId\":\"8649e01f-e083-492b-bcbf-f13cccadd72a\"},{\"originalName\":\"[latestAgentVersions].versionco\"},{\"originalName\":\"[latestAgentVersions].agent\"},{\"originalName\":\"[agentMappings].latestVersion\"}]}",
+              "size": 0,
+              "showRefreshButton": true,
+              "queryType": 7,
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "Release Notes",
+                    "formatter": 7,
+                    "formatOptions": {
+                      "linkTarget": "Url"
+                    }
+                  }
+                ]
+              }
+            },
+            "conditionalVisibility": {
+              "parameterName": "showLatestVersions",
+              "comparison": "isEqualTo",
+              "value": "Show"
+            },
+            "showPin": false,
+            "name": "versionsTable"
+          },
           {
             "type": 1,
             "content": {
@@ -325,7 +814,7 @@
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
-              "query": "resources\r\n| where type contains \"microsoft.compute/virtualmachines/extensions\" or \r\ntype contains \"microsoft.hybridcompute/machines/extensions\" or\r\ntype contains \"microsoft.compute/virtualmachinescalesets/extensions\"\r\n| extend agent = iff(name =~ 'OmsAgentForLinux', 'Legacy Log Analytics', \r\n                        iff(name =~ \"MicrosoftMonitoringAgent\", 'Legacy Log Analytics',\r\n                        iff(name =~ \"AzureSecurityLinuxAgent\", 'Defender for Servers P2',\r\n                        iff(name =~ \"AzureSecurityWindowsAgent\", 'Defender for Servers P2',\r\n                        iff(name =~ \"AzureMonitorWindowsAgent\", 'Azure Monitor Agent',\r\n                        iff(name =~ \"AzureMonitorLinuxAgent\", 'Azure Monitor Agent',\r\n                        iff(name has \"MDE.\", 'Defender for Endpoint',\r\n                        iff(name startswith \"AzurePolicyfor\", 'Azure Guest Configuration',\r\n                        iff(name =~ \"LinuxAgent.AzureSecurityCenter\", 'Qualys',\r\n                        iff(name =~ \"WindowsAgent.AzureSecurityCenter\", 'Qualys',\r\n                    name))))))))))\r\n| where agent in ({securityAgents})\r\n| where agent matches regex \"{agentView}\"\r\n| extend autoUpgradeEnabled = properties.enableAutomaticUpgrade\r\n| extend installSucceeded = properties.provisioningState == 'Succeeded'\r\n| extend version = properties.typeHandlerVersion\r\n| extend azureResourceId = properties.settings.azureResourceId\r\n| extend vNextEnabled = properties.settings.vNextEnabled\r\n| extend statusMessage = properties.instanceView.status.message\r\n| extend statusLevel = properties.instanceView.status.level\r\n| extend statusMessage = properties.instanceView.status.message\r\n| extend statuscode = properties.instanceView.status.code\r\n| extend workspaceId = properties.settings.workspaceId\r\n| parse id with * \"/\" machineId \"/extensions/\" *\r\n| extend machineId =  strcat('/', tolower(machineId))",
+              "query": "resources\r\n| where type contains \"microsoft.compute/virtualmachines/extensions\" or \r\ntype contains \"microsoft.hybridcompute/machines/extensions\" or\r\ntype contains \"microsoft.compute/virtualmachinescalesets/extensions\"\r\n| extend agent = iff(name =~ 'OmsAgentForLinux', 'Legacy Log Analytics', \r\n                        iff(name =~ \"MicrosoftMonitoringAgent\", 'Legacy Log Analytics',\r\n                        iff(name =~ \"AzureSecurityLinuxAgent\", 'Defender for Servers P2',\r\n                        iff(name =~ \"AzureSecurityWindowsAgent\", 'Defender for Servers P2',\r\n                        iff(name =~ \"AzureMonitorWindowsAgent\", 'Azure Monitor Agent',\r\n                        iff(name =~ \"AzureMonitorLinuxAgent\", 'Azure Monitor Agent',\r\n                        iff(name has \"MDE.\", 'Defender for Endpoint',\r\n                        iff(name startswith \"AzurePolicyfor\", 'Azure Guest Configuration',\r\n                        iff(name =~ \"LinuxAgent.AzureSecurityCenter\", 'Qualys',\r\n                        iff(name =~ \"WindowsAgent.AzureSecurityCenter\", 'Qualys',\r\n                    name))))))))))\r\n| where agent in ({securityAgents})\r\n| where agent matches regex \"{agentView}\"\r\n| extend agent = tostring(agent)\r\n| extend autoUpgradeEnabled = properties.enableAutomaticUpgrade\r\n| extend installSucceeded = properties.provisioningState == 'Succeeded'\r\n| extend version = properties.typeHandlerVersion\r\n| extend azureResourceId = properties.settings.azureResourceId\r\n| extend vNextEnabled = properties.settings.vNextEnabled\r\n| extend statusMessage = properties.instanceView.status.message\r\n| extend statusLevel = properties.instanceView.status.level\r\n| extend statusMessage = properties.instanceView.status.message\r\n| extend statuscode = properties.instanceView.status.code\r\n| extend workspaceId = properties.settings.workspaceId\r\n| parse id with * \"/\" machineId \"/extensions/\" *\r\n| extend machineId =  strcat('/', tolower(machineId))",
               "size": 4,
               "showAnalytics": true,
               "title": "All Extensions",
@@ -438,44 +927,6 @@
             "customWidth": "60",
             "showPin": false,
             "name": "allAgentsPie"
-          },
-          {
-            "type": 3,
-            "content": {
-              "version": "KqlItem/1.0",
-              "query": "{\"version\":\"Merge/1.0\",\"merges\":[{\"id\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\",\"mergeType\":\"innerunique\",\"leftTable\":\"allmachines\",\"rightTable\":\"allExtensions\",\"leftColumn\":\"id\",\"rightColumn\":\"machineId\"}],\"projectRename\":[{\"originalName\":\"[allmachines].id\",\"mergedName\":\"id\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].name\",\"mergedName\":\"name\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].type\",\"mergedName\":\"type\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].tenantId\",\"mergedName\":\"tenantId\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].kind\",\"mergedName\":\"kind\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].location\",\"mergedName\":\"location\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].resourceGroup\",\"mergedName\":\"resourceGroup\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].subscriptionId\",\"mergedName\":\"subscriptionId\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].managedBy\",\"mergedName\":\"managedBy\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].apiVersion\",\"mergedName\":\"apiVersion\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].sku\",\"mergedName\":\"sku\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].plan\",\"mergedName\":\"plan\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].properties\",\"mergedName\":\"properties\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].tags\",\"mergedName\":\"tags\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].identity\",\"mergedName\":\"identity\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].zones\",\"mergedName\":\"zones\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].extendedLocation\",\"mergedName\":\"extendedLocation\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].systemData\",\"mergedName\":\"systemData\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].machineStatus\",\"mergedName\":\"machineStatus\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].osType\",\"mergedName\":\"osType\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allmachines].osComputerName\",\"mergedName\":\"osComputerName\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].id\",\"mergedName\":\"id1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].name\",\"mergedName\":\"name1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].type\",\"mergedName\":\"type1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].tenantId\",\"mergedName\":\"tenantId1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].kind\",\"mergedName\":\"kind1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].location\",\"mergedName\":\"location1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].resourceGroup\",\"mergedName\":\"resourceGroup1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].subscriptionId\",\"mergedName\":\"subscriptionId1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].managedBy\",\"mergedName\":\"managedBy1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].apiVersion\",\"mergedName\":\"apiVersion1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].sku\",\"mergedName\":\"sku1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].plan\",\"mergedName\":\"plan1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].properties\",\"mergedName\":\"properties1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].tags\",\"mergedName\":\"tags1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].identity\",\"mergedName\":\"identity1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].zones\",\"mergedName\":\"zones1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].extendedLocation\",\"mergedName\":\"extendedLocation1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].systemData\",\"mergedName\":\"systemData1\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].agent\",\"mergedName\":\"agent\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].autoUpgradeEnabled\",\"mergedName\":\"autoUpgradeEnabled\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].installSucceeded\",\"mergedName\":\"installSucceeded\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].version\",\"mergedName\":\"version\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].azureResourceId\",\"mergedName\":\"azureResourceId\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].vNextEnabled\",\"mergedName\":\"vNextEnabled\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].statusMessage\",\"mergedName\":\"statusMessage\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].statusLevel\",\"mergedName\":\"statusLevel\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].statuscode\",\"mergedName\":\"statuscode\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].workspaceId\",\"mergedName\":\"workspaceId\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].machineId\",\"mergedName\":\"machineId\",\"fromId\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\"},{\"originalName\":\"[allExtensions].test\",\"mergedName\":\"test\",\"fromId\":\"unknown\"},{\"originalName\":\"[allExtensions].securityAgents\",\"mergedName\":\"securityAgents\",\"fromId\":\"unknown\"}]}",
-              "size": 1,
-              "queryType": 7,
-              "visualization": "piechart",
-              "tileSettings": {
-                "titleContent": {
-                  "columnMatch": "Agent",
-                  "formatter": 12,
-                  "formatOptions": {
-                    "min": 0,
-                    "palette": "blue"
-                  },
-                  "numberFormat": {
-                    "unit": 17,
-                    "options": {
-                      "style": "decimal"
-                    }
-                  }
-                },
-                "showBorder": false
-              },
-              "chartSettings": {
-                "xAxis": "Agent",
-                "yAxis": [
-                  "autoUpgradeEnabled"
-                ],
-                "group": "agent",
-                "createOtherGroup": 0
-              }
-            },
-            "customWidth": "60",
-            "showPin": false,
-            "name": "allAgentsPie - Copy"
           },
           {
             "type": 3,
@@ -1470,252 +1921,7 @@
         "version": "NotebookGroup/1.0",
         "groupType": "editable",
         "loadType": "always",
-        "items": [
-          {
-            "type": 9,
-            "content": {
-              "version": "KqlParameterItem/1.0",
-              "crossComponentResources": [
-                "/subscriptions/ada06e68-375e-4210-be3a-c6cacebf41c5"
-              ],
-              "parameters": [
-                {
-                  "id": "8e238a36-fc4c-4a98-976f-a53294c1db87",
-                  "version": "KqlParameterItem/1.0",
-                  "name": "topVmLocation",
-                  "type": 1,
-                  "isRequired": true,
-                  "query": "resources\r\n| where type =~ 'Microsoft.Compute/virtualMachines'\r\n| project location\r\n| top 1 by location",
-                  "timeContext": {
-                    "durationMs": 86400000
-                  },
-                  "queryType": 1
-                },
-                {
-                  "version": "KqlParameterItem/1.0",
-                  "name": "topVmSubscription",
-                  "type": 1,
-                  "isRequired": true,
-                  "query": "resources\r\n| where type =~ 'Microsoft.Compute/virtualMachines'\r\n| project location, subscriptionId\r\n| top 1 by location\r\n| project subscriptionId",
-                  "timeContext": {
-                    "durationMs": 86400000
-                  },
-                  "queryType": 1,
-                  "resourceType": "microsoft.resourcegraph/resources",
-                  "id": "9116ed8d-2865-469e-8f2d-e18814e804a4"
-                },
-                {
-                  "id": "5ce7b1ca-d6b7-43fa-b280-5caf5763adf6",
-                  "version": "KqlParameterItem/1.0",
-                  "name": "mdeLinuxLatestVersion",
-                  "type": 1,
-                  "isRequired": true,
-                  "query": "{\"version\":\"ARMEndpoint/1.0\",\"data\":null,\"headers\":[],\"method\":\"GET\",\"path\":\"/subscriptions/{topVmSubscription}/providers/Microsoft.Compute/locations/{topVmLocation}/publishers/Microsoft.Azure.AzureDefenderForServers/artifacttypes/vmextension/types/MDE.Linux/versions?\",\"urlParams\":[{\"key\":\"api-version\",\"value\":\"2022-08-01\"},{\"key\":\"$orderby\",\"value\":\"name desc\"},{\"key\":\"$top\",\"value\":\"1\"}],\"batchDisabled\":false,\"transformers\":[{\"type\":\"jsonpath\",\"settings\":{\"tablePath\":\"$[0].name\",\"columns\":[]}}]}",
-                  "timeContext": {
-                    "durationMs": 86400000
-                  },
-                  "queryType": 12
-                },
-                {
-                  "version": "KqlParameterItem/1.0",
-                  "name": "mdeWindowsLatestVersion",
-                  "type": 1,
-                  "isRequired": true,
-                  "query": "{\"version\":\"ARMEndpoint/1.0\",\"data\":null,\"headers\":[],\"method\":\"GET\",\"path\":\"/subscriptions/{topVmSubscription}/providers/Microsoft.Compute/locations/{topVmLocation}/publishers/Microsoft.Azure.AzureDefenderForServers/artifacttypes/vmextension/types/MDE.Linux/versions?\",\"urlParams\":[{\"key\":\"api-version\",\"value\":\"2022-08-01\"},{\"key\":\"$orderby\",\"value\":\"name desc\"},{\"key\":\"$top\",\"value\":\"1\"}],\"batchDisabled\":false,\"transformers\":[{\"type\":\"jsonpath\",\"settings\":{\"tablePath\":\"$[0].name\",\"columns\":[]}}]}",
-                  "timeContext": {
-                    "durationMs": 86400000
-                  },
-                  "queryType": 12,
-                  "id": "31ae95f4-8420-464b-8e7b-aeb94ed18dc8"
-                },
-                {
-                  "version": "KqlParameterItem/1.0",
-                  "name": "amaWindowsLatestVersion",
-                  "type": 1,
-                  "isRequired": true,
-                  "query": "{\"version\":\"ARMEndpoint/1.0\",\"data\":null,\"headers\":[],\"method\":\"GET\",\"path\":\"/subscriptions/{topVmSubscription}/providers/Microsoft.Compute/locations/{topVmLocation}/publishers/Microsoft.Azure.Monitor/artifacttypes/vmextension/types/AzureMonitorWindowsAgent/versions?\",\"urlParams\":[{\"key\":\"api-version\",\"value\":\"2022-08-01\"},{\"key\":\"$orderby\",\"value\":\"name desc\"},{\"key\":\"$top\",\"value\":\"1\"}],\"batchDisabled\":false,\"transformers\":[{\"type\":\"jsonpath\",\"settings\":{\"tablePath\":\"$[0].name\",\"columns\":[]}}]}",
-                  "timeContext": {
-                    "durationMs": 86400000
-                  },
-                  "queryType": 12,
-                  "id": "d0b248b2-4745-4ac4-ba92-960d45962870"
-                },
-                {
-                  "version": "KqlParameterItem/1.0",
-                  "name": "amaLinuxLatestVersion",
-                  "type": 1,
-                  "isRequired": true,
-                  "query": "{\"version\":\"ARMEndpoint/1.0\",\"data\":null,\"headers\":[],\"method\":\"GET\",\"path\":\"/subscriptions/{topVmSubscription}/providers/Microsoft.Compute/locations/{topVmLocation}/publishers/Microsoft.Azure.Monitor/artifacttypes/vmextension/types/AzureMonitorLinuxAgent/versions?\",\"urlParams\":[{\"key\":\"api-version\",\"value\":\"2022-08-01\"},{\"key\":\"$orderby\",\"value\":\"name desc\"},{\"key\":\"$top\",\"value\":\"1\"}],\"batchDisabled\":false,\"transformers\":[{\"type\":\"jsonpath\",\"settings\":{\"tablePath\":\"$[0].name\",\"columns\":[]}}]}",
-                  "timeContext": {
-                    "durationMs": 86400000
-                  },
-                  "queryType": 12,
-                  "id": "dfdd6b4b-b053-4a67-bf8e-2834d57c663e"
-                },
-                {
-                  "version": "KqlParameterItem/1.0",
-                  "name": "defenderWindowsLatestVersions",
-                  "type": 1,
-                  "isRequired": true,
-                  "query": "{\"version\":\"ARMEndpoint/1.0\",\"data\":null,\"headers\":[],\"method\":\"GET\",\"path\":\"/subscriptions/{topVmSubscription}/providers/Microsoft.Compute/locations/{topVmLocation}/publishers/Microsoft.Azure.Security.Monitoring/artifacttypes/vmextension/types/AzureSecurityWindowsAgent/versions?\",\"urlParams\":[{\"key\":\"api-version\",\"value\":\"2022-08-01\"},{\"key\":\"$orderby\",\"value\":\"name desc\"},{\"key\":\"$top\",\"value\":\"1\"}],\"batchDisabled\":false,\"transformers\":[{\"type\":\"jsonpath\",\"settings\":{\"tablePath\":\"$[0].name\",\"columns\":[]}}]}",
-                  "timeContext": {
-                    "durationMs": 86400000
-                  },
-                  "queryType": 12,
-                  "id": "cac9db84-fd9d-45e5-b9ec-12fedb716ce5"
-                },
-                {
-                  "version": "KqlParameterItem/1.0",
-                  "name": "defenderLinuxLatestVersion",
-                  "type": 1,
-                  "isRequired": true,
-                  "query": "{\"version\":\"ARMEndpoint/1.0\",\"data\":null,\"headers\":[],\"method\":\"GET\",\"path\":\"/subscriptions/{topVmSubscription}/providers/Microsoft.Compute/locations/{topVmLocation}/publishers/Microsoft.Azure.Security.Monitoring/artifacttypes/vmextension/types/AzureSecurityLinuxAgent/versions?\",\"urlParams\":[{\"key\":\"api-version\",\"value\":\"2022-08-01\"},{\"key\":\"$orderby\",\"value\":\"name desc\"},{\"key\":\"$top\",\"value\":\"1\"}],\"batchDisabled\":false,\"transformers\":[{\"type\":\"jsonpath\",\"settings\":{\"tablePath\":\"$[0].name\",\"columns\":[]}}]}",
-                  "timeContext": {
-                    "durationMs": 86400000
-                  },
-                  "queryType": 12,
-                  "id": "381179b3-b386-4800-bd37-fd21abdb919d"
-                },
-                {
-                  "version": "KqlParameterItem/1.0",
-                  "name": "guestConfigLinuxLatestVersion",
-                  "type": 1,
-                  "isRequired": true,
-                  "query": "{\"version\":\"ARMEndpoint/1.0\",\"data\":null,\"headers\":[],\"method\":\"GET\",\"path\":\"/subscriptions/{topVmSubscription}/providers/Microsoft.Compute/locations/{topVmLocation}/publishers/Microsoft.GuestConfiguration/artifacttypes/vmextension/types/ConfigurationforLinux/versions?\",\"urlParams\":[{\"key\":\"api-version\",\"value\":\"2022-08-01\"},{\"key\":\"$orderby\",\"value\":\"name desc\"},{\"key\":\"$top\",\"value\":\"1\"}],\"batchDisabled\":false,\"transformers\":[{\"type\":\"jsonpath\",\"settings\":{\"tablePath\":\"$[0].name\",\"columns\":[]}}]}",
-                  "timeContext": {
-                    "durationMs": 86400000
-                  },
-                  "queryType": 12,
-                  "id": "e377785d-bf9a-4bd5-a82a-ac5fe33ff9e4"
-                },
-                {
-                  "version": "KqlParameterItem/1.0",
-                  "name": "guestConfigWindowsLatestVersion",
-                  "type": 1,
-                  "isRequired": true,
-                  "query": "{\"version\":\"ARMEndpoint/1.0\",\"data\":null,\"headers\":[],\"method\":\"GET\",\"path\":\"/subscriptions/{topVmSubscription}/providers/Microsoft.Compute/locations/{topVmLocation}/publishers/Microsoft.GuestConfiguration/artifacttypes/vmextension/types/ConfigurationforWindows/versions?\",\"urlParams\":[{\"key\":\"api-version\",\"value\":\"2022-08-01\"},{\"key\":\"$orderby\",\"value\":\"name desc\"},{\"key\":\"$top\",\"value\":\"1\"}],\"batchDisabled\":false,\"transformers\":[{\"type\":\"jsonpath\",\"settings\":{\"tablePath\":\"$[0].name\",\"columns\":[]}}]}",
-                  "timeContext": {
-                    "durationMs": 86400000
-                  },
-                  "queryType": 12,
-                  "id": "9c50b860-9fbe-47a0-8a7e-0d2bdd6bfcb7"
-                },
-                {
-                  "version": "KqlParameterItem/1.0",
-                  "name": "mmaWindowsLatestVersion",
-                  "type": 1,
-                  "isRequired": true,
-                  "query": "{\"version\":\"ARMEndpoint/1.0\",\"data\":null,\"headers\":[],\"method\":\"GET\",\"path\":\"/subscriptions/{topVmSubscription}/providers/Microsoft.Compute/locations/{topVmLocation}/publishers/Microsoft.EnterpriseCloud.Monitoring/artifacttypes/vmextension/types/MicrosoftMonitoringAgent/versions?\",\"urlParams\":[{\"key\":\"api-version\",\"value\":\"2022-08-01\"},{\"key\":\"$orderby\",\"value\":\"name desc\"},{\"key\":\"$top\",\"value\":\"1\"}],\"batchDisabled\":false,\"transformers\":[{\"type\":\"jsonpath\",\"settings\":{\"tablePath\":\"$[0].name\",\"columns\":[]}}]}",
-                  "timeContext": {
-                    "durationMs": 86400000
-                  },
-                  "queryType": 12,
-                  "id": "28ec80e2-7364-4f88-b8e7-e65eedbdfb4b"
-                },
-                {
-                  "version": "KqlParameterItem/1.0",
-                  "name": "mmaLinuxLatestVersion",
-                  "type": 1,
-                  "isRequired": true,
-                  "query": "{\"version\":\"ARMEndpoint/1.0\",\"data\":null,\"headers\":[],\"method\":\"GET\",\"path\":\"/subscriptions/{topVmSubscription}/providers/Microsoft.Compute/locations/{topVmLocation}/publishers/Microsoft.EnterpriseCloud.Monitoring/artifacttypes/vmextension/types/OmsAgentForLinux/versions?\",\"urlParams\":[{\"key\":\"api-version\",\"value\":\"2022-08-01\"},{\"key\":\"$orderby\",\"value\":\"name desc\"},{\"key\":\"$top\",\"value\":\"1\"}],\"batchDisabled\":false,\"transformers\":[{\"type\":\"jsonpath\",\"settings\":{\"tablePath\":\"$[0].name\",\"columns\":[]}}]}",
-                  "timeContext": {
-                    "durationMs": 86400000
-                  },
-                  "queryType": 12,
-                  "id": "dba8f4d1-ef62-45cf-a752-819a6f1da18a"
-                },
-                {
-                  "version": "KqlParameterItem/1.0",
-                  "name": "qualysLinuxLatestVersion",
-                  "type": 1,
-                  "isRequired": true,
-                  "query": "{\"version\":\"ARMEndpoint/1.0\",\"data\":null,\"headers\":[],\"method\":\"GET\",\"path\":\"/subscriptions/{topVmSubscription}/providers/Microsoft.Compute/locations/{topVmLocation}/publishers/Qualys/artifacttypes/vmextension/types/LinuxAgent.AzureSecurityCenter/versions?\",\"urlParams\":[{\"key\":\"api-version\",\"value\":\"2022-08-01\"},{\"key\":\"$orderby\",\"value\":\"name desc\"},{\"key\":\"$top\",\"value\":\"1\"}],\"batchDisabled\":false,\"transformers\":[{\"type\":\"jsonpath\",\"settings\":{\"tablePath\":\"$[0].name\",\"columns\":[]}}]}",
-                  "timeContext": {
-                    "durationMs": 86400000
-                  },
-                  "queryType": 12,
-                  "id": "536ffc31-876c-4235-8ae5-ec9d5f37b3b0"
-                },
-                {
-                  "version": "KqlParameterItem/1.0",
-                  "name": "qualysWindowsLatestVersion",
-                  "type": 1,
-                  "isRequired": true,
-                  "query": "{\"version\":\"ARMEndpoint/1.0\",\"data\":null,\"headers\":[],\"method\":\"GET\",\"path\":\"/subscriptions/{topVmSubscription}/providers/Microsoft.Compute/locations/{topVmLocation}/publishers/Qualys/artifacttypes/vmextension/types/WindowsAgent.AzureSecurityCenter/versions?\",\"urlParams\":[{\"key\":\"api-version\",\"value\":\"2022-08-01\"},{\"key\":\"$orderby\",\"value\":\"name desc\"},{\"key\":\"$top\",\"value\":\"1\"}],\"batchDisabled\":false,\"transformers\":[{\"type\":\"jsonpath\",\"settings\":{\"tablePath\":\"$[0].name\",\"columns\":[]}}]}",
-                  "timeContext": {
-                    "durationMs": 86400000
-                  },
-                  "queryType": 12,
-                  "id": "94028af5-1733-4db3-9e56-932c73d45ea1"
-                }
-              ],
-              "style": "above",
-              "queryType": 1
-            },
-            "conditionalVisibility": {
-              "parameterName": "showHiddenObjects",
-              "comparison": "isEqualTo",
-              "value": "True"
-            },
-            "name": "parameters - 13"
-          },
-          {
-            "type": 1,
-            "content": {
-              "json": "- Latest Agent Versions are region specific. This view pulls the latest versions from virtual machines by the top region in your enivornment ({topVmLocation}). You can list all versions for a region via [az vm extension image list-versions](https://learn.microsoft.com/cli/azure/vm/extension/image?view=azure-cli-latest#az-vm-extension-image-list-versions)\r\n\r\n- Verison numbers don't always correlate to installed versions reported by the operating system or docs pages. These version numbers represent the extension version number",
-              "style": "info"
-            },
-            "name": "text - 2"
-          },
-          {
-            "type": 3,
-            "content": {
-              "version": "KqlItem/1.0",
-              "query": "{\"version\":\"1.0.0\",\"content\":\"[\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Legacy Log Analytics\\\",\\r\\n\\t\\t\\\"name\\\": \\\"OmsAgentForLinux\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Linux\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"{mmaLinuxLatestVersion}\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"https://learn.microsoft.com/azure/virtual-machines/extensions/oms-linux\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Legacy Log Analytics\\\",\\r\\n\\t\\t\\\"name\\\": \\\"MicrosoftMonitoringAgent\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Windows\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"{mmaWindowsLatestVersion}\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"https://learn.microsoft.com/en-us/azure/virtual-machines/extensions/oms-windows\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Defender for Servers P2\\\",\\r\\n\\t\\t\\\"name\\\": \\\"AzureSecurityLinuxAgent\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Linux\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"{defenderLinuxLatestVersion}\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"N/A\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Defender for Servers P2\\\",\\r\\n\\t\\t\\\"name\\\": \\\"AzureSecurityWindowsAgent\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Windows\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"{defenderWindowsLatestVersions}\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"N/A\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Azure Monitor Agent\\\",\\r\\n\\t\\t\\\"name\\\": \\\"AzureMonitorLinuxAgent\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Linux\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"{amaLinuxLatestVersion}\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"https://learn.microsoft.com/azure/azure-monitor/agents/azure-monitor-agent-extension-versions\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Azure Monitor Agent\\\",\\r\\n\\t\\t\\\"name\\\": \\\"AzureMonitorWindowsAgent\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Windows\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"{amaWindowsLatestVersion}\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"https://learn.microsoft.com/azure/azure-monitor/agents/azure-monitor-agent-extension-versions\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Defender for Endpoint\\\",\\r\\n\\t\\t\\\"name\\\": \\\"MDE.Linux\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Linux\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"{mdeLinuxLatestVersion}\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"https://learn.microsoft.com/microsoft-365/security/defender-endpoint/linux-whatsnew\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Defender for Endpoint\\\",\\r\\n\\t\\t\\\"name\\\": \\\"MDE.Windows\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Windows\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"{mdeWindowsLatestVersion}\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"https://learn.microsoft.com/microsoft-365/security/defender-endpoint/windows-whatsnew\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Azure Guest Configuration\\\",\\r\\n\\t\\t\\\"name\\\": \\\"AzurePolicyforLinux\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Linux\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"{guestConfigLinuxLatestVersion}\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"https://learn.microsoft.com/azure/governance/machine-configuration/agent-notes#release-notes\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Azure Guest Configuration\\\",\\r\\n\\t\\t\\\"name\\\": \\\"AzurePolicyforWindows\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Windows\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"{guestConfigWindowsLatestVersion}\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"https://learn.microsoft.com/azure/governance/machine-configuration/agent-notes#release-notes\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Qualys\\\",\\r\\n\\t\\t\\\"name\\\": \\\"LinuxAgent.AzureSecurityCenter\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Linux\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"{qualysLinuxLatestVersion}\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"N/A\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Qualys\\\",\\r\\n\\t\\t\\\"name\\\": \\\"WindowsAgent.AzureSecurityCenter\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Windows\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"{qualysWindowsLatestVersion}\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"N/A\\\"\\r\\n\\t}\\r\\n]\",\"transformers\":null}",
-              "size": 0,
-              "title": "Latest Agents ({topVmLocation})",
-              "showRefreshButton": true,
-              "showExportToExcel": true,
-              "queryType": 8,
-              "visualization": "table",
-              "gridSettings": {
-                "formatters": [
-                  {
-                    "columnMatch": "versionDocs",
-                    "formatter": 7,
-                    "formatOptions": {
-                      "linkTarget": "Url"
-                    }
-                  }
-                ],
-                "labelSettings": [
-                  {
-                    "columnId": "agent",
-                    "label": "Agent"
-                  },
-                  {
-                    "columnId": "name",
-                    "label": "Extension Name"
-                  },
-                  {
-                    "columnId": "os",
-                    "label": "Operating System"
-                  },
-                  {
-                    "columnId": "latestVersion",
-                    "label": "Latest Version"
-                  },
-                  {
-                    "columnId": "versionDocs",
-                    "label": "Release Notes"
-                  }
-                ]
-              }
-            },
-            "showPin": false,
-            "name": "agentMappings"
-          }
-        ],
+        "items": [],
         "exportParameters": true
       },
       "conditionalVisibility": {
