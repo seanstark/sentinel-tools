@@ -108,8 +108,7 @@
                     "additionalResourceOptions": [],
                     "showDefault": false
                   },
-                  "jsonData": "[\r\n    { \"value\": \"True\", \"label\":\"Yes\"}, \r\n    { \"value\": \"False\", \"label\":\"No\", \"selected\":true }\r\n]",
-                  "value": "True"
+                  "jsonData": "[\r\n    { \"value\": \"True\", \"label\":\"Yes\"}, \r\n    { \"value\": \"False\", \"label\":\"No\", \"selected\":true }\r\n]"
                 },
                 {
                   "id": "04829011-99d5-490e-8bf3-516a27d22b42",
@@ -179,14 +178,6 @@
                   "linkTarget": "parameter",
                   "linkLabel": "Overview",
                   "subTarget": "overview",
-                  "style": "link"
-                },
-                {
-                  "id": "7dcba471-e433-422e-8aae-22f6b7f4c009",
-                  "cellValue": "Tab",
-                  "linkTarget": "parameter",
-                  "linkLabel": "Agent Versions",
-                  "subTarget": "agentVersions",
                   "style": "link"
                 },
                 {
@@ -535,10 +526,53 @@
             },
             "defaultValue": "value::all",
             "queryType": 12
+          },
+          {
+            "version": "KqlParameterItem/1.0",
+            "name": "arcWindowsLatestVersion",
+            "type": 2,
+            "isRequired": true,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::all"
+              ],
+              "showDefault": false
+            },
+            "jsonData": "[\"N/A\"]",
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "defaultValue": "value::all",
+            "id": "e8a02372-a51a-48f0-8322-8127577a549b"
+          },
+          {
+            "version": "KqlParameterItem/1.0",
+            "name": "arcLinuxLatestVersion",
+            "type": 2,
+            "isRequired": true,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::all"
+              ],
+              "showDefault": false
+            },
+            "jsonData": "[\"N/A\"]",
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "defaultValue": "value::all",
+            "id": "a3c7c0e1-19d9-400b-a354-e08bd82a6779"
           }
         ],
         "style": "above",
-        "queryType": 12
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces"
       },
       "conditionalVisibility": {
         "parameterName": "showHiddenObjects",
@@ -551,19 +585,33 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "let versionTable = datatable(agent:string, version:string)\r\n[\r\n    \"mdeLinuxLatestVersion\", \"{mdeLinuxLatestVersion}\",\r\n    \"mdeWindowsLatestVersion\", \"{mdeWindowsLatestVersion}\",\r\n    \"amaLinuxLatestVersion\", \"{amaLinuxLatestVersion}\",\r\n    \"amaWindowsLatestVersion\", \"{amaWindowsLatestVersion}\",\r\n    \"defenderLinuxLatestVersion\", \"{defenderLinuxLatestVersion}\",\r\n    \"defenderWindowsLatestVersions\", \"{defenderWindowsLatestVersions}\",\r\n    \"guestConfigLinuxLatestVersion\", \"{guestConfigLinuxLatestVersion}\",\r\n    \"guestConfigWindowsLatestVersion\", \"{guestConfigWindowsLatestVersion}\",\r\n    \"mmaWindowsLatestVersion\", \"{mmaWindowsLatestVersion}\",\r\n    \"mmaLinuxLatestVersion\", \"{mmaLinuxLatestVersion}\",\r\n    \"qualysLinuxLatestVersion\", \"{qualysLinuxLatestVersion}\",\r\n    \"qualysWindowsLatestVersion\", \"{qualysWindowsLatestVersion}\",\r\n];\r\nversionTable\r\n| extend version = replace_regex(version, @\"(')\", @'')\r\n| extend version = todynamic(version)\r\n| mv-expand split(version, ',')\r\n| extend versionco = parse_version(tostring(version))\r\n| summarize arg_max(versionco, *) by agent\r\n| project agent, version",
+        "query": "let versionTable = datatable(agent:string, version:string)\r\n[\r\n    \"mdeLinuxLatestVersion\", \"{mdeLinuxLatestVersion}\",\r\n    \"mdeWindowsLatestVersion\", \"{mdeWindowsLatestVersion}\",\r\n    \"amaLinuxLatestVersion\", \"{amaLinuxLatestVersion}\",\r\n    \"amaWindowsLatestVersion\", \"{amaWindowsLatestVersion}\",\r\n    \"defenderLinuxLatestVersion\", \"{defenderLinuxLatestVersion}\",\r\n    \"defenderWindowsLatestVersions\", \"{defenderWindowsLatestVersions}\",\r\n    \"guestConfigLinuxLatestVersion\", \"{guestConfigLinuxLatestVersion}\",\r\n    \"guestConfigWindowsLatestVersion\", \"{guestConfigWindowsLatestVersion}\",\r\n    \"mmaWindowsLatestVersion\", \"{mmaWindowsLatestVersion}\",\r\n    \"mmaLinuxLatestVersion\", \"{mmaLinuxLatestVersion}\",\r\n    \"qualysLinuxLatestVersion\", \"{qualysLinuxLatestVersion}\",\r\n    \"qualysWindowsLatestVersion\", \"{qualysWindowsLatestVersion}\",\r\n    \"arcWindowsLatestVersion\", \"{arcWindowsLatestVersion}\",\r\n    \"arcLinuxLatestVersion\", \"{arcLinuxLatestVersion}\"\r\n];\r\nversionTable\r\n| extend version = replace_regex(version, @\"(')\", @'')\r\n| extend version = todynamic(version)\r\n| mv-expand split(version, ',')\r\n| extend versionco = parse_version(tostring(version))\r\n| summarize arg_max(versionco, *) by agent\r\n| project agent, version",
         "size": 4,
+        "title": "Latest Agent Versions Table",
         "timeContext": {
           "durationMs": 86400000
         },
         "queryType": 0,
         "resourceType": "microsoft.operationalinsights/workspaces",
-        "sortBy": []
+        "gridSettings": {
+          "sortBy": [
+            {
+              "itemKey": "agent",
+              "sortOrder": 1
+            }
+          ]
+        },
+        "sortBy": [
+          {
+            "itemKey": "agent",
+            "sortOrder": 1
+          }
+        ]
       },
       "conditionalVisibility": {
         "parameterName": "showHiddenObjects",
         "comparison": "isEqualTo",
-        "value": "Yes"
+        "value": "True"
       },
       "name": "latestAgentVersions"
     },
@@ -592,8 +640,7 @@
                   "jsonData": "[\r\n    {\"value\": \"Show\"},\r\n    {\"value\": \"Hide\", \"selected\":true}\r\n]\r\n\r\n",
                   "timeContext": {
                     "durationMs": 86400000
-                  },
-                  "value": "Show"
+                  }
                 },
                 {
                   "version": "KqlParameterItem/1.0",
@@ -635,7 +682,7 @@
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
-              "query": "{\"version\":\"1.0.0\",\"content\":\"[\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Legacy Log Analytics\\\",\\r\\n\\t\\t\\\"name\\\": \\\"OmsAgentForLinux\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Linux\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"mmaLinuxLatestVersion\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"https://learn.microsoft.com/azure/virtual-machines/extensions/oms-linux\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Legacy Log Analytics\\\",\\r\\n\\t\\t\\\"name\\\": \\\"MicrosoftMonitoringAgent\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Windows\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"mmaWindowsLatestVersion\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"https://learn.microsoft.com/en-us/azure/virtual-machines/extensions/oms-windows\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Defender for Servers P2\\\",\\r\\n\\t\\t\\\"name\\\": \\\"AzureSecurityLinuxAgent\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Linux\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"defenderLinuxLatestVersion\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"N/A\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Defender for Servers P2\\\",\\r\\n\\t\\t\\\"name\\\": \\\"AzureSecurityWindowsAgent\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Windows\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"defenderWindowsLatestVersions\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"N/A\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Azure Monitor Agent\\\",\\r\\n\\t\\t\\\"name\\\": \\\"AzureMonitorLinuxAgent\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Linux\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"amaLinuxLatestVersion\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"https://learn.microsoft.com/azure/azure-monitor/agents/azure-monitor-agent-extension-versions\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Azure Monitor Agent\\\",\\r\\n\\t\\t\\\"name\\\": \\\"AzureMonitorWindowsAgent\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Windows\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"amaWindowsLatestVersion\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"https://learn.microsoft.com/azure/azure-monitor/agents/azure-monitor-agent-extension-versions\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Defender for Endpoint\\\",\\r\\n\\t\\t\\\"name\\\": \\\"MDE.Linux\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Linux\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"mdeLinuxLatestVersion\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"https://learn.microsoft.com/microsoft-365/security/defender-endpoint/linux-whatsnew\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Defender for Endpoint\\\",\\r\\n\\t\\t\\\"name\\\": \\\"MDE.Windows\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Windows\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"mdeWindowsLatestVersion\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"https://learn.microsoft.com/microsoft-365/security/defender-endpoint/windows-whatsnew\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Azure Guest Configuration\\\",\\r\\n\\t\\t\\\"name\\\": \\\"AzurePolicyforLinux\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Linux\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"guestConfigLinuxLatestVersion\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"https://learn.microsoft.com/azure/governance/machine-configuration/agent-notes#release-notes\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Azure Guest Configuration\\\",\\r\\n\\t\\t\\\"name\\\": \\\"AzurePolicyforWindows\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Windows\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"guestConfigWindowsLatestVersion\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"https://learn.microsoft.com/azure/governance/machine-configuration/agent-notes#release-notes\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Qualys\\\",\\r\\n\\t\\t\\\"name\\\": \\\"LinuxAgent.AzureSecurityCenter\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Linux\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"qualysLinuxLatestVersion\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"N/A\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Qualys\\\",\\r\\n\\t\\t\\\"name\\\": \\\"WindowsAgent.AzureSecurityCenter\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Windows\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"qualysWindowsLatestVersion\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"N/A\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Azure Arc\\\",\\r\\n\\t\\t\\\"name\\\": \\\"ArcAgentForWindows\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Windows\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"arcWindowsLatestVersion\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"https://learn.microsoft.com/azure/azure-arc/servers/agent-release-notes\\\"\\r\\n\\t}\\r\\n\\t,\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Azure Arc\\\",\\r\\n\\t\\t\\\"name\\\": \\\"ArcAgentForLinux\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Windows\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"arcLinuxLatestVersion\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"https://learn.microsoft.com/azure/azure-arc/servers/agent-release-notes\\\"\\r\\n\\t}\\r\\n]\",\"transformers\":null}",
+              "query": "{\"version\":\"1.0.0\",\"content\":\"[\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Legacy Log Analytics\\\",\\r\\n\\t\\t\\\"name\\\": \\\"OmsAgentForLinux\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Linux\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"mmaLinuxLatestVersion\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"https://learn.microsoft.com/azure/virtual-machines/extensions/oms-linux\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Legacy Log Analytics\\\",\\r\\n\\t\\t\\\"name\\\": \\\"MicrosoftMonitoringAgent\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Windows\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"mmaWindowsLatestVersion\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"https://learn.microsoft.com/en-us/azure/virtual-machines/extensions/oms-windows\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Defender for Servers P2\\\",\\r\\n\\t\\t\\\"name\\\": \\\"AzureSecurityLinuxAgent\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Linux\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"defenderLinuxLatestVersion\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"N/A\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Defender for Servers P2\\\",\\r\\n\\t\\t\\\"name\\\": \\\"AzureSecurityWindowsAgent\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Windows\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"defenderWindowsLatestVersions\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"N/A\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Azure Monitor Agent\\\",\\r\\n\\t\\t\\\"name\\\": \\\"AzureMonitorLinuxAgent\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Linux\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"amaLinuxLatestVersion\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"https://learn.microsoft.com/azure/azure-monitor/agents/azure-monitor-agent-extension-versions\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Azure Monitor Agent\\\",\\r\\n\\t\\t\\\"name\\\": \\\"AzureMonitorWindowsAgent\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Windows\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"amaWindowsLatestVersion\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"https://learn.microsoft.com/azure/azure-monitor/agents/azure-monitor-agent-extension-versions\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Defender for Endpoint\\\",\\r\\n\\t\\t\\\"name\\\": \\\"MDE.Linux\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Linux\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"mdeLinuxLatestVersion\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"https://learn.microsoft.com/microsoft-365/security/defender-endpoint/linux-whatsnew\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Defender for Endpoint\\\",\\r\\n\\t\\t\\\"name\\\": \\\"MDE.Windows\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Windows\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"mdeWindowsLatestVersion\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"https://learn.microsoft.com/microsoft-365/security/defender-endpoint/windows-whatsnew\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Azure Guest Configuration\\\",\\r\\n\\t\\t\\\"name\\\": \\\"AzurePolicyforLinux\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Linux\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"guestConfigLinuxLatestVersion\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"https://learn.microsoft.com/azure/governance/machine-configuration/agent-notes#release-notes\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Azure Guest Configuration\\\",\\r\\n\\t\\t\\\"name\\\": \\\"AzurePolicyforWindows\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Windows\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"guestConfigWindowsLatestVersion\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"https://learn.microsoft.com/azure/governance/machine-configuration/agent-notes#release-notes\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Qualys\\\",\\r\\n\\t\\t\\\"name\\\": \\\"LinuxAgent.AzureSecurityCenter\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Linux\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"qualysLinuxLatestVersion\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"N/A\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Qualys\\\",\\r\\n\\t\\t\\\"name\\\": \\\"WindowsAgent.AzureSecurityCenter\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Windows\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"qualysWindowsLatestVersion\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"N/A\\\"\\r\\n\\t},\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Azure Arc\\\",\\r\\n\\t\\t\\\"name\\\": \\\"ArcAgentForWindows\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Windows\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"arcWindowsLatestVersion\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"https://learn.microsoft.com/azure/azure-arc/servers/agent-release-notes\\\"\\r\\n\\t}\\r\\n\\t,\\r\\n\\t{\\r\\n\\t\\t\\\"agent\\\": \\\"Azure Arc\\\",\\r\\n\\t\\t\\\"name\\\": \\\"ArcAgentForLinux\\\",\\r\\n\\t\\t\\\"os\\\": \\\"Linux\\\",\\r\\n\\t\\t\\\"latestVersion\\\": \\\"arcLinuxLatestVersion\\\",\\r\\n\\t\\t\\\"versionDocs\\\": \\\"https://learn.microsoft.com/azure/azure-arc/servers/agent-release-notes\\\"\\r\\n\\t}\\r\\n]\",\"transformers\":null}",
               "size": 0,
               "title": "Latest Agents ({topVmLocation})",
               "showRefreshButton": true,
@@ -650,6 +697,12 @@
                     "formatOptions": {
                       "linkTarget": "Url"
                     }
+                  }
+                ],
+                "sortBy": [
+                  {
+                    "itemKey": "agent",
+                    "sortOrder": 1
                   }
                 ],
                 "labelSettings": [
@@ -674,13 +727,19 @@
                     "label": "Release Notes"
                   }
                 ]
-              }
+              },
+              "sortBy": [
+                {
+                  "itemKey": "agent",
+                  "sortOrder": 1
+                }
+              ]
             },
             "customWidth": "50",
             "conditionalVisibility": {
               "parameterName": "showHiddenObjects",
               "comparison": "isEqualTo",
-              "value": "Yes"
+              "value": "True"
             },
             "showPin": false,
             "name": "agentMappings"
@@ -735,7 +794,7 @@
           {
             "type": 1,
             "content": {
-              "json": "This is a consolidated view of all agents. Some columns and values are only applicable to specific agent types. ",
+              "json": "This is a consolidated view of all agents. Some columns and values are only applicable to specific agent types. \r\n\r\nThe Log Analytics agents (OMS/MMA) will reach [end of support by August 2024](https://azure.microsoft.com/updates/were-retiring-the-log-analytics-agent-in-azure-monitor-on-31-august-2024/). The Azure Monitor agent is the recommended replacement. Learn more about migrating to [Azure Monitor](https://aka.ms/migratetoAMA)",
               "style": "info"
             },
             "name": "text - 8"
@@ -810,7 +869,7 @@
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
-              "query": "resources\r\n| where type contains \"microsoft.compute/virtualmachines/extensions\" or \r\n        type contains \"microsoft.hybridcompute/machines/extensions\" or\r\n        type contains \"microsoft.compute/virtualmachinescalesets/extensions\"\r\n| project-away kind, managedBy, sku, plan, identity, zones, extendedLocation, systemData, apiVersion\r\n| extend agent = tostring(iff(name =~ 'OmsAgentForLinux', 'Legacy Log Analytics', \r\n                        iff(name =~ \"MicrosoftMonitoringAgent\", 'Legacy Log Analytics',\r\n                        iff(name =~ \"AzureSecurityLinuxAgent\", 'Defender for Servers P2',\r\n                        iff(name =~ \"AzureSecurityWindowsAgent\", 'Defender for Servers P2',\r\n                        iff(name =~ \"AzureMonitorWindowsAgent\", 'Azure Monitor Agent',\r\n                        iff(name =~ \"AzureMonitorLinuxAgent\", 'Azure Monitor Agent',\r\n                        iff(name has \"MDE.\", 'Defender for Endpoint',\r\n                        iff(name startswith \"AzurePolicyfor\", 'Azure Guest Configuration',\r\n                        iff(name =~ \"LinuxAgent.AzureSecurityCenter\", 'Qualys',\r\n                        iff(name =~ \"WindowsAgent.AzureSecurityCenter\", 'Qualys',\r\n                    name)))))))))))\r\n| extend autoUpgradeEnabled = properties.enableAutomaticUpgrade\r\n| extend provisioningState = tostring(properties.provisioningState)\r\n| extend version = tostring(properties.typeHandlerVersion)\r\n| extend vNextEnabled = tostring(properties.settings.vNextEnabled)\r\n| extend statusLevel = tostring(properties.instanceView.status.level)\r\n| extend statusMessage = tostring(properties.instanceView.status.message)\r\n| extend statusCode = tostring(properties.instanceView.status.code)\r\n| extend workspaceId = tostring(properties.settings.workspaceId)\r\n| join kind=leftouter ( // Join Log Analytics Workspaces\r\n        Resources\r\n            | where type == \"microsoft.operationalinsights/workspaces\"\r\n            | extend workspaceId = properties.customerId\r\n            | project workspaceResourceId = id, tostring(workspaceId)\r\n        ) on workspaceId\r\n| parse id with * \"/\" machineId \"/extensions/\" *\r\n| extend machineId =  strcat('/', tolower(machineId))\r\n| join kind=leftouter ( // Join Machines\r\n        Resources\r\n        | where type =~ 'Microsoft.Compute/virtualMachines' or \r\n                type == \"microsoft.compute/virtualmachinescalesets\" or\r\n                type == \"microsoft.hybridcompute/machines\"\r\n        | extend machineId = tolower(id)\r\n        | extend machineStatus = tostring(iff(\r\n                                type =~ 'Microsoft.Compute/virtualMachines', properties.extended.instanceView.powerState.displayStatus,\r\n                                iff(type == \"microsoft.compute/virtualmachinescalesets\", 'n/a',\r\n                                iff(type == \"microsoft.hybridcompute/machines\", properties.status,\r\n                                'uknown'))))\r\n        | extend osType = tolower(tostring(iff(\r\n                                type =~ 'Microsoft.Compute/virtualMachines', properties.storageProfile.osDisk.osType,\r\n                                iff(type == \"microsoft.compute/virtualmachinescalesets\", properties.virtualMachineProfile.storageProfile.osDisk.osType,\r\n                                iff(type == \"microsoft.hybridcompute/machines\", properties.osType,\r\n                                'uknown')))))\r\n        | extend hostName = tostring(iff(\r\n                                type =~ 'Microsoft.Compute/virtualMachines', properties.extended.instanceView.computerName,\r\n                                iff(type == \"microsoft.compute/virtualmachinescalesets\", properties.virtualMachineProfile.osProfile.computerNamePrefix,\r\n                                iff(type == \"microsoft.hybridcompute/machines\", properties.machineFqdn,\r\n                                'uknown'))))\r\n        | project-away kind, managedBy, apiVersion, sku, plan, identity, zones, extendedLocation, systemData\r\n        ) on machineId\r\n| union ( // Union Arc Machines as an Agent\r\n        resources\r\n        | where type == \"microsoft.hybridcompute/machines\"\r\n        | extend agent = \"Azure Arc\"\r\n        | extend name = iff(properties.osType == \"linux\", \"ArcAgentForLinux\", \"ArcAgentForWindows\")\r\n        | extend autoUpgradeEnabled = properties.agentUpgrade\r\n        | extend provisioningState = tostring(properties.provisioningState)\r\n        | extend version = tostring(properties.agentVersion)\r\n        | extend machineId = tolower(tostring(id))\r\n        | extend osType = tostring(properties.osType)\r\n        | extend statusMessage = tostring(properties.errorDetails)\r\n        | extend statusCode = tostring(properties.status)\r\n        | extend hostName = tostring(properties.machineFqdn)\r\n        | extend machineStatus = tostring(properties.status)\r\n        | project-away apiVersion, systemData, sku, plan, identity, kind, managedBy, zones, extendedLocation\r\n    )\r\n| where agent in ({securityAgents})\r\n| where agent matches regex \"{agentView}\"\r\n| project-away workspaceId, workspaceId1, id1, name1, type1, tenantId1, location1, resourceGroup1, subscriptionId1, properties1, tags1, machineId1, properties\r\n| project machineId, hostName, osType, machineStatus, agent, provisioningState, version, autoUpgradeEnabled, vNextEnabled, statusLevel, statusCode, statusMessage, workspaceResourceId, subscriptionId, resourceGroup, location, tenantId, type, name, id, tags",
+              "query": "resources\r\n| where type contains \"microsoft.compute/virtualmachines/extensions\" or \r\n        type contains \"microsoft.hybridcompute/machines/extensions\" or\r\n        type contains \"microsoft.compute/virtualmachinescalesets/extensions\"\r\n| project-away kind, managedBy, sku, plan, identity, zones, extendedLocation, systemData, apiVersion\r\n| extend agent = tostring(iff(name =~ 'OmsAgentForLinux', 'Legacy Log Analytics', \r\n                        iff(name =~ \"MicrosoftMonitoringAgent\", 'Legacy Log Analytics',\r\n                        iff(name =~ \"AzureSecurityLinuxAgent\", 'Defender for Servers P2',\r\n                        iff(name =~ \"AzureSecurityWindowsAgent\", 'Defender for Servers P2',\r\n                        iff(name =~ \"AzureMonitorWindowsAgent\", 'Azure Monitor Agent',\r\n                        iff(name =~ \"AzureMonitorLinuxAgent\", 'Azure Monitor Agent',\r\n                        iff(name has \"MDE.\", 'Defender for Endpoint',\r\n                        iff(name startswith \"AzurePolicyfor\", 'Azure Guest Configuration',\r\n                        iff(name =~ \"LinuxAgent.AzureSecurityCenter\", 'Qualys',\r\n                        iff(name =~ \"WindowsAgent.AzureSecurityCenter\", 'Qualys',\r\n                    name)))))))))))\r\n| extend autoUpgradeEnabled = properties.enableAutomaticUpgrade\r\n| extend provisioningState = tostring(properties.provisioningState)\r\n| extend version = tostring(properties.typeHandlerVersion)\r\n| extend vNextEnabled = tostring(properties.settings.vNextEnabled)\r\n| extend statusLevel = tostring(properties.instanceView.status.level)\r\n| extend statusMessage = tostring(properties.instanceView.status.message)\r\n| extend statusCode = tostring(properties.instanceView.status.code)\r\n| extend workspaceId = tostring(properties.settings.workspaceId)\r\n| join kind=leftouter ( // Join Log Analytics Workspaces\r\n        Resources\r\n            | where type == \"microsoft.operationalinsights/workspaces\"\r\n            | extend workspaceId = properties.customerId\r\n            | project workspaceResourceId = id, tostring(workspaceId)\r\n        ) on workspaceId\r\n| parse id with * \"/\" machineId \"/extensions/\" *\r\n| extend machineId =  strcat('/', tolower(machineId))\r\n| join kind=leftouter ( // Join Machines\r\n        Resources\r\n        | where type =~ 'Microsoft.Compute/virtualMachines' or \r\n                type == \"microsoft.compute/virtualmachinescalesets\" or\r\n                type == \"microsoft.hybridcompute/machines\"\r\n        | extend machineId = tolower(id)\r\n        | extend machineStatus = tostring(iff(\r\n                                type =~ 'Microsoft.Compute/virtualMachines', properties.extended.instanceView.powerState.displayStatus,\r\n                                iff(type == \"microsoft.compute/virtualmachinescalesets\", 'n/a',\r\n                                iff(type == \"microsoft.hybridcompute/machines\", properties.status,\r\n                                'uknown'))))\r\n        | extend osType = tolower(tostring(iff(\r\n                                type =~ 'Microsoft.Compute/virtualMachines', properties.storageProfile.osDisk.osType,\r\n                                iff(type == \"microsoft.compute/virtualmachinescalesets\", properties.virtualMachineProfile.storageProfile.osDisk.osType,\r\n                                iff(type == \"microsoft.hybridcompute/machines\", properties.osType,\r\n                                'uknown')))))\r\n        | extend hostName = tostring(iff(\r\n                                type =~ 'Microsoft.Compute/virtualMachines', properties.extended.instanceView.computerName,\r\n                                iff(type == \"microsoft.compute/virtualmachinescalesets\", properties.virtualMachineProfile.osProfile.computerNamePrefix,\r\n                                iff(type == \"microsoft.hybridcompute/machines\", properties.machineFqdn,\r\n                                'uknown'))))\r\n        | project-away kind, managedBy, apiVersion, sku, plan, identity, zones, extendedLocation, systemData\r\n        ) on machineId\r\n| union ( // Union Arc Machines as an Agent\r\n        resources\r\n        | where type == \"microsoft.hybridcompute/machines\"\r\n        | extend agent = \"Azure Arc\"\r\n        | extend name = iff(properties.osType == \"linux\", \"ArcAgentForLinux\", \"ArcAgentForWindows\")\r\n        | extend autoUpgradeEnabled = properties.agentUpgrade[0]\r\n        | extend provisioningState = tostring(properties.provisioningState)\r\n        | extend version = tostring(properties.agentVersion)\r\n        | extend machineId = tolower(tostring(id))\r\n        | extend osType = tostring(properties.osType)\r\n        | extend statusMessage = tostring(properties.errorDetails)\r\n        | extend statusCode = tostring(properties.status)\r\n        | extend hostName = tostring(properties.machineFqdn)\r\n        | extend tags = properties.tags\r\n        | extend machineStatus = tostring(properties.status)\r\n        | project-away apiVersion, systemData, sku, plan, identity, kind, managedBy, zones, extendedLocation\r\n    )\r\n| where agent in ({securityAgents})\r\n| where agent matches regex \"{agentView}\"\r\n| project-away workspaceId, workspaceId1, id1, name1, type1, tenantId1, location1, resourceGroup1, subscriptionId1, properties1, tags1, machineId1, properties\r\n| project machineId, hostName, osType, machineStatus, agent, provisioningState, version, autoUpgradeEnabled, vNextEnabled, statusLevel, statusCode, statusMessage, workspaceResourceId, subscriptionId, resourceGroup, location, tenantId, type, name, id, tags",
               "size": 0,
               "showAnalytics": true,
               "title": "All Agents",
@@ -819,31 +878,21 @@
               "queryType": 1,
               "resourceType": "microsoft.resourcegraph/resources"
             },
+            "conditionalVisibility": {
+              "parameterName": "showHiddenObjects",
+              "comparison": "isEqualTo",
+              "value": "True"
+            },
             "name": "allAgents"
           },
           {
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
-              "query": "{\"version\":\"Merge/1.0\",\"merges\":[{\"id\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\",\"mergeType\":\"inner\",\"leftTable\":\"allAgents\",\"rightTable\":\"versionsTable\",\"leftColumn\":\"name\",\"rightColumn\":\"name\"}],\"projectRename\":[{\"originalName\":\"[allAgents].machineId\",\"mergedName\":\"machineId\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].hostName\",\"mergedName\":\"hostName\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].osType\",\"mergedName\":\"osType\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].machineStatus\",\"mergedName\":\"machineStatus\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].agent\",\"mergedName\":\"agent\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].provisioningState\",\"mergedName\":\"provisioningState\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].version\",\"mergedName\":\"version\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[versionsTable].Latest Version\",\"mergedName\":\"Latest Version\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].autoUpgradeEnabled\",\"mergedName\":\"autoUpgradeEnabled\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].vNextEnabled\",\"mergedName\":\"vNextEnabled\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].statusLevel\",\"mergedName\":\"statusLevel\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].statusCode\",\"mergedName\":\"statusCode\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].statusMessage\",\"mergedName\":\"statusMessage\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].workspaceResourceId\",\"mergedName\":\"workspaceResourceId\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].subscriptionId\",\"mergedName\":\"subscriptionId\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].resourceGroup\",\"mergedName\":\"resourceGroup\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].location\",\"mergedName\":\"location\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].tenantId\",\"mergedName\":\"tenantId\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].type\",\"mergedName\":\"type\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].name\",\"mergedName\":\"name\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].id\",\"mergedName\":\"id\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].tags\",\"mergedName\":\"tags\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[versionsTable].Agent\",\"mergedName\":\"Agent\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[versionsTable].name\",\"mergedName\":\"Extension Name\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[versionsTable].Operating System\",\"mergedName\":\"Operating System\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[versionsTable].Release Notes\",\"mergedName\":\"Release Notes\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"}]}",
+              "query": "{\"version\":\"Merge/1.0\",\"merges\":[{\"id\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\",\"mergeType\":\"inner\",\"leftTable\":\"allAgents\",\"rightTable\":\"versionsTable\",\"leftColumn\":\"name\",\"rightColumn\":\"name\"}],\"projectRename\":[{\"originalName\":\"[allAgents].machineId\",\"mergedName\":\"machineId\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].hostName\",\"mergedName\":\"hostName\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].osType\",\"mergedName\":\"osType\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].machineStatus\",\"mergedName\":\"machineStatus\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].agent\",\"mergedName\":\"agent\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].provisioningState\",\"mergedName\":\"provisioningState\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].version\",\"mergedName\":\"version\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[versionsTable].Latest Version\",\"mergedName\":\"Latest Version\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].autoUpgradeEnabled\",\"mergedName\":\"autoUpgradeEnabled\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].vNextEnabled\",\"mergedName\":\"vNextEnabled\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].statusLevel\",\"mergedName\":\"statusLevel\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].statusCode\",\"mergedName\":\"statusCode\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].statusMessage\",\"mergedName\":\"statusMessage\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].workspaceResourceId\",\"mergedName\":\"workspaceResourceId\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].subscriptionId\",\"mergedName\":\"subscriptionId\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].resourceGroup\",\"mergedName\":\"resourceGroup\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].location\",\"mergedName\":\"location\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].tenantId\",\"mergedName\":\"tenantId\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].name\",\"mergedName\":\"name\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].tags\",\"mergedName\":\"tags\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[versionsTable].name\",\"mergedName\":\"Extension Name\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[versionsTable].Release Notes\"},{\"originalName\":\"[versionsTable].Operating System\"},{\"originalName\":\"[versionsTable].Agent\"},{\"originalName\":\"[allAgents].type\"},{\"originalName\":\"[allAgents].id\"}]}",
               "size": 3,
               "showAnalytics": true,
               "title": "All Agents",
-              "showRefreshButton": true,
-              "showExportToExcel": true,
-              "queryType": 7,
-              "visualization": "table"
-            },
-            "showPin": false,
-            "name": "allAgentsMerge"
-          },
-          {
-            "type": 3,
-            "content": {
-              "version": "KqlItem/1.0",
-              "query": "{\"version\":\"Merge/1.0\",\"merges\":[{\"id\":\"ecaddf57-dc60-488d-ba63-c4ae2e18205b\",\"mergeType\":\"leftanti\",\"leftTable\":\"allmachines\",\"rightTable\":\"allExtensionsMerge\",\"leftColumn\":\"id\",\"rightColumn\":\"machineId\"}]}",
-              "size": 1,
-              "title": "Computers Missing Agent(s)",
               "showRefreshButton": true,
               "showExportToExcel": true,
               "queryType": 7,
@@ -851,7 +900,88 @@
               "gridSettings": {
                 "formatters": [
                   {
-                    "columnMatch": "id",
+                    "columnMatch": "machineId",
+                    "formatter": 13,
+                    "formatOptions": {
+                      "linkTarget": "Resource",
+                      "linkIsContextBlade": true,
+                      "showIcon": true,
+                      "customColumnWidthSetting": "22ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "machineStatus",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "18ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "agent",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "25ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "provisioningState",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "15ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "version",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "!=",
+                          "thresholdValue": "[\"Latest Version\"]",
+                          "representation": "Important",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "success",
+                          "text": "{0}{1}"
+                        }
+                      ],
+                      "customColumnWidthSetting": "18ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "Latest Version",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "18ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "autoUpgradeEnabled",
+                    "formatter": 1,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "18ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "statusLevel",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "18ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "statusCode",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "18ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "workspaceResourceId",
                     "formatter": 0,
                     "formatOptions": {
                       "customColumnWidthSetting": "20ch"
@@ -859,82 +989,99 @@
                   },
                   {
                     "columnMatch": "subscriptionId",
-                    "formatter": 13,
+                    "formatter": 15,
                     "formatOptions": {
                       "linkTarget": null,
                       "showIcon": true
                     }
+                  },
+                  {
+                    "columnMatch": "name",
+                    "formatter": 5
+                  },
+                  {
+                    "columnMatch": "Extension Name",
+                    "formatter": 5
                   }
                 ],
                 "labelSettings": [
                   {
-                    "columnId": "id",
-                    "label": "Name"
+                    "columnId": "machineId",
+                    "label": "Machine "
                   },
                   {
-                    "columnId": "location",
-                    "label": "Location"
+                    "columnId": "hostName",
+                    "label": "Host Name"
                   },
                   {
-                    "columnId": "resourceGroup",
-                    "label": "Resource Group"
+                    "columnId": "osType",
+                    "label": "Operating System"
+                  },
+                  {
+                    "columnId": "machineStatus",
+                    "label": "Machine Status"
+                  },
+                  {
+                    "columnId": "agent",
+                    "label": "Agent"
+                  },
+                  {
+                    "columnId": "provisioningState",
+                    "label": "Install State"
+                  },
+                  {
+                    "columnId": "version",
+                    "label": "Version"
+                  },
+                  {
+                    "columnId": "autoUpgradeEnabled",
+                    "label": "Auto Upgrade"
+                  },
+                  {
+                    "columnId": "vNextEnabled",
+                    "label": "Windows Unified Agent"
+                  },
+                  {
+                    "columnId": "statusLevel",
+                    "label": "Status Level"
+                  },
+                  {
+                    "columnId": "statusCode",
+                    "label": "Status Code"
+                  },
+                  {
+                    "columnId": "statusMessage",
+                    "label": "Status Message"
+                  },
+                  {
+                    "columnId": "workspaceResourceId",
+                    "label": "MMA Workspace"
                   },
                   {
                     "columnId": "subscriptionId",
                     "label": "Subscription"
                   },
                   {
-                    "columnId": "osType",
-                    "label": "OS"
+                    "columnId": "resourceGroup",
+                    "label": "Resource Group"
                   },
                   {
-                    "columnId": "osComputerName",
-                    "label": "HostName"
+                    "columnId": "location",
+                    "label": "Location"
+                  },
+                  {
+                    "columnId": "tenantId",
+                    "label": "Tenant"
+                  },
+                  {
+                    "columnId": "tags",
+                    "label": "Tags"
                   }
                 ]
-              },
-              "tileSettings": {
-                "titleContent": {
-                  "columnMatch": "Agent",
-                  "formatter": 12,
-                  "formatOptions": {
-                    "min": 0,
-                    "palette": "blue"
-                  },
-                  "numberFormat": {
-                    "unit": 17,
-                    "options": {
-                      "style": "decimal"
-                    }
-                  }
-                },
-                "showBorder": false
-              },
-              "chartSettings": {
-                "xAxis": "osType",
-                "yAxis": [
-                  "agent"
-                ],
-                "group": null,
-                "createOtherGroup": 0,
-                "ySettings": {
-                  "numberFormatSettings": {
-                    "unit": 17,
-                    "options": {
-                      "style": "decimal",
-                      "useGrouping": false
-                    }
-                  }
-                }
               }
             },
-            "conditionalVisibility": {
-              "parameterName": "showMachinesMissingAgent",
-              "comparison": "isEqualTo",
-              "value": "Show"
-            },
             "showPin": false,
-            "name": "computersMissingAgent"
+            "name": "allAgentsMerge"
           }
         ],
         "exportParameters": true
