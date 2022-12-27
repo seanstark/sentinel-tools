@@ -636,8 +636,7 @@
                   "jsonData": "[\r\n    {\"value\": \"Show\", \"selected\":true},\r\n    {\"value\": \"Hide\"}\r\n]",
                   "timeContext": {
                     "durationMs": 86400000
-                  },
-                  "value": "Hide"
+                  }
                 }
               ],
               "style": "formVertical",
