@@ -26,24 +26,31 @@
             "type": 9,
             "content": {
               "version": "KqlParameterItem/1.0",
+              "crossComponentResources": [
+                "/subscriptions/ada06e68-375e-4210-be3a-c6cacebf41c5/resourcegroups/sentinel-prd/providers/microsoft.operationalinsights/workspaces/sentinel-prd"
+              ],
               "parameters": [
                 {
                   "id": "130a5425-6a32-4eb5-bbf9-20e3813df8b4",
                   "version": "KqlParameterItem/1.0",
                   "name": "Subscription",
                   "type": 6,
+                  "isRequired": true,
                   "multiSelect": true,
                   "quote": "'",
                   "delimiter": ",",
                   "typeSettings": {
-                    "additionalResourceOptions": [],
-                    "includeAll": false
+                    "additionalResourceOptions": [
+                      "value::all"
+                    ],
+                    "includeAll": true,
+                    "showDefault": false
                   },
                   "timeContext": {
                     "durationMs": 86400000
                   },
                   "value": [
-                    "/subscriptions/ada06e68-375e-4210-be3a-c6cacebf41c5"
+                    "value::all"
                   ]
                 },
                 {
@@ -105,7 +112,7 @@
                   },
                   "queryType": 1,
                   "resourceType": "microsoft.resourcegraph/resources",
-                  "value": null
+                  "value": "Environment"
                 },
                 {
                   "id": "f1a97731-1029-4dbb-b1b7-cb2bc73e09ef",
@@ -123,7 +130,7 @@
                   },
                   "queryType": 1,
                   "resourceType": "microsoft.resourcegraph/resources",
-                  "value": "value::1"
+                  "value": "Prod"
                 },
                 {
                   "id": "dd26bd17-eeaf-4aa9-a515-ed1ce9be0d71",
@@ -144,7 +151,7 @@
                 }
               ],
               "style": "above",
-              "queryType": 1,
+              "queryType": 0,
               "resourceType": "microsoft.resourcegraph/resources"
             },
             "name": "Global Filters"
