@@ -26,9 +26,6 @@
             "type": 9,
             "content": {
               "version": "KqlParameterItem/1.0",
-              "crossComponentResources": [
-                "/subscriptions/ada06e68-375e-4210-be3a-c6cacebf41c5/resourcegroups/sentinel-prd/providers/microsoft.operationalinsights/workspaces/sentinel-prd"
-              ],
               "parameters": [
                 {
                   "id": "130a5425-6a32-4eb5-bbf9-20e3813df8b4",
@@ -49,9 +46,7 @@
                   "timeContext": {
                     "durationMs": 86400000
                   },
-                  "value": [
-                    "value::all"
-                  ]
+                  "defaultValue": "value::all"
                 },
                 {
                   "id": "f7d146f5-de38-4aeb-98c2-77a9b005c408",
@@ -152,7 +147,7 @@
               ],
               "style": "above",
               "queryType": 0,
-              "resourceType": "microsoft.resourcegraph/resources"
+              "resourceType": "microsoft.operationalinsights/workspaces"
             },
             "name": "Global Filters"
           },
