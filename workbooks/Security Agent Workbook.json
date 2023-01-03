@@ -1519,7 +1519,7 @@
             "content": {
               "version": "KqlItem/1.0",
               "query": "resources\r\n| where type contains \"microsoft.compute/virtualmachines/extensions\" or \r\ntype contains \"microsoft.hybridcompute/machines/extensions\" or\r\ntype contains \"microsoft.compute/virtualmachinescalesets/extensions\"\r\n| extend agent = iff(name =~ 'OmsAgentForLinux', 'Legacy Log Analytics', \r\n                        iff(name =~ \"MicrosoftMonitoringAgent\", 'Legacy Log Analytics',\r\n                        iff(name =~ \"AzureSecurityLinuxAgent\", 'Defender for Servers P2',\r\n                        iff(name =~ \"AzureSecurityWindowsAgent\", 'Defender for Servers P2',\r\n                        iff(name =~ \"AzureMonitorWindowsAgent\", 'Azure Monitor Agent',\r\n                        iff(name =~ \"AzureMonitorLinuxAgent\", 'Azure Monitor Agent',\r\n                        iff(name has \"MDE.\", 'Defender for Endpoint',\r\n                        iff(name startswith \"AzurePolicyfor\", 'Azure Guest Configuration',\r\n                        iff(name =~ \"LinuxAgent.AzureSecurityCenter\", 'Qualys',\r\n                        iff(name =~ \"WindowsAgent.AzureSecurityCenter\", 'Qualys',\r\n                    name))))))))))\r\n| where agent in ({securityAgents})\r\n| extend tagFilter = tostring(case(isempty(\"{machineTag}\"),\"\", strcat('\"',\"{machineTag}\",'\"',\":\",'\"',\"{machineTagValue}\",'\"')))\r\n| where tostring(tags) contains tagFilter\r\n| summarize agentCount = count(),\r\nuniqueVersions = dcount(tostring(properties.typeHandlerVersion)),\r\nautoUpgradeEnabled = countif(properties.enableAutomaticUpgrade == true), \r\nautoUpgradeDisabled = countif(properties.enableAutomaticUpgrade == false or isnotempty(properties.enableAutomaticUpgrade)),\r\ninstallSucceeded = countif(properties.provisioningState == 'Succeeded'),\r\ninstallFailed = countif(properties.provisioningState == 'Failed')\r\nby agent\r\n",
-              "size": 1,
+              "size": 0,
               "showAnalytics": true,
               "title": "Agent Breakdown",
               "showRefreshButton": true,
@@ -1534,7 +1534,17 @@
                 "formatters": [
                   {
                     "columnMatch": "agent",
-                    "formatter": 1
+                    "formatter": 1,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "25ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "agentCount",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "12ch"
+                    }
                   },
                   {
                     "columnMatch": "uniqueVersions",
@@ -1551,7 +1561,7 @@
                     "formatOptions": {
                       "min": 0,
                       "palette": "blue",
-                      "customColumnWidthSetting": "30ch"
+                      "customColumnWidthSetting": "25ch"
                     }
                   },
                   {
@@ -1560,7 +1570,7 @@
                     "formatOptions": {
                       "min": 0,
                       "palette": "orange",
-                      "customColumnWidthSetting": "30ch"
+                      "customColumnWidthSetting": "25ch"
                     }
                   },
                   {
@@ -1569,7 +1579,7 @@
                     "formatOptions": {
                       "min": 0,
                       "palette": "green",
-                      "customColumnWidthSetting": "30ch"
+                      "customColumnWidthSetting": "25ch"
                     }
                   },
                   {
