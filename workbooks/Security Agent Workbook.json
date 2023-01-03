@@ -26,6 +26,9 @@
             "type": 9,
             "content": {
               "version": "KqlParameterItem/1.0",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
               "parameters": [
                 {
                   "id": "130a5425-6a32-4eb5-bbf9-20e3813df8b4",
@@ -46,23 +49,10 @@
                   "timeContext": {
                     "durationMs": 86400000
                   },
-                  "defaultValue": "value::all"
-                },
-                {
-                  "id": "f7d146f5-de38-4aeb-98c2-77a9b005c408",
-                  "version": "KqlParameterItem/1.0",
-                  "name": "workspaceType",
-                  "label": "Workspace Type",
-                  "type": 5,
-                  "isRequired": true,
-                  "typeSettings": {
-                    "additionalResourceOptions": [],
-                    "showDefault": false
-                  },
-                  "jsonData": "[\r\n    {\"value\": \"Alll\", \"selected\": true},\r\n    {\"value\": \"Microsoft Sentinel\"},\r\n    {\"value\": \"Defender for Cloud\"}\r\n]",
-                  "timeContext": {
-                    "durationMs": 86400000
-                  }
+                  "defaultValue": "value::all",
+                  "value": [
+                    "value::all"
+                  ]
                 },
                 {
                   "id": "290051bb-a82a-4234-8b86-af5df0b87f86",
@@ -70,17 +60,22 @@
                   "name": "Workspace",
                   "type": 5,
                   "isRequired": true,
+                  "query": "where type =~ 'microsoft.operationalinsights/workspaces'\r\n| project value =id, label = name",
+                  "crossComponentResources": [
+                    "{Subscription}"
+                  ],
                   "typeSettings": {
-                    "resourceTypeFilter": {
-                      "microsoft.operationalinsights/workspaces": true
-                    },
-                    "additionalResourceOptions": [],
+                    "additionalResourceOptions": [
+                      "value::1"
+                    ],
                     "showDefault": false
                   },
                   "timeContext": {
                     "durationMs": 86400000
                   },
-                  "value": "/subscriptions/ada06e68-375e-4210-be3a-c6cacebf41c5/resourcegroups/sentinel-prd/providers/microsoft.operationalinsights/workspaces/sentinel-prd"
+                  "defaultValue": "value::1",
+                  "queryType": 1,
+                  "resourceType": "microsoft.resourcegraph/resources"
                 },
                 {
                   "id": "f8321a8b-90ac-43ae-a0fd-8f157e971808",
@@ -101,13 +96,16 @@
                   "label": "Machine Tags",
                   "type": 2,
                   "query": "Resources\r\n| where type =~ 'Microsoft.Compute/virtualMachines' or \r\ntype == \"microsoft.compute/virtualmachinescalesets\" or\r\ntype == \"microsoft.hybridcompute/machines\"\r\n| where isnotempty(tags)\r\n| project tags\r\n| mvexpand tags\r\n| extend tagKey = tostring(bag_keys(tags)[0])\r\n| distinct tagKey",
+                  "crossComponentResources": [
+                    "{Subscription}"
+                  ],
                   "typeSettings": {
                     "additionalResourceOptions": [],
                     "showDefault": false
                   },
                   "queryType": 1,
                   "resourceType": "microsoft.resourcegraph/resources",
-                  "value": "Environment"
+                  "value": null
                 },
                 {
                   "id": "f1a97731-1029-4dbb-b1b7-cb2bc73e09ef",
@@ -117,15 +115,18 @@
                   "type": 2,
                   "isRequired": true,
                   "query": "Resources\r\n| where type =~ 'Microsoft.Compute/virtualMachines' or \r\ntype == \"microsoft.compute/virtualmachinescalesets\" or\r\ntype == \"microsoft.hybridcompute/machines\"\r\n| where isnotempty(tags)\r\n| project tags\r\n| mvexpand tags\r\n| extend tagKey = tostring(bag_keys(tags)[0])\r\n| where tagKey == \"{machineTag}\"\r\n| extend tagValue = tostring(tags[tagKey])\r\n| distinct tagValue\r\n",
+                  "crossComponentResources": [
+                    "{Subscription}"
+                  ],
                   "typeSettings": {
                     "additionalResourceOptions": [
                       "value::1"
                     ],
                     "showDefault": false
                   },
+                  "defaultValue": "value::1",
                   "queryType": 1,
-                  "resourceType": "microsoft.resourcegraph/resources",
-                  "value": "Prod"
+                  "resourceType": "microsoft.resourcegraph/resources"
                 },
                 {
                   "id": "dd26bd17-eeaf-4aa9-a515-ed1ce9be0d71",
@@ -146,8 +147,8 @@
                 }
               ],
               "style": "above",
-              "queryType": 0,
-              "resourceType": "microsoft.operationalinsights/workspaces"
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources"
             },
             "name": "Global Filters"
           },
@@ -195,6 +196,9 @@
       "type": 9,
       "content": {
         "version": "KqlParameterItem/1.0",
+        "crossComponentResources": [
+          "{Subscription}"
+        ],
         "parameters": [
           {
             "id": "8e238a36-fc4c-4a98-976f-a53294c1db87",
@@ -203,23 +207,30 @@
             "type": 1,
             "isRequired": true,
             "query": "resources\r\n| where type =~ 'Microsoft.Compute/virtualMachines'\r\n| project location\r\n| top 1 by location",
+            "crossComponentResources": [
+              "{Subscription}"
+            ],
             "timeContext": {
               "durationMs": 86400000
             },
-            "queryType": 1
+            "queryType": 1,
+            "resourceType": "microsoft.resourcegraph/resources"
           },
           {
+            "id": "9116ed8d-2865-469e-8f2d-e18814e804a4",
             "version": "KqlParameterItem/1.0",
             "name": "topVmSubscription",
             "type": 1,
             "isRequired": true,
             "query": "resources\r\n| where type =~ 'Microsoft.Compute/virtualMachines'\r\n| project location, subscriptionId\r\n| top 1 by location\r\n| project subscriptionId",
+            "crossComponentResources": [
+              "{Subscription}"
+            ],
             "timeContext": {
               "durationMs": 86400000
             },
             "queryType": 1,
-            "resourceType": "microsoft.resourcegraph/resources",
-            "id": "9116ed8d-2865-469e-8f2d-e18814e804a4"
+            "resourceType": "microsoft.resourcegraph/resources"
           },
           {
             "id": "c350e495-da30-43f9-9448-e40d74112ea3",
@@ -532,7 +543,10 @@
               "durationMs": 86400000
             },
             "defaultValue": "value::all",
-            "id": "e8a02372-a51a-48f0-8322-8127577a549b"
+            "id": "e8a02372-a51a-48f0-8322-8127577a549b",
+            "value": [
+              "value::all"
+            ]
           },
           {
             "version": "KqlParameterItem/1.0",
@@ -553,12 +567,15 @@
               "durationMs": 86400000
             },
             "defaultValue": "value::all",
-            "id": "a3c7c0e1-19d9-400b-a354-e08bd82a6779"
+            "id": "a3c7c0e1-19d9-400b-a354-e08bd82a6779",
+            "value": [
+              "value::all"
+            ]
           }
         ],
         "style": "above",
-        "queryType": 0,
-        "resourceType": "microsoft.operationalinsights/workspaces"
+        "queryType": 1,
+        "resourceType": "microsoft.resourcegraph/resources"
       },
       "conditionalVisibility": {
         "parameterName": "showHiddenObjects",
@@ -579,6 +596,9 @@
         },
         "queryType": 0,
         "resourceType": "microsoft.operationalinsights/workspaces",
+        "crossComponentResources": [
+          "{Workspace}"
+        ],
         "gridSettings": {
           "sortBy": [
             {
@@ -655,7 +675,10 @@
               "size": 4,
               "title": "All Machines",
               "queryType": 1,
-              "resourceType": "microsoft.resourcegraph/resources"
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ]
             },
             "customWidth": "50",
             "conditionalVisibility": {
@@ -876,7 +899,10 @@
               "showRefreshButton": true,
               "showExportToExcel": true,
               "queryType": 1,
-              "resourceType": "microsoft.resourcegraph/resources"
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ]
             },
             "conditionalVisibility": {
               "parameterName": "showHiddenObjects",
@@ -1221,6 +1247,9 @@
               "showRefreshButton": true,
               "queryType": 1,
               "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
               "visualization": "tiles",
               "tileSettings": {
                 "titleContent": {
@@ -1264,6 +1293,9 @@
               "showRefreshButton": true,
               "queryType": 1,
               "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
               "visualization": "tiles",
               "tileSettings": {
                 "titleContent": {
@@ -1306,6 +1338,9 @@
               "showRefreshButton": true,
               "queryType": 1,
               "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
               "visualization": "tiles",
               "tileSettings": {
                 "titleContent": {
@@ -1347,6 +1382,9 @@
               "title": "Legacy Log Analytic Agent Workspaces",
               "queryType": 1,
               "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
               "visualization": "tiles",
               "tileSettings": {
                 "titleContent": {
@@ -1381,6 +1419,9 @@
               "showRefreshButton": true,
               "queryType": 1,
               "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
               "visualization": "tiles",
               "tileSettings": {
                 "titleContent": {
@@ -1424,6 +1465,9 @@
               "exportParameterName": "agentTypeagent",
               "queryType": 1,
               "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
               "visualization": "tiles",
               "tileSettings": {
                 "titleContent": {
@@ -1482,6 +1526,9 @@
               "showExportToExcel": true,
               "queryType": 1,
               "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
               "visualization": "table",
               "gridSettings": {
                 "formatters": [
@@ -1631,13 +1678,16 @@
             "content": {
               "version": "KqlItem/1.0",
               "query": "resources\r\n| where type == \"microsoft.compute/virtualmachines\" or type == \"microsoft.hybridcompute/machines\"\r\n| parse id with * \"achines/\" ComputerName\r\n| extend ComputerName = tolower(ComputerName)\r\n| join kind=leftouter (\r\nresources\r\n| where (type contains \"microsoft.hybridcompute/machines/extensions\" or type contains \"microsoft.compute/virtualmachines/extensions\") and (name == \"MicrosoftMonitoringAgent\" or name == \"OmsAgentForLinux\" or name == \"OMSAgentForLinux\")\r\n| parse id with * \"achines/\" ComputerName \"/\" *\r\n| extend ComputerName = tolower(ComputerName)\r\n| extend MMA = tostring(name)\r\n) on ComputerName\r\n| join kind=leftouter (\r\nresources\r\n| where (type contains \"microsoft.hybridcompute/machines/extensions\" or type contains \"microsoft.compute/virtualmachines/extensions\") and (name == \"AzureMonitorWindowsAgent\" or name == \"AzureMonitorLinuxAgent\")\r\n| parse id with * \"achines/\" ComputerName \"/\" *\r\n| extend ComputerName = tolower(ComputerName)\r\n| extend AMAgent = tostring(name)\r\n) on ComputerName\r\n| project id, name, ['type'], MMA, AMAgent, subscriptionId, tags\r\n| union (\r\n    resources\r\n    | where type == \"microsoft.compute/virtualmachinescalesets\"\r\n    | project id, name, subscriptionId\r\n    | join kind=leftouter (\r\n    resources\r\n    | where type == \"microsoft.compute/virtualmachinescalesets\"\r\n    | extend extensionprofile = properties.virtualMachineProfile.extensionProfile\r\n    | extend extensions = extensionprofile.extensions\r\n    | mv-expand extensions\r\n    | extend extensiontype = extensions.properties.type\r\n    | where extensiontype in (\"MicrosoftMonitoringAgent\" )\r\n    | project id, name, MMA = extensiontype, subscriptionId\r\n    ) on name \r\n    | join kind=fullouter (\r\n    resources\r\n    | where type == \"microsoft.compute/virtualmachinescalesets\"\r\n    | extend extensionprofile = properties.virtualMachineProfile.extensionProfile\r\n    | extend extensions = extensionprofile.extensions\r\n    | mv-expand extensions\r\n    | extend extensiontype = extensions.properties.type\r\n    | where extensiontype in (\"AzureMonitorWindowsAgent\")\r\n    | project id, name, AMAgent = extensiontype, subscriptionId\r\n    ) on $left.name == $right.name\r\n    | extend ComputerName = iff(isempty(name), name1, name)\r\n    | extend id = iff(isempty(id), id1, id)\r\n    | extend subscriptionId = iff(isempty(subscriptionId), subscriptionId1, subscriptionId)\r\n    | project id, name = ComputerName, [\"type\"] = \"Virtual Machine Scale Sets\", MMA, AMAgent, subscriptionId\r\n)\r\n| extend VMType = case(type == \"microsoft.compute/virtualmachines\", \"Azure Virtual Machines\",\r\n                type == \"microsoft.hybridcompute/machines\", \"Arc-enabled Servers\", \r\n                type == \"Virtual Machine Scale Sets\", \"Virtual Machine Scale Sets\", \r\n                \"Other\")\r\n| extend MMA = iff(isnotempty(MMA_string), MMA_string, MMA_dynamic)\r\n| extend AMAgent = iff(isnotempty(AMAgent_string), AMAgent_string, AMAgent_dynamic)\r\n| extend tagFilter = tostring(case(isempty(\"{machineTag}\"),\"\", strcat('\"',\"{machineTag}\",'\"',\":\",'\"',\"{machineTagValue}\",'\"')))\r\n| where tostring(tags) contains tagFilter\r\n| summarize MachineCount = count(), BothAgents = countif(isnotempty(MMA) and isnotempty(AMAgent)), MMAOnly = countif(isnotempty(MMA) and isempty(AMAgent)), AMAOnly = countif(isempty(MMA) and isnotempty(AMAgent)) by subscriptionId, VMType\r\n| extend counts = pack_array(BothAgents, MMAOnly, AMAOnly)\r\n| extend migstatus = case(BothAgents != 0, \"In Progress\",\r\n                            AMAOnly != 0 and BothAgents == 0 and MMAOnly == 0, \"Completed\", \r\n                            AMAOnly != 0 and MMAOnly != 0, \"In Progress\",\r\n                            MMAOnly != 0 and BothAgents == 0, \"Not Started\", \"Not Started\")",
-              "size": 1,
+              "size": 0,
               "showAnalytics": true,
               "title": "Logging Agent Summary and Migration Status",
               "showRefreshButton": true,
               "showExportToExcel": true,
               "queryType": 1,
               "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
               "visualization": "table",
               "gridSettings": {
                 "formatters": [
@@ -1769,6 +1819,9 @@
               "title": "Rule Types",
               "queryType": 1,
               "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
               "visualization": "tiles",
               "tileSettings": {
                 "titleContent": {
@@ -1851,6 +1904,9 @@
               "showExportToExcel": true,
               "queryType": 1,
               "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
               "visualization": "table",
               "gridSettings": {
                 "formatters": [
@@ -1924,6 +1980,9 @@
               ],
               "queryType": 1,
               "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
               "gridSettings": {
                 "filter": true
               }
@@ -2033,7 +2092,7 @@
     }
   ],
   "fallbackResourceIds": [
-    "/subscriptions/ada06e68-375e-4210-be3a-c6cacebf41c5/resourcegroups/sentinel-prd/providers/microsoft.operationalinsights/workspaces/sentinel-prd"
+    "azure monitor"
   ],
   "fromTemplateId": "sentinel-UserWorkbook",
   "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
