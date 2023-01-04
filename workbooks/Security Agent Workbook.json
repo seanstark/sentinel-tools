@@ -655,7 +655,8 @@
                   "jsonData": "[\r\n    {\"value\": \"Show\", \"selected\":true},\r\n    {\"value\": \"Hide\"}\r\n]",
                   "timeContext": {
                     "durationMs": 86400000
-                  }
+                  },
+                  "value": "Hide"
                 }
               ],
               "style": "formVertical",
@@ -1543,7 +1544,7 @@
             "content": {
               "version": "KqlItem/1.0",
               "query": "Resources\r\n| where type =~ 'Microsoft.Compute/virtualMachines' or \r\ntype == \"microsoft.compute/virtualmachinescalesets\" or\r\ntype == \"microsoft.hybridcompute/machines\"\r\n| extend text = iff(\r\n                        type =~ 'Microsoft.Compute/virtualMachines', 'Azure Virtual Machines', \r\n                        iff(type =~ \"microsoft.compute/virtualmachinescalesets\", 'Azure Virtual Machine Scale Sets',\r\n                        iff(type == \"microsoft.hybridcompute/machines\", 'Azure Arc Machines',\r\n                    'Unknown')))\r\n| extend tagFilter = tostring(case(isempty(\"{machineTag}\"),\"\", strcat('\"',\"{machineTag}\",'\"',\":\",'\"',\"{machineTagValue}\",'\"')))\r\n| where tostring(tags) contains tagFilter\r\n| summarize Mcount = count() by text",
-              "size": 4,
+              "size": 1,
               "showAnalytics": true,
               "title": "Machine Types",
               "showRefreshButton": true,
@@ -1580,8 +1581,53 @@
                 "size": "auto"
               }
             },
-            "customWidth": "70",
+            "customWidth": "35",
             "name": "machineTypeQuery"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "Resources\r\n| where type =~ 'Microsoft.Compute/virtualMachines' or \r\ntype == \"microsoft.compute/virtualmachinescalesets\" or\r\ntype == \"microsoft.hybridcompute/machines\"\r\n| extend text = iff(\r\n                        type =~ 'Microsoft.Compute/virtualMachines', 'Azure', \r\n                        iff(type =~ \"microsoft.compute/virtualmachinescalesets\", 'Azure',\r\n                        iff(type == \"microsoft.hybridcompute/machines\", properties.detectedProperties.cloudprovider,\r\n                    'Unknown')))\r\n| where text != ''\r\n| extend tagFilter = tostring(case(isempty(\"\"),\"\", strcat('\"',\"\",'\"',\":\",'\"',\"value::1\",'\"')))\r\n| where tostring(tags) contains tagFilter\r\n| summarize Mcount = count() by text",
+              "size": 1,
+              "showAnalytics": true,
+              "title": "Machine Cloud Providers",
+              "showRefreshButton": true,
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
+              "visualization": "tiles",
+              "tileSettings": {
+                "titleContent": {
+                  "formatter": 1
+                },
+                "leftContent": {
+                  "columnMatch": "Mcount",
+                  "formatter": 12,
+                  "formatOptions": {
+                    "palette": "auto"
+                  },
+                  "numberFormat": {
+                    "unit": 17,
+                    "options": {
+                      "maximumSignificantDigits": 3,
+                      "maximumFractionDigits": 2
+                    }
+                  }
+                },
+                "rightContent": {
+                  "columnMatch": "text"
+                },
+                "showBorder": false,
+                "sortCriteriaField": "Mcount",
+                "sortOrderField": 2,
+                "size": "auto"
+              }
+            },
+            "customWidth": "35",
+            "name": "cloudProvider"
           },
           {
             "type": 3,
