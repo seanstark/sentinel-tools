@@ -18,6 +18,14 @@
           {
             "type": 1,
             "content": {
+              "json": "This workbook show extensions (agents) installed on Native Azure and Azure Arc Connected Machines only. This workbook will not show machines not connected with Azure Arc.",
+              "style": "warning"
+            },
+            "name": "text - 7"
+          },
+          {
+            "type": 1,
+            "content": {
               "json": "#### Workbook Global Filters"
             },
             "name": "text - 2"
@@ -876,7 +884,7 @@
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
-              "query": "resources\r\n| where type contains \"microsoft.compute/virtualmachines/extensions\" or \r\ntype contains \"microsoft.hybridcompute/machines/extensions\" or\r\ntype contains \"microsoft.compute/virtualmachinescalesets/extensions\"\r\n| extend agent = iff(name =~ 'OmsAgentForLinux', 'Legacy Log Analytics', \r\n                        iff(name =~ \"MicrosoftMonitoringAgent\", 'Legacy Log Analytics',\r\n                        iff(name =~ \"AzureSecurityLinuxAgent\", 'Defender for Servers P2',\r\n                        iff(name =~ \"AzureSecurityWindowsAgent\", 'Defender for Servers P2',\r\n                        iff(name =~ \"AzureMonitorWindowsAgent\", 'Azure Monitor Agent',\r\n                        iff(name =~ \"AzureMonitorLinuxAgent\", 'Azure Monitor Agent',\r\n                        iff(name has \"MDE.\", 'Defender for Endpoint',\r\n                        iff(name startswith \"AzurePolicyfor\", 'Azure Guest Configuration',\r\n                        iff(name =~ \"LinuxAgent.AzureSecurityCenter\", 'Qualys',\r\n                        iff(name =~ \"WindowsAgent.AzureSecurityCenter\", 'Qualys',\r\n                    name))))))))))\r\n| where agent in ({securityAgents})\r\n| extend version = tostring(properties.typeHandlerVersion)\r\n| extend view = \"{agentView}\"\r\n| extend viewMatch = case(view == 'All Agents', \" \", view)\r\n| where agent contains viewMatch\r\n| extend tagFilter = tostring(case(isempty(\"{machineTag}\"),\"\", strcat('\"',\"{machineTag}\",'\"',\":\",'\"',\"{machineTagValue}\",'\"')))\r\n| where tostring(tags) contains tagFilter\r\n| summarize agentCount = count(),\r\nautoUpgradeEnabled = countif(properties.enableAutomaticUpgrade == true), \r\nautoUpgradeDisabled = countif(properties.enableAutomaticUpgrade == false or isnotempty(properties.enableAutomaticUpgrade)),\r\ninstallSucceeded = countif(properties.provisioningState == 'Succeeded'),\r\ninstallFailed = countif(properties.provisioningState == 'Failed')\r\nby agent, version\r\n",
+              "query": "resources\r\n| where type contains \"microsoft.compute/virtualmachines/extensions\" or \r\ntype contains \"microsoft.hybridcompute/machines/extensions\" or\r\ntype contains \"microsoft.compute/virtualmachinescalesets/extensions\"\r\n| extend agent = iff(name =~ 'OmsAgentForLinux', 'Legacy Log Analytics', \r\n                        iff(name =~ \"MicrosoftMonitoringAgent\", 'Legacy Log Analytics',\r\n                        iff(name =~ \"AzureSecurityLinuxAgent\", 'Defender for Servers P2',\r\n                        iff(name =~ \"AzureSecurityWindowsAgent\", 'Defender for Servers P2',\r\n                        iff(name =~ \"AzureMonitorWindowsAgent\", 'Azure Monitor Agent',\r\n                        iff(name =~ \"AzureMonitorLinuxAgent\", 'Azure Monitor Agent',\r\n                        iff(name has \"MDE.\", 'Defender for Endpoint',\r\n                        iff(name startswith \"AzurePolicyfor\", 'Azure Guest Configuration',\r\n                        iff(name =~ \"LinuxAgent.AzureSecurityCenter\", 'Qualys',\r\n                        iff(name =~ \"WindowsAgent.AzureSecurityCenter\", 'Qualys',\r\n                    name))))))))))\r\n| where agent in ({securityAgents})\r\n| extend version = tostring(properties.typeHandlerVersion)\r\n| extend view = \"{agentView}\"\r\n| extend viewMatch = case(view == 'All Agents', \" \", view)\r\n| where agent contains viewMatch\r\n| extend tagFilter = tostring(case(isempty(\"{machineTag}\"),\"\", strcat('\"',\"{machineTag}\",'\"',\":\",'\"',\"{machineTagValue}\",'\"')))\r\n| where tostring(tags) contains tagFilter\r\n| summarize agentCount = count(),\r\nautoUpgradeEnabled = countif(properties.enableAutomaticUpgrade == true), \r\nautoUpgradeDisabled = countif(properties.enableAutomaticUpgrade == false or isnotempty(properties.enableAutomaticUpgrade)),\r\ninstallSucceeded = countif(properties.provisioningState == 'Succeeded'),\r\ninstallFailed = countif(properties.provisioningState == 'Failed')\r\nby agent, version\r\n| order by agent, agentCount\r\n",
               "size": 0,
               "showAnalytics": true,
               "title": "Agent Breakdown",
@@ -886,7 +894,7 @@
                   "fieldName": "agent",
                   "parameterName": "agentvername",
                   "parameterType": 1,
-                  "defaultValue": "\"'"
+                  "defaultValue": "\"\""
                 },
                 {
                   "fieldName": "version",
@@ -1120,7 +1128,7 @@
               "query": "{\"version\":\"Merge/1.0\",\"merges\":[{\"id\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\",\"mergeType\":\"inner\",\"leftTable\":\"allAgents\",\"rightTable\":\"versionsTable\",\"leftColumn\":\"name\",\"rightColumn\":\"name\"}],\"projectRename\":[{\"originalName\":\"[allAgents].machineId\",\"mergedName\":\"machineId\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].hostName\",\"mergedName\":\"hostName\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].subscriptionId\",\"mergedName\":\"subscriptionId\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].resourceGroup\",\"mergedName\":\"resourceGroup\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].osType\",\"mergedName\":\"osType\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].machineStatus\",\"mergedName\":\"machineStatus\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].agent\",\"mergedName\":\"agent\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].id\",\"mergedName\":\"id\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].provisioningState\",\"mergedName\":\"provisioningState\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].version\",\"mergedName\":\"version\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[versionsTable].Latest Version\",\"mergedName\":\"Latest Version\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].workspaceResourceId\",\"mergedName\":\"workspaceResourceId\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].autoUpgradeEnabled\",\"mergedName\":\"autoUpgradeEnabled\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].vNextEnabled\",\"mergedName\":\"vNextEnabled\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].statusLevel\",\"mergedName\":\"statusLevel\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].statusCode\",\"mergedName\":\"statusCode\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].statusMessage\",\"mergedName\":\"statusMessage\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].location\",\"mergedName\":\"location\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].tenantId\",\"mergedName\":\"tenantId\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].name\",\"mergedName\":\"name\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].tags\",\"mergedName\":\"tags\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[versionsTable].name\",\"mergedName\":\"Extension Name\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].viewType\",\"mergedName\":\"viewType\",\"fromId\":\"unknown\"},{\"originalName\":\"[allAgents].view\",\"mergedName\":\"view\",\"fromId\":\"unknown\"},{\"originalName\":\"[allAgents].viewMatch\",\"mergedName\":\"viewMatch\",\"fromId\":\"unknown\"},{\"originalName\":\"[allAgents].match\",\"mergedName\":\"match\",\"fromId\":\"unknown\"},{\"originalName\":\"[allAgents].type\"},{\"originalName\":\"[versionsTable].Release Notes\"},{\"originalName\":\"[versionsTable].Operating System\"},{\"originalName\":\"[versionsTable].Agent\"}]}",
               "size": 2,
               "showAnalytics": true,
-              "title": "{$rowCount} Machines with {agentView}",
+              "title": "{$rowCount} Machines with {agentView}   (Filtered Applied: {agentvername} - {agentver})",
               "showRefreshButton": true,
               "showExportToExcel": true,
               "queryType": 7,
@@ -2438,6 +2446,10 @@
   "fallbackResourceIds": [
     "azure monitor"
   ],
+  "styleSettings": {
+    "paddingStyle": "narrow",
+    "spacingStyle": "narrow"
+  },
   "fromTemplateId": "sentinel-UserWorkbook",
   "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
 }
