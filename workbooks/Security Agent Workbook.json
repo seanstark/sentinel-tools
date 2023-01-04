@@ -51,7 +51,9 @@
                   },
                   "defaultValue": "value::all",
                   "value": [
-                    "value::all"
+                    "/subscriptions/d1d8779d-38d7-4f06-91db-9cbc8de0176f",
+                    "/subscriptions/45f9252d-e27e-4ed8-ab4e-dc5054de13fa",
+                    "/subscriptions/ebb79bc0-aa86-44a7-8111-cabbe0c43993"
                   ]
                 },
                 {
@@ -1998,18 +2000,18 @@
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
-              "query": "Resources\n| where type =~ 'Microsoft.Compute/virtualMachines' or \ntype == \"microsoft.compute/virtualmachinescalesets\" or\ntype == \"microsoft.hybridcompute/machines\"\n| extend text = iff(\n                        type =~ 'Microsoft.Compute/virtualMachines', 'Azure Virtual Machines', \n                        iff(type =~ \"microsoft.compute/virtualmachinescalesets\", 'Azure Virtual Machine Scale Sets',\n                        iff(type == \"microsoft.hybridcompute/machines\", 'Azure Arc Machines',\n                    'Unknown')))",
+              "query": "resources\n| where type contains \"microsoft.compute/virtualmachines/extensions\" or \n        type contains \"microsoft.hybridcompute/machines/extensions\" or\n        type contains \"microsoft.compute/virtualmachinescalesets/extensions\"\n| project-away kind, managedBy, sku, plan, identity, zones, extendedLocation, systemData, apiVersion\n| extend agent = tostring(iff(name =~ 'OmsAgentForLinux', 'Legacy Log Analytics', \n                        iff(name =~ \"MicrosoftMonitoringAgent\", 'Legacy Log Analytics',\n                        iff(name =~ \"AzureSecurityLinuxAgent\", 'Defender for Servers P2',\n                        iff(name =~ \"AzureSecurityWindowsAgent\", 'Defender for Servers P2',\n                        iff(name =~ \"AzureMonitorWindowsAgent\", 'Azure Monitor Agent',\n                        iff(name =~ \"AzureMonitorLinuxAgent\", 'Azure Monitor Agent',\n                        iff(name has \"MDE.\", 'Defender for Endpoint',\n                        iff(name startswith \"AzurePolicyfor\", 'Azure Guest Configuration',\n                        iff(name =~ \"LinuxAgent.AzureSecurityCenter\", 'Qualys',\n                        iff(name =~ \"WindowsAgent.AzureSecurityCenter\", 'Qualys',\n                    name)))))))))))\n| where agent == 'Azure Monitor Agent' or agent == 'Defender for Servers P2'\n| extend autoUpgradeEnabled = properties.enableAutomaticUpgrade\n| extend provisioningState = tostring(properties.provisioningState)\n| extend version = tostring(properties.typeHandlerVersion)\n| extend statusLevel = tostring(properties.instanceView.status.level)\n| extend statusMessage = tostring(properties.instanceView.status.message)\n| extend statusCode = tostring(properties.instanceView.status.code)\n| parse id with * \"/\" machineId \"/extensions/\" *\n| extend machineId =  strcat('/', tolower(machineId))\n| extend machineName = split(machineId, '/')[-1]\n| join kind=leftouter ( // Join Machines\n        Resources\n        | where type =~ 'Microsoft.Compute/virtualMachines' or \n                type == \"microsoft.compute/virtualmachinescalesets\" or\n                type == \"microsoft.hybridcompute/machines\"\n        | extend machineId = tolower(id)\n        | extend machineStatus = tostring(iff(\n                                type =~ 'Microsoft.Compute/virtualMachines', properties.extended.instanceView.powerState.displayStatus,\n                                iff(type == \"microsoft.compute/virtualmachinescalesets\", 'n/a',\n                                iff(type == \"microsoft.hybridcompute/machines\", properties.status,\n                                'uknown'))))\n        | extend osType = tolower(tostring(iff(\n                                type =~ 'Microsoft.Compute/virtualMachines', properties.storageProfile.osDisk.osType,\n                                iff(type == \"microsoft.compute/virtualmachinescalesets\", properties.virtualMachineProfile.storageProfile.osDisk.osType,\n                                iff(type == \"microsoft.hybridcompute/machines\", properties.osType,\n                                'uknown')))))\n        | extend hostName = tostring(iff(\n                                type =~ 'Microsoft.Compute/virtualMachines', properties.extended.instanceView.computerName,\n                                iff(type == \"microsoft.compute/virtualmachinescalesets\", properties.virtualMachineProfile.osProfile.computerNamePrefix,\n                                iff(type == \"microsoft.hybridcompute/machines\", properties.machineFqdn,\n                                'uknown'))))\n        | project-away kind, managedBy, apiVersion, sku, plan, identity, zones, extendedLocation, systemData\n        ) on machineId\n| extend tagFilter = tostring(case(isempty(\"{machineTag}\"),\"\", strcat('\"',\"{machineTag}\",'\"',\":\",'\"',\"{machineTagValue}\",'\"')))\n| where tostring(tags) contains tagFilter\n| project-away id1, name1, type1, tenantId1, location1, resourceGroup1, subscriptionId1, properties1, tags1, machineId1, properties\n| project machineId, hostName, machineName, subscriptionId, resourceGroup, location, osType, machineStatus, agent, provisioningState, version, autoUpgradeEnabled, statusLevel, statusCode, statusMessage, tenantId, type, name, id, tags",
               "size": 0,
               "showAnalytics": true,
               "showRefreshButton": true,
               "exportedParameters": [
                 {
-                  "fieldName": "id",
+                  "fieldName": "machineId",
                   "parameterName": "dcrMachineId",
                   "parameterType": 1
                 },
                 {
-                  "fieldName": "name",
+                  "fieldName": "machineName",
                   "parameterName": "dcrMachineName",
                   "parameterType": 1
                 }
@@ -2020,7 +2022,113 @@
                 "{Subscription}"
               ],
               "gridSettings": {
-                "filter": true
+                "formatters": [
+                  {
+                    "columnMatch": "machineId",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "25ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "hostName",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "25ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "machineName",
+                    "formatter": 5
+                  },
+                  {
+                    "columnMatch": "subscriptionId",
+                    "formatter": 15,
+                    "formatOptions": {
+                      "linkTarget": null,
+                      "showIcon": true,
+                      "customColumnWidthSetting": "25ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "resourceGroup",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "22ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "tenantId",
+                    "formatter": 5
+                  },
+                  {
+                    "columnMatch": "type",
+                    "formatter": 5
+                  },
+                  {
+                    "columnMatch": "name",
+                    "formatter": 5
+                  },
+                  {
+                    "columnMatch": "id",
+                    "formatter": 5
+                  },
+                  {
+                    "columnMatch": "kind",
+                    "formatter": 5
+                  }
+                ],
+                "filter": true,
+                "labelSettings": [
+                  {
+                    "columnId": "machineId",
+                    "label": "Machine"
+                  },
+                  {
+                    "columnId": "hostName",
+                    "label": "Host Name"
+                  },
+                  {
+                    "columnId": "subscriptionId",
+                    "label": "Subscription"
+                  },
+                  {
+                    "columnId": "resourceGroup",
+                    "label": "Resource Group"
+                  },
+                  {
+                    "columnId": "location",
+                    "label": "Location"
+                  },
+                  {
+                    "columnId": "osType",
+                    "label": "Operating System"
+                  },
+                  {
+                    "columnId": "machineStatus",
+                    "label": "Machine Status"
+                  },
+                  {
+                    "columnId": "agent",
+                    "label": "Agent"
+                  },
+                  {
+                    "columnId": "provisioningState",
+                    "label": "Install State"
+                  },
+                  {
+                    "columnId": "version",
+                    "label": "Version"
+                  },
+                  {
+                    "columnId": "autoUpgradeEnabled",
+                    "label": "Auto Upgrade"
+                  },
+                  {
+                    "columnId": "tags",
+                    "label": "Tags"
+                  }
+                ]
               }
             },
             "conditionalVisibility": {
@@ -2036,7 +2144,7 @@
               "version": "KqlItem/1.0",
               "query": "{\"version\":\"ARMEndpoint/1.0\",\"data\":null,\"headers\":[],\"method\":\"GET\",\"path\":\"{dcrMachineId}/providers/Microsoft.Insights/dataCollectionRuleAssociations?\",\"urlParams\":[{\"key\":\"api-version\",\"value\":\"2021-09-01-preview\"}],\"batchDisabled\":false,\"transformers\":[{\"type\":\"jsonpath\",\"settings\":{\"tablePath\":\"$.value\",\"columns\":[{\"path\":\"properties.dataCollectionRuleId\",\"columnid\":\"dataCollectionRule\",\"columnType\":\"string\"},{\"path\":\"name\",\"columnid\":\"name\",\"columnType\":\"string\"},{\"path\":\"systemData.createdBy\",\"columnid\":\"createdBy\",\"columnType\":\"string\"},{\"path\":\"systemData.createdAt\",\"columnid\":\"createdAt\",\"columnType\":\"datetime\"},{\"path\":\"systemData.lastModifiedBy\",\"columnid\":\"lastModifiedBy\",\"columnType\":\"string\"},{\"path\":\"systemData.lastModifiedAt\",\"columnid\":\"lastModifiedAt\",\"columnType\":\"datetime\"}]}}]}",
               "size": 0,
-              "title": "Data Collection Rules by {dcrMachineName}",
+              "title": "Data Collection Rules for {dcrMachineName}",
               "showRefreshButton": true,
               "showExportToExcel": true,
               "queryType": 12,
