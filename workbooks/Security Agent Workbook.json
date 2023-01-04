@@ -881,6 +881,33 @@
             "name": "agentTabs"
           },
           {
+            "type": 9,
+            "content": {
+              "version": "KqlParameterItem/1.0",
+              "parameters": [
+                {
+                  "id": "d4c7b811-64bf-4ba9-93a1-24f12d473a5a",
+                  "version": "KqlParameterItem/1.0",
+                  "name": "showAgentBreakdown",
+                  "label": "Show Agent Breakdown",
+                  "type": 10,
+                  "isRequired": true,
+                  "typeSettings": {
+                    "additionalResourceOptions": []
+                  },
+                  "jsonData": "[\r\n    {\"value\": \"Show\", \"selected\":true},\r\n    {\"value\": \"Hide\"}\r\n]",
+                  "timeContext": {
+                    "durationMs": 86400000
+                  }
+                }
+              ],
+              "style": "formVertical",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces"
+            },
+            "name": "showAgentBreakdown"
+          },
+          {
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
@@ -1077,6 +1104,11 @@
                 "showBorder": false,
                 "size": "auto"
               }
+            },
+            "conditionalVisibility": {
+              "parameterName": "showAgentBreakdown",
+              "comparison": "isEqualTo",
+              "value": "Show"
             },
             "name": "agentVersionDetails"
           },
