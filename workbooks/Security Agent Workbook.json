@@ -759,7 +759,7 @@
             "content": {
               "version": "KqlItem/1.0",
               "query": "{\"version\":\"Merge/1.0\",\"merges\":[{\"id\":\"8649e01f-e083-492b-bcbf-f13cccadd72a\",\"mergeType\":\"innerunique\",\"leftTable\":\"agentMappings\",\"rightTable\":\"latestAgentVersions\",\"leftColumn\":\"latestVersion\",\"rightColumn\":\"agent\"}],\"projectRename\":[{\"originalName\":\"[agentMappings].agent\",\"mergedName\":\"Agent\",\"fromId\":\"8649e01f-e083-492b-bcbf-f13cccadd72a\"},{\"originalName\":\"[agentMappings].name\",\"mergedName\":\"name\",\"fromId\":\"8649e01f-e083-492b-bcbf-f13cccadd72a\"},{\"originalName\":\"[agentMappings].os\",\"mergedName\":\"Operating System\",\"fromId\":\"8649e01f-e083-492b-bcbf-f13cccadd72a\"},{\"originalName\":\"[latestAgentVersions].version\",\"mergedName\":\"Latest Version\",\"fromId\":\"8649e01f-e083-492b-bcbf-f13cccadd72a\"},{\"originalName\":\"[agentMappings].versionDocs\",\"mergedName\":\"Release Notes\",\"fromId\":\"8649e01f-e083-492b-bcbf-f13cccadd72a\"},{\"originalName\":\"[latestAgentVersions].versionco\"},{\"originalName\":\"[latestAgentVersions].agent\"},{\"originalName\":\"[agentMappings].latestVersion\"}]}",
-              "size": 4,
+              "size": 1,
               "title": "Latest Versions",
               "showRefreshButton": true,
               "queryType": 7,
@@ -915,7 +915,7 @@
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
-              "query": "{\"version\":\"Merge/1.0\",\"merges\":[{\"id\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\",\"mergeType\":\"inner\",\"leftTable\":\"allAgents\",\"rightTable\":\"versionsTable\",\"leftColumn\":\"name\",\"rightColumn\":\"name\"}],\"projectRename\":[{\"originalName\":\"[allAgents].machineId\",\"mergedName\":\"machineId\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].hostName\",\"mergedName\":\"hostName\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].osType\",\"mergedName\":\"osType\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].machineStatus\",\"mergedName\":\"machineStatus\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].agent\",\"mergedName\":\"agent\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].id\",\"mergedName\":\"id\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].provisioningState\",\"mergedName\":\"provisioningState\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].version\",\"mergedName\":\"version\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[versionsTable].Latest Version\",\"mergedName\":\"Latest Version\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].autoUpgradeEnabled\",\"mergedName\":\"autoUpgradeEnabled\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].vNextEnabled\",\"mergedName\":\"vNextEnabled\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].statusLevel\",\"mergedName\":\"statusLevel\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].statusCode\",\"mergedName\":\"statusCode\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].statusMessage\",\"mergedName\":\"statusMessage\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].workspaceResourceId\",\"mergedName\":\"workspaceResourceId\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].subscriptionId\",\"mergedName\":\"subscriptionId\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].resourceGroup\",\"mergedName\":\"resourceGroup\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].location\",\"mergedName\":\"location\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].tenantId\",\"mergedName\":\"tenantId\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].name\",\"mergedName\":\"name\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].tags\",\"mergedName\":\"tags\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[versionsTable].name\",\"mergedName\":\"Extension Name\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].viewType\",\"mergedName\":\"viewType\",\"fromId\":\"unknown\"},{\"originalName\":\"[allAgents].view\",\"mergedName\":\"view\",\"fromId\":\"unknown\"},{\"originalName\":\"[allAgents].viewMatch\",\"mergedName\":\"viewMatch\",\"fromId\":\"unknown\"},{\"originalName\":\"[allAgents].match\",\"mergedName\":\"match\",\"fromId\":\"unknown\"},{\"originalName\":\"[allAgents].type\"},{\"originalName\":\"[versionsTable].Release Notes\"},{\"originalName\":\"[versionsTable].Operating System\"},{\"originalName\":\"[versionsTable].Agent\"}]}",
+              "query": "{\"version\":\"Merge/1.0\",\"merges\":[{\"id\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\",\"mergeType\":\"inner\",\"leftTable\":\"allAgents\",\"rightTable\":\"versionsTable\",\"leftColumn\":\"name\",\"rightColumn\":\"name\"}],\"projectRename\":[{\"originalName\":\"[allAgents].machineId\",\"mergedName\":\"machineId\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].hostName\",\"mergedName\":\"hostName\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].subscriptionId\",\"mergedName\":\"subscriptionId\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].resourceGroup\",\"mergedName\":\"resourceGroup\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].osType\",\"mergedName\":\"osType\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].machineStatus\",\"mergedName\":\"machineStatus\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].agent\",\"mergedName\":\"agent\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].id\",\"mergedName\":\"id\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].provisioningState\",\"mergedName\":\"provisioningState\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].version\",\"mergedName\":\"version\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[versionsTable].Latest Version\",\"mergedName\":\"Latest Version\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].workspaceResourceId\",\"mergedName\":\"workspaceResourceId\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].autoUpgradeEnabled\",\"mergedName\":\"autoUpgradeEnabled\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].vNextEnabled\",\"mergedName\":\"vNextEnabled\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].statusLevel\",\"mergedName\":\"statusLevel\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].statusCode\",\"mergedName\":\"statusCode\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].statusMessage\",\"mergedName\":\"statusMessage\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].location\",\"mergedName\":\"location\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].tenantId\",\"mergedName\":\"tenantId\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].name\",\"mergedName\":\"name\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].tags\",\"mergedName\":\"tags\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[versionsTable].name\",\"mergedName\":\"Extension Name\",\"fromId\":\"a5bd26b2-3d51-4aef-9654-08e7126d408c\"},{\"originalName\":\"[allAgents].viewType\",\"mergedName\":\"viewType\",\"fromId\":\"unknown\"},{\"originalName\":\"[allAgents].view\",\"mergedName\":\"view\",\"fromId\":\"unknown\"},{\"originalName\":\"[allAgents].viewMatch\",\"mergedName\":\"viewMatch\",\"fromId\":\"unknown\"},{\"originalName\":\"[allAgents].match\",\"mergedName\":\"match\",\"fromId\":\"unknown\"},{\"originalName\":\"[allAgents].type\"},{\"originalName\":\"[versionsTable].Release Notes\"},{\"originalName\":\"[versionsTable].Operating System\"},{\"originalName\":\"[versionsTable].Agent\"}]}",
               "size": 3,
               "showAnalytics": true,
               "title": "{$rowCount} Machines with {agentView}",
@@ -932,6 +932,20 @@
                       "linkTarget": "Resource",
                       "linkIsContextBlade": true,
                       "showIcon": true,
+                      "customColumnWidthSetting": "26ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "hostName",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "30ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "osType",
+                    "formatter": 0,
+                    "formatOptions": {
                       "customColumnWidthSetting": "22ch"
                     }
                   },
@@ -1054,6 +1068,14 @@
                     "label": "Host Name"
                   },
                   {
+                    "columnId": "subscriptionId",
+                    "label": "Subscription"
+                  },
+                  {
+                    "columnId": "resourceGroup",
+                    "label": "Resource Group"
+                  },
+                  {
                     "columnId": "osType",
                     "label": "Operating System"
                   },
@@ -1074,6 +1096,10 @@
                     "label": "Version"
                   },
                   {
+                    "columnId": "workspaceResourceId",
+                    "label": "MMA Workspace"
+                  },
+                  {
                     "columnId": "autoUpgradeEnabled",
                     "label": "Auto Upgrade"
                   },
@@ -1092,18 +1118,6 @@
                   {
                     "columnId": "statusMessage",
                     "label": "Status Message"
-                  },
-                  {
-                    "columnId": "workspaceResourceId",
-                    "label": "MMA Workspace"
-                  },
-                  {
-                    "columnId": "subscriptionId",
-                    "label": "Subscription"
-                  },
-                  {
-                    "columnId": "resourceGroup",
-                    "label": "Resource Group"
                   },
                   {
                     "columnId": "location",
@@ -1145,7 +1159,7 @@
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
-              "query": "{\"version\":\"Merge/1.0\",\"merges\":[{\"id\":\"fd2eeed2-489b-4f83-94ab-ce77d7610084\",\"mergeType\":\"rightanti\",\"leftTable\":\"allAgents\",\"rightTable\":\"allMachines\",\"leftColumn\":\"machineId\",\"rightColumn\":\"machineId\"}],\"projectRename\":[{\"originalName\":\"[allMachines].machineId\",\"mergedName\":\"machineId\",\"fromId\":\"fd2eeed2-489b-4f83-94ab-ce77d7610084\"},{\"originalName\":\"[allMachines].hostName\",\"mergedName\":\"hostName\",\"fromId\":\"fd2eeed2-489b-4f83-94ab-ce77d7610084\"},{\"originalName\":\"[allMachines].osType\",\"mergedName\":\"osType\",\"fromId\":\"fd2eeed2-489b-4f83-94ab-ce77d7610084\"},{\"originalName\":\"[allMachines].machineStatus\",\"mergedName\":\"machineStatus\",\"fromId\":\"fd2eeed2-489b-4f83-94ab-ce77d7610084\"},{\"originalName\":\"[allMachines].subscriptionId\",\"mergedName\":\"subscriptionId\",\"fromId\":\"fd2eeed2-489b-4f83-94ab-ce77d7610084\"},{\"originalName\":\"[allMachines].resourceGroup\",\"mergedName\":\"resourceGroup\",\"fromId\":\"fd2eeed2-489b-4f83-94ab-ce77d7610084\"},{\"originalName\":\"[allMachines].location\",\"mergedName\":\"location\",\"fromId\":\"fd2eeed2-489b-4f83-94ab-ce77d7610084\"},{\"originalName\":\"[allMachines].tags\",\"mergedName\":\"tags\",\"fromId\":\"fd2eeed2-489b-4f83-94ab-ce77d7610084\"},{\"originalName\":\"[allMachines].tenantId\",\"mergedName\":\"tenantId\",\"fromId\":\"fd2eeed2-489b-4f83-94ab-ce77d7610084\"},{\"originalName\":\"[allMachines].properties\",\"mergedName\":\"properties\",\"fromId\":\"fd2eeed2-489b-4f83-94ab-ce77d7610084\"},{\"originalName\":\"[allMachines].tagFilter\",\"mergedName\":\"tagFilter\",\"fromId\":\"unknown\"},{\"originalName\":\"[allMachines].name\"},{\"originalName\":\"[allMachines].type\"}]}",
+              "query": "{\"version\":\"Merge/1.0\",\"merges\":[{\"id\":\"fd2eeed2-489b-4f83-94ab-ce77d7610084\",\"mergeType\":\"rightanti\",\"leftTable\":\"allAgents\",\"rightTable\":\"allMachines\",\"leftColumn\":\"machineId\",\"rightColumn\":\"machineId\"}],\"projectRename\":[{\"originalName\":\"[allMachines].machineId\",\"mergedName\":\"machineId\",\"fromId\":\"fd2eeed2-489b-4f83-94ab-ce77d7610084\"},{\"originalName\":\"[allMachines].hostName\",\"mergedName\":\"hostName\",\"fromId\":\"fd2eeed2-489b-4f83-94ab-ce77d7610084\"},{\"originalName\":\"[allMachines].subscriptionId\",\"mergedName\":\"subscriptionId\",\"fromId\":\"fd2eeed2-489b-4f83-94ab-ce77d7610084\"},{\"originalName\":\"[allMachines].resourceGroup\",\"mergedName\":\"resourceGroup\",\"fromId\":\"fd2eeed2-489b-4f83-94ab-ce77d7610084\"},{\"originalName\":\"[allMachines].osType\",\"mergedName\":\"osType\",\"fromId\":\"fd2eeed2-489b-4f83-94ab-ce77d7610084\"},{\"originalName\":\"[allMachines].machineStatus\",\"mergedName\":\"machineStatus\",\"fromId\":\"fd2eeed2-489b-4f83-94ab-ce77d7610084\"},{\"originalName\":\"[allMachines].location\",\"mergedName\":\"location\",\"fromId\":\"fd2eeed2-489b-4f83-94ab-ce77d7610084\"},{\"originalName\":\"[allMachines].tags\",\"mergedName\":\"tags\",\"fromId\":\"fd2eeed2-489b-4f83-94ab-ce77d7610084\"},{\"originalName\":\"[allMachines].tenantId\",\"mergedName\":\"tenantId\",\"fromId\":\"fd2eeed2-489b-4f83-94ab-ce77d7610084\"},{\"originalName\":\"[allMachines].properties\",\"mergedName\":\"properties\",\"fromId\":\"fd2eeed2-489b-4f83-94ab-ce77d7610084\"},{\"originalName\":\"[allMachines].tagFilter\",\"mergedName\":\"tagFilter\",\"fromId\":\"unknown\"},{\"originalName\":\"[allMachines].name\"},{\"originalName\":\"[allMachines].type\"}]}",
               "size": 0,
               "title": "{$rowCount} Machines Missing {agentView}",
               "showRefreshButton": true,
@@ -1187,20 +1201,20 @@
                     "label": "Host Name"
                   },
                   {
-                    "columnId": "osType",
-                    "label": "Operating System"
-                  },
-                  {
-                    "columnId": "machineStatus",
-                    "label": "Machine Status"
-                  },
-                  {
                     "columnId": "subscriptionId",
                     "label": "Subscription"
                   },
                   {
                     "columnId": "resourceGroup",
                     "label": "Resource Group"
+                  },
+                  {
+                    "columnId": "osType",
+                    "label": "Operating System"
+                  },
+                  {
+                    "columnId": "machineStatus",
+                    "label": "Machine Status"
                   },
                   {
                     "columnId": "location",
