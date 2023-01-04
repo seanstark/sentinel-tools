@@ -630,19 +630,6 @@
         "groupType": "editable",
         "items": [
           {
-            "type": 1,
-            "content": {
-              "json": "##### This is a consolidated view of all agents. Some columns and values are only applicable to specific agent types. \r\n\r\n- Latest Agent Versions are region specific. This view pulls the latest versions from virtual machines by the top region in your enivornment ({topVmLocation}). You can list all versions for a region via [az vm extension image list-versions](https://learn.microsoft.com/cli/azure/vm/extension/image?view=azure-cli-latest#az-vm-extension-image-list-versions)\r\n\r\n- Verison numbers don't always correlate to installed versions reported by the operating system or docs pages. These version numbers represent the extension version number.\r\n\r\n- Virtual Machine Scale sets do not show the invidual instances running (API Limitation)\r\n\r\n- Azure Arc Latest Version is currently not supported\r\n\r\nThe Log Analytics agents (OMS/MMA) will reach [end of support by August 2024](https://azure.microsoft.com/updates/were-retiring-the-log-analytics-agent-in-azure-monitor-on-31-august-2024/). The Azure Monitor agent is the recommended replacement. Learn more about migrating to [Azure Monitor](https://aka.ms/migratetoAMA)",
-              "style": "info"
-            },
-            "conditionalVisibility": {
-              "parameterName": "showLatestVersions",
-              "comparison": "isEqualTo",
-              "value": "Show"
-            },
-            "name": "text - 2"
-          },
-          {
             "type": 9,
             "content": {
               "version": "KqlParameterItem/1.0",
@@ -668,6 +655,19 @@
               "resourceType": "microsoft.operationalinsights/workspaces"
             },
             "name": "connectedMachineParams"
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "##### This is a consolidated view of all agents. Some columns and values are only applicable to specific agent types. \r\n\r\n- Latest Agent Versions are region specific. This view pulls the latest versions from virtual machines by the top region in your enivornment ({topVmLocation}). You can list all versions for a region via [az vm extension image list-versions](https://learn.microsoft.com/cli/azure/vm/extension/image?view=azure-cli-latest#az-vm-extension-image-list-versions)\r\n\r\n- Verison numbers don't always correlate to installed versions reported by the operating system or docs pages. These version numbers represent the extension version number.\r\n\r\n- Virtual Machine Scale sets do not show the invidual instances running (API Limitation)\r\n\r\n- Azure Arc Latest Version is currently not supported\r\n\r\nThe Log Analytics agents (OMS/MMA) will reach [end of support by August 2024](https://azure.microsoft.com/updates/were-retiring-the-log-analytics-agent-in-azure-monitor-on-31-august-2024/). The Azure Monitor agent is the recommended replacement. Learn more about migrating to [Azure Monitor](https://aka.ms/migratetoAMA)",
+              "style": "info"
+            },
+            "conditionalVisibility": {
+              "parameterName": "showLatestVersions",
+              "comparison": "isEqualTo",
+              "value": "Show"
+            },
+            "name": "text - 2"
           },
           {
             "type": 3,
@@ -873,6 +873,206 @@
             "name": "agentTabs"
           },
           {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\r\n| where type contains \"microsoft.compute/virtualmachines/extensions\" or \r\ntype contains \"microsoft.hybridcompute/machines/extensions\" or\r\ntype contains \"microsoft.compute/virtualmachinescalesets/extensions\"\r\n| extend agent = iff(name =~ 'OmsAgentForLinux', 'Legacy Log Analytics', \r\n                        iff(name =~ \"MicrosoftMonitoringAgent\", 'Legacy Log Analytics',\r\n                        iff(name =~ \"AzureSecurityLinuxAgent\", 'Defender for Servers P2',\r\n                        iff(name =~ \"AzureSecurityWindowsAgent\", 'Defender for Servers P2',\r\n                        iff(name =~ \"AzureMonitorWindowsAgent\", 'Azure Monitor Agent',\r\n                        iff(name =~ \"AzureMonitorLinuxAgent\", 'Azure Monitor Agent',\r\n                        iff(name has \"MDE.\", 'Defender for Endpoint',\r\n                        iff(name startswith \"AzurePolicyfor\", 'Azure Guest Configuration',\r\n                        iff(name =~ \"LinuxAgent.AzureSecurityCenter\", 'Qualys',\r\n                        iff(name =~ \"WindowsAgent.AzureSecurityCenter\", 'Qualys',\r\n                    name))))))))))\r\n| where agent in ({securityAgents})\r\n| extend version = tostring(properties.typeHandlerVersion)\r\n| extend view = \"{agentView}\"\r\n| extend viewMatch = case(view == 'All Agents', \" \", view)\r\n| where agent contains viewMatch\r\n| extend tagFilter = tostring(case(isempty(\"{machineTag}\"),\"\", strcat('\"',\"{machineTag}\",'\"',\":\",'\"',\"{machineTagValue}\",'\"')))\r\n| where tostring(tags) contains tagFilter\r\n| summarize agentCount = count(),\r\nautoUpgradeEnabled = countif(properties.enableAutomaticUpgrade == true), \r\nautoUpgradeDisabled = countif(properties.enableAutomaticUpgrade == false or isnotempty(properties.enableAutomaticUpgrade)),\r\ninstallSucceeded = countif(properties.provisioningState == 'Succeeded'),\r\ninstallFailed = countif(properties.provisioningState == 'Failed')\r\nby agent, version\r\n",
+              "size": 0,
+              "showAnalytics": true,
+              "title": "Agent Breakdown",
+              "showRefreshButton": true,
+              "exportedParameters": [
+                {
+                  "fieldName": "agent",
+                  "parameterName": "agentvername",
+                  "parameterType": 1,
+                  "defaultValue": "\"'"
+                },
+                {
+                  "fieldName": "version",
+                  "parameterName": "agentver",
+                  "parameterType": 1,
+                  "defaultValue": "\"\""
+                }
+              ],
+              "showExportToExcel": true,
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
+              "visualization": "table",
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "version",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "aggregation": "Sum"
+                    }
+                  },
+                  {
+                    "columnMatch": "agent",
+                    "formatter": 1,
+                    "formatOptions": {
+                      "aggregation": "Unique",
+                      "customColumnWidthSetting": "25ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "agentCount",
+                    "formatter": 0,
+                    "formatOptions": {
+                      "customColumnWidthSetting": "12ch"
+                    },
+                    "numberFormat": {
+                      "unit": 0,
+                      "options": {
+                        "style": "decimal",
+                        "useGrouping": false
+                      }
+                    }
+                  },
+                  {
+                    "columnMatch": "autoUpgradeEnabled",
+                    "formatter": 4,
+                    "formatOptions": {
+                      "min": 0,
+                      "palette": "blue",
+                      "customColumnWidthSetting": "25ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "autoUpgradeDisabled",
+                    "formatter": 4,
+                    "formatOptions": {
+                      "min": 0,
+                      "palette": "orange",
+                      "customColumnWidthSetting": "25ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "installSucceeded",
+                    "formatter": 4,
+                    "formatOptions": {
+                      "min": 0,
+                      "palette": "green",
+                      "customColumnWidthSetting": "25ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "installFailed",
+                    "formatter": 4,
+                    "formatOptions": {
+                      "min": 0,
+                      "palette": "redBright",
+                      "customColumnWidthSetting": "20ch"
+                    }
+                  },
+                  {
+                    "columnMatch": "uniqueVersions",
+                    "formatter": 4,
+                    "formatOptions": {
+                      "min": 0,
+                      "palette": "purple",
+                      "customColumnWidthSetting": "30ch"
+                    }
+                  }
+                ],
+                "filter": true,
+                "sortBy": [
+                  {
+                    "itemKey": "agent",
+                    "sortOrder": 1
+                  }
+                ],
+                "labelSettings": [
+                  {
+                    "columnId": "agent",
+                    "label": "Agent"
+                  },
+                  {
+                    "columnId": "version",
+                    "label": "Version",
+                    "comment": "`"
+                  },
+                  {
+                    "columnId": "agentCount",
+                    "label": "Count"
+                  },
+                  {
+                    "columnId": "autoUpgradeEnabled",
+                    "label": "Auto Upgrade Enabled"
+                  },
+                  {
+                    "columnId": "autoUpgradeDisabled",
+                    "label": "Auto Upgrade Disabled"
+                  },
+                  {
+                    "columnId": "installSucceeded",
+                    "label": "Installation Succeeded"
+                  },
+                  {
+                    "columnId": "installFailed",
+                    "label": "Installation Failed"
+                  }
+                ]
+              },
+              "sortBy": [
+                {
+                  "itemKey": "agent",
+                  "sortOrder": 1
+                }
+              ],
+              "tileSettings": {
+                "titleContent": {
+                  "columnMatch": "acount",
+                  "formatter": 1
+                },
+                "subtitleContent": {
+                  "columnMatch": "agent",
+                  "numberFormat": {
+                    "unit": 17,
+                    "options": {
+                      "style": "decimal"
+                    }
+                  }
+                },
+                "leftContent": {
+                  "columnMatch": "agent",
+                  "formatter": 10,
+                  "formatOptions": {
+                    "palette": "blue",
+                    "compositeBarSettings": {
+                      "labelText": "",
+                      "columnSettings": [
+                        {
+                          "columnName": "acount",
+                          "color": "blue"
+                        },
+                        {
+                          "columnName": "autoUpgrade",
+                          "color": "blue"
+                        }
+                      ]
+                    }
+                  },
+                  "numberFormat": {
+                    "unit": 17,
+                    "options": {
+                      "style": "decimal",
+                      "maximumFractionDigits": 2,
+                      "maximumSignificantDigits": 3
+                    }
+                  }
+                },
+                "showBorder": false,
+                "size": "auto"
+              }
+            },
+            "name": "agentVersionDetails"
+          },
+          {
             "type": 11,
             "content": {
               "version": "LinkItem/1.0",
@@ -894,7 +1094,7 @@
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
-              "query": "resources\r\n| where type contains \"microsoft.compute/virtualmachines/extensions\" or \r\n        type contains \"microsoft.hybridcompute/machines/extensions\" or\r\n        type contains \"microsoft.compute/virtualmachinescalesets/extensions\"\r\n| project-away kind, managedBy, sku, plan, identity, zones, extendedLocation, systemData, apiVersion\r\n| extend agent = tostring(iff(name =~ 'OmsAgentForLinux', 'Legacy Log Analytics', \r\n                        iff(name =~ \"MicrosoftMonitoringAgent\", 'Legacy Log Analytics',\r\n                        iff(name =~ \"AzureSecurityLinuxAgent\", 'Defender for Servers P2',\r\n                        iff(name =~ \"AzureSecurityWindowsAgent\", 'Defender for Servers P2',\r\n                        iff(name =~ \"AzureMonitorWindowsAgent\", 'Azure Monitor Agent',\r\n                        iff(name =~ \"AzureMonitorLinuxAgent\", 'Azure Monitor Agent',\r\n                        iff(name has \"MDE.\", 'Defender for Endpoint',\r\n                        iff(name startswith \"AzurePolicyfor\", 'Azure Guest Configuration',\r\n                        iff(name =~ \"LinuxAgent.AzureSecurityCenter\", 'Qualys',\r\n                        iff(name =~ \"WindowsAgent.AzureSecurityCenter\", 'Qualys',\r\n                    name)))))))))))\r\n| extend autoUpgradeEnabled = properties.enableAutomaticUpgrade\r\n| extend provisioningState = tostring(properties.provisioningState)\r\n| extend version = tostring(properties.typeHandlerVersion)\r\n| extend vNextEnabled = tostring(properties.settings.vNextEnabled)\r\n| extend statusLevel = tostring(properties.instanceView.status.level)\r\n| extend statusMessage = tostring(properties.instanceView.status.message)\r\n| extend statusCode = tostring(properties.instanceView.status.code)\r\n| extend workspaceId = tostring(properties.settings.workspaceId)\r\n| join kind=leftouter ( // Join Log Analytics Workspaces\r\n        Resources\r\n            | where type == \"microsoft.operationalinsights/workspaces\"\r\n            | extend workspaceId = properties.customerId\r\n            | project workspaceResourceId = id, tostring(workspaceId)\r\n        ) on workspaceId\r\n| parse id with * \"/\" machineId \"/extensions/\" *\r\n| extend machineId =  strcat('/', tolower(machineId))\r\n| join kind=leftouter ( // Join Machines\r\n        Resources\r\n        | where type =~ 'Microsoft.Compute/virtualMachines' or \r\n                type == \"microsoft.compute/virtualmachinescalesets\" or\r\n                type == \"microsoft.hybridcompute/machines\"\r\n        | extend machineId = tolower(id)\r\n        | extend machineStatus = tostring(iff(\r\n                                type =~ 'Microsoft.Compute/virtualMachines', properties.extended.instanceView.powerState.displayStatus,\r\n                                iff(type == \"microsoft.compute/virtualmachinescalesets\", 'n/a',\r\n                                iff(type == \"microsoft.hybridcompute/machines\", properties.status,\r\n                                'uknown'))))\r\n        | extend osType = tolower(tostring(iff(\r\n                                type =~ 'Microsoft.Compute/virtualMachines', properties.storageProfile.osDisk.osType,\r\n                                iff(type == \"microsoft.compute/virtualmachinescalesets\", properties.virtualMachineProfile.storageProfile.osDisk.osType,\r\n                                iff(type == \"microsoft.hybridcompute/machines\", properties.osType,\r\n                                'uknown')))))\r\n        | extend hostName = tostring(iff(\r\n                                type =~ 'Microsoft.Compute/virtualMachines', properties.extended.instanceView.computerName,\r\n                                iff(type == \"microsoft.compute/virtualmachinescalesets\", properties.virtualMachineProfile.osProfile.computerNamePrefix,\r\n                                iff(type == \"microsoft.hybridcompute/machines\", properties.machineFqdn,\r\n                                'uknown'))))\r\n        | project-away kind, managedBy, apiVersion, sku, plan, identity, zones, extendedLocation, systemData\r\n        ) on machineId\r\n| union ( // Union Arc Machines as an Agent\r\n        resources\r\n        | where type == \"microsoft.hybridcompute/machines\"\r\n        | extend agent = \"Azure Arc\"\r\n        | extend name = iff(properties.osType == \"linux\", \"ArcAgentForLinux\", \"ArcAgentForWindows\")\r\n        | extend autoUpgradeEnabled = properties.agentUpgrade[0]\r\n        | extend provisioningState = tostring(properties.provisioningState)\r\n        | extend version = tostring(properties.agentVersion)\r\n        | extend machineId = tolower(tostring(id))\r\n        | extend osType = tostring(properties.osType)\r\n        | extend statusMessage = tostring(properties.errorDetails)\r\n        | extend statusCode = tostring(properties.status)\r\n        | extend hostName = tostring(properties.machineFqdn)\r\n        | extend tags = properties.tags\r\n        | extend machineStatus = tostring(properties.status)\r\n        | project-away apiVersion, systemData, sku, plan, identity, kind, managedBy, zones, extendedLocation\r\n    )\r\n| where agent in ({securityAgents})\r\n| extend view = \"{agentView}\"\r\n| extend viewMatch = case(view == 'All Agents', \" \", view)\r\n| where agent contains viewMatch\r\n| extend tagFilter = tostring(case(isempty(\"{machineTag}\"),\"\", strcat('\"',\"{machineTag}\",'\"',\":\",'\"',\"{machineTagValue}\",'\"')))\r\n| where tostring(tags) contains tagFilter\r\n| project-away workspaceId, workspaceId1, id1, name1, type1, tenantId1, location1, resourceGroup1, subscriptionId1, properties1, tags1, machineId1, properties\r\n| project viewMatch, machineId, hostName, osType, machineStatus, agent, provisioningState, version, autoUpgradeEnabled, vNextEnabled, statusLevel, statusCode, statusMessage, workspaceResourceId, subscriptionId, resourceGroup, location, tenantId, type, name, id, tags",
+              "query": "resources\r\n| where type contains \"microsoft.compute/virtualmachines/extensions\" or \r\n        type contains \"microsoft.hybridcompute/machines/extensions\" or\r\n        type contains \"microsoft.compute/virtualmachinescalesets/extensions\"\r\n| project-away kind, managedBy, sku, plan, identity, zones, extendedLocation, systemData, apiVersion\r\n| extend agent = tostring(iff(name =~ 'OmsAgentForLinux', 'Legacy Log Analytics', \r\n                        iff(name =~ \"MicrosoftMonitoringAgent\", 'Legacy Log Analytics',\r\n                        iff(name =~ \"AzureSecurityLinuxAgent\", 'Defender for Servers P2',\r\n                        iff(name =~ \"AzureSecurityWindowsAgent\", 'Defender for Servers P2',\r\n                        iff(name =~ \"AzureMonitorWindowsAgent\", 'Azure Monitor Agent',\r\n                        iff(name =~ \"AzureMonitorLinuxAgent\", 'Azure Monitor Agent',\r\n                        iff(name has \"MDE.\", 'Defender for Endpoint',\r\n                        iff(name startswith \"AzurePolicyfor\", 'Azure Guest Configuration',\r\n                        iff(name =~ \"LinuxAgent.AzureSecurityCenter\", 'Qualys',\r\n                        iff(name =~ \"WindowsAgent.AzureSecurityCenter\", 'Qualys',\r\n                    name)))))))))))\r\n| extend autoUpgradeEnabled = properties.enableAutomaticUpgrade\r\n| extend provisioningState = tostring(properties.provisioningState)\r\n| extend version = tostring(properties.typeHandlerVersion)\r\n| extend vNextEnabled = tostring(properties.settings.vNextEnabled)\r\n| extend statusLevel = tostring(properties.instanceView.status.level)\r\n| extend statusMessage = tostring(properties.instanceView.status.message)\r\n| extend statusCode = tostring(properties.instanceView.status.code)\r\n| extend workspaceId = tostring(properties.settings.workspaceId)\r\n| join kind=leftouter ( // Join Log Analytics Workspaces\r\n        Resources\r\n            | where type == \"microsoft.operationalinsights/workspaces\"\r\n            | extend workspaceId = properties.customerId\r\n            | project workspaceResourceId = id, tostring(workspaceId)\r\n        ) on workspaceId\r\n| parse id with * \"/\" machineId \"/extensions/\" *\r\n| extend machineId =  strcat('/', tolower(machineId))\r\n| join kind=leftouter ( // Join Machines\r\n        Resources\r\n        | where type =~ 'Microsoft.Compute/virtualMachines' or \r\n                type == \"microsoft.compute/virtualmachinescalesets\" or\r\n                type == \"microsoft.hybridcompute/machines\"\r\n        | extend machineId = tolower(id)\r\n        | extend machineStatus = tostring(iff(\r\n                                type =~ 'Microsoft.Compute/virtualMachines', properties.extended.instanceView.powerState.displayStatus,\r\n                                iff(type == \"microsoft.compute/virtualmachinescalesets\", 'n/a',\r\n                                iff(type == \"microsoft.hybridcompute/machines\", properties.status,\r\n                                'uknown'))))\r\n        | extend osType = tolower(tostring(iff(\r\n                                type =~ 'Microsoft.Compute/virtualMachines', properties.storageProfile.osDisk.osType,\r\n                                iff(type == \"microsoft.compute/virtualmachinescalesets\", properties.virtualMachineProfile.storageProfile.osDisk.osType,\r\n                                iff(type == \"microsoft.hybridcompute/machines\", properties.osType,\r\n                                'uknown')))))\r\n        | extend hostName = tostring(iff(\r\n                                type =~ 'Microsoft.Compute/virtualMachines', properties.extended.instanceView.computerName,\r\n                                iff(type == \"microsoft.compute/virtualmachinescalesets\", properties.virtualMachineProfile.osProfile.computerNamePrefix,\r\n                                iff(type == \"microsoft.hybridcompute/machines\", properties.machineFqdn,\r\n                                'uknown'))))\r\n        | project-away kind, managedBy, apiVersion, sku, plan, identity, zones, extendedLocation, systemData\r\n        ) on machineId\r\n| union ( // Union Arc Machines as an Agent\r\n        resources\r\n        | where type == \"microsoft.hybridcompute/machines\"\r\n        | extend agent = \"Azure Arc\"\r\n        | extend name = iff(properties.osType == \"linux\", \"ArcAgentForLinux\", \"ArcAgentForWindows\")\r\n        | extend autoUpgradeEnabled = properties.agentUpgrade[0]\r\n        | extend provisioningState = tostring(properties.provisioningState)\r\n        | extend version = tostring(properties.agentVersion)\r\n        | extend machineId = tolower(tostring(id))\r\n        | extend osType = tostring(properties.osType)\r\n        | extend statusMessage = tostring(properties.errorDetails)\r\n        | extend statusCode = tostring(properties.status)\r\n        | extend hostName = tostring(properties.machineFqdn)\r\n        | extend tags = properties.tags\r\n        | extend machineStatus = tostring(properties.status)\r\n        | project-away apiVersion, systemData, sku, plan, identity, kind, managedBy, zones, extendedLocation\r\n    )\r\n| where agent in ({securityAgents})\r\n| extend view = \"{agentView}\"\r\n| extend viewMatch = case(view == 'All Agents', \" \", view)\r\n| where agent contains viewMatch\r\n| extend tagFilter = tostring(case(isempty(\"{machineTag}\"),\"\", strcat('\"',\"{machineTag}\",'\"',\":\",'\"',\"{machineTagValue}\",'\"')))\r\n| where tostring(tags) contains tagFilter\r\n| where agent contains \"{agentvername}\" and version contains \"{agentver}\"\r\n| project-away workspaceId, workspaceId1, id1, name1, type1, tenantId1, location1, resourceGroup1, subscriptionId1, properties1, tags1, machineId1, properties\r\n| project viewMatch, machineId, hostName, osType, machineStatus, agent, provisioningState, version, autoUpgradeEnabled, vNextEnabled, statusLevel, statusCode, statusMessage, workspaceResourceId, subscriptionId, resourceGroup, location, tenantId, type, name, id, tags",
               "size": 0,
               "showAnalytics": true,
               "title": "All Agents",
