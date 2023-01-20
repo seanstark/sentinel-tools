@@ -14,7 +14,7 @@
 .PARAMETER newTimeFormat
     Optionally you can specify the recordStartTimestampFormat to update to. This configured to yyyy-MM-ddTHH:mm:ssK by default
  .EXAMPLE
-    .\update-dcr.ps1 -subscriptionId 'ada06e68-375e-4210-be3a-c6cacebf41c5' -resourceGroup 'sentinel-dcrs' -ruleName 'windows-events'
+    .\update-dcrTimestampFormat.ps1 -subscriptionId 'ada06e68-375e-4210-be3a-c6cacebf41c5' -resourceGroup 'sentinel-dcrs' -ruleName 'windows-events'
 #>
 
 param(
