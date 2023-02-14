@@ -2,20 +2,53 @@
 	"$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
 	"contentVersion": "1.0.0.0",
 	"metadata": {
-		"title": "",
-		"description": "",
-		"prerequisites": "",
-		"postDeployment": [],
-		"prerequisitesDeployTemplateFile": "",
+		"title": "Defender for Cloud Data Connector At Scale",
+		"description": [
+			"This workflow will enable the Microsoft Defender for Cloud data connector in Microsoft Sentinel automatically for all subscriptions you have the logic app scoped to. The solution also provides the ability to:",
+			"Exclude Subscriptions",
+			"Log results to your Sentinel Workspace",
+			"Leverage a workbook to track and audit connector changes",
+			"Send Email Notifications"
+		],
+		"version": "1.0.0",
+		"prerequisites": [
+			"**Requirements**",
+			"- The custom role described in [Create a Custom Role](https://github.com/seanstark/sentinel-tools/tree/main/enable-sentinel-mdfc-sub-con##create-a-custom-role)",
+			"- Rights to assign the role and scope to either subscriptions or management groups",
+			"- Rights to complete the deployment, Log Analytics Contributor, Microsoft Sentinel Contributor, and Contributor.",
+			"- Rights to create a custom role at the desired scope, such as Owner or User Access Administrator",
+			"**Steps**",
+			"1. Deploy the Custom Role",
+			"2. Deploy the Logic App",
+			"3. Deploy the Workbook"
+		],
+		"postDeployment": [
+			"Deploy the Workbook to audit the Defender for Cloud Data Connector and Workflow - [More Information](https://github.com/seanstark/sentinel-tools/tree/main/enable-sentinel-mdfc-sub-con#workbook)"
+		],
+		"prerequisitesDeployTemplateFile": "./customRoleDeploy.json",
 		"lastUpdateTime": "",
 		"entities": [],
-		"tags": [],
+		"tags": ["Utilities"],
 		"support": {
-			"tier": "community",
-			"armtemplate": "Generated from https://github.com/Azure/Azure-Sentinel/tree/master/Tools/Playbook-ARM-Template-Generator"
+			"tier": "community"
 		},
+		"categories": {
+			"domains": ["Security - Automation (SOAR)"]
+		},		
 		"author": {
-			"name": ""
+			"name": "Sean Stark"
+		},
+	    "releaseNotes": [
+			{
+				"version": "1.0.0",
+				"title": "Defender for Cloud Data Connector At Scale",
+				"notes": [
+					"Initial version"
+				]
+			}
+		],
+		"source": {
+			"kind": "Community"
 		}
 	},
 	"parameters": {
