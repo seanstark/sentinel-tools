@@ -22,6 +22,9 @@
 - Report on current versions without updating
 
 # Usage
+
+ > Azure Arc does not return a detailed status of the udpate request
+
 - The script takes input from an object of machines from either [**Get-AzVM**](https://learn.microsoft.com/powershell/module/az.compute/get-azvm?view) or [**Get-AzConnectedMachine**](https://learn.microsoft.com/powershell/module/az.connectedmachine/get-azconnectedmachine). This will give you the flexibility to scope updates to specific machines. 
 
 - You can specify the versions you want to update to using the **linuxTargetVersion** and **windowsTargetVersion** parameters.
