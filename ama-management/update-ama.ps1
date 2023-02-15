@@ -23,11 +23,11 @@
 
  .EXAMPLE
     Update Azure Virtual Machines to the latest version of Windows and Linux
-    .\update-ama.ps1 -machines $(Get-AzVM) latestVersion
+    .\update-ama.ps1 -machines $(Get-AzVM) -latestVersion
 
  .EXAMPLE
     Generate a report of Azure Virtual Machines with current versions
-    .\update-ama.ps1 -machines $(Get-AzVM) latestVersion -report
+    .\update-ama.ps1 -machines $(Get-AzVM) -latestVersion -report
 
  .EXAMPLE
     Update Azure Arc Machines to a specific version
@@ -35,11 +35,11 @@
 
  .EXAMPLE
     Update Azure Arc Machines to the latest version of Windows and Linux
-    .\update-ama.ps1 -machines $(Get-AzConnectedMachine) latestVersion
+    .\update-ama.ps1 -machines $(Get-AzConnectedMachine) -latestVersion
 
  .EXAMPLE
     Generate a report of Azure Arc Machines with current versions
-    .\update-ama.ps1 -machines $(Get-AzConnectedMachine) latestVersion -report
+    .\update-ama.ps1 -machines $(Get-AzConnectedMachine) -latestVersion -report
 #>
 
 param(
@@ -112,8 +112,8 @@ ForEach ($machine in $machines){
     }
     If($machine.Type -like 'Microsoft.HybridCompute/machines'){
         $state = $machine.Status
-        $windowsAgent = Get-AzConnectedMachineExtension MachineName $machine.Name -ResourceGroupName $machine.ResourceGroupName -Name 'AzureMonitorWindowsAgent' -ErrorAction SilentlyContinue
-        $linuxAgent = Get-AzConnectedMachineExtension MachineName $machine.Name -ResourceGroupName $machine.ResourceGroupName -Name 'AzureMonitorLinuxAgent' -ErrorAction SilentlyContinue
+        $windowsAgent = Get-AzConnectedMachineExtension -MachineName $machine.Name -ResourceGroupName $machine.ResourceGroupName -Name 'AzureMonitorWindowsAgent' -ErrorAction SilentlyContinue
+        $linuxAgent = Get-AzConnectedMachineExtension -MachineName $machine.Name -ResourceGroupName $machine.ResourceGroupName -Name 'AzureMonitorLinuxAgent' -ErrorAction SilentlyContinue
     }
 
     # If latestVersion is flagged, get the latest published version for the region where the machine resides
@@ -146,13 +146,13 @@ ForEach ($machine in $machines){
         $agent | Add-Member -MemberType NoteProperty -Name SubscriptionId -Value $machine.id.split('/')[2] -Force
         $agentsToUpgrade += $agent
 
-        Write-Verbose ($agent | Select VMName, SubscriptionId, ResourceGroupName, MachineState, MachineType, Name, CurrentVersion, TargetVersion, extensionTarget, EnableAutomaticUpgrade, ProvisioningState)
+        Write-Verbose ($agent | Select MachineName, SubscriptionId, ResourceGroupName, MachineState, MachineType, Name, CurrentVersion, TargetVersion, extensionTarget, EnableAutomaticUpgrade, ProvisioningState)
     }
 }
 
 If ($report){
     Write-Host 'Report only specified'
-    $agentsToUpgrade | Select VMName, SubscriptionId, ResourceGroupName, MachineState, MachineType, Name, CurrentVersion, TargetVersion, extensionTarget, EnableAutomaticUpgrade, ProvisioningState | ft
+    $agentsToUpgrade | Select MachineName, SubscriptionId, ResourceGroupName, MachineState, MachineType, Name, CurrentVersion, TargetVersion, extensionTarget, EnableAutomaticUpgrade, ProvisioningState | ft
 }else {
     #Get only running or connected machines
     $agentsToUpgrade = $agentsToUpgrade | Where-Object {$_.MachineState -like 'VM running' -or $_.MachineState -like 'Connected'}
