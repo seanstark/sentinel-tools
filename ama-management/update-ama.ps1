@@ -1,9 +1,63 @@
+<#
+ .DESCRIPTION
+    This script will update Azure Virtual Machines and Azure Arc Machines to the desired or latest version of the Azure Monitor Agent.
 
+ .PARAMETER machines
+    Specify an object of machines from Get-AzVM or Get-AzConnectedMachine
 
-$linuxTargetVersion = '1.22.2'
-$windowsTargetVersion = '1.9.0.0'
-$machines = Get-AzVM 
-$report = $true
+ .PARAMETER linuxTargetVersion
+    Specify the version of the Azure Monitor Agent to ugprade to for Linux. See https://learn.microsoft.com/azure/azure-monitor/agents/azure-monitor-agent-extension-versions
+
+ .PARAMETER windowsTargetVersion
+    Specify the version of the Azure Monitor Agent to ugprade to for Windows. See https://learn.microsoft.com/azure/azure-monitor/agents/azure-monitor-agent-extension-versions
+
+ .PARAMETER latestVersion
+    Specify the latestVersion switch to use the latest version available for Linux and Windows. This is unique to each region.
+
+ .PARAMETER report
+    Specify the report switch to only report on machines with current versions
+
+ .EXAMPLE
+    Update Azure Virtual Machines to a specific version
+    .\update-ama.ps1 -machines $(Get-AzVM) -linuxTargetVersion 1.22.2 -windowsTargetVersion 1.10.0.0
+
+ .EXAMPLE
+    Update Azure Virtual Machines to the latest version of Windows and Linux
+    .\update-ama.ps1 -machines $(Get-AzVM) latestVersion
+
+ .EXAMPLE
+    Generate a report of Azure Virtual Machines with current versions
+    .\update-ama.ps1 -machines $(Get-AzVM) latestVersion -report
+
+ .EXAMPLE
+    Update Azure Arc Machines to a specific version
+    .\update-ama.ps1 -machines $(Get-AzConnectedMachine) -linuxTargetVersion 1.22.2 -windowsTargetVersion 1.10.0.0
+
+ .EXAMPLE
+    Update Azure Arc Machines to the latest version of Windows and Linux
+    .\update-ama.ps1 -machines $(Get-AzConnectedMachine) latestVersion
+
+ .EXAMPLE
+    Generate a report of Azure Arc Machines Machines with current versions
+    .\update-ama.ps1 -machines $(Get-AzConnectedMachine) latestVersion -report
+#>
+
+param(
+    [Parameter(Mandatory=$true)]
+    [object]$machines,
+
+    [Parameter(Mandatory=$true, ParameterSetName = 'TargetVersion')]
+    [string]$linuxTargetVersion,
+
+    [Parameter(Mandatory=$true, ParameterSetName = 'TargetVersion')]
+    [string]$windowsTargetVersion,
+
+    [Parameter(Mandatory=$true, ParameterSetName = 'LatestVersion')]
+    [switch]$latestVersion,
+
+    [Parameter(Mandatory=$false)]
+    [switch]$report
+)
 
 $requiredModules = 'Az.Accounts', 'Az.Compute', 'Az.ConnectedMachine'
 $availableModules = Get-Module -ListAvailable -Name $requiredModules
@@ -18,14 +72,39 @@ If(!(Get-AzContext)){
     Connect-AzAccount -Subscription $subscriptionId | Out-Null
 }
 
-#Target Version cannot contain leading zeros
-If
+function Get-latestVersion{
+    Param($versions)
+    $latest = $versions | % {[version]$_} | Sort-Object -Descending | Select -First 1
+    $latest.ToString()
+}
+
+#Get Latest Versions for each machine region
+If($latestVersion){
+    $regionLatestVersions = @()
+    $regions = $machines.location | Get-Unique
+    ForEach ($region in $regions){
+        $windowsVersions = Get-AzVMExtensionImage -PublisherName 'Microsoft.Azure.Monitor' -Type 'AzureMonitorWindowsAgent' -Location $region 
+        $linuxVersions = Get-AzVMExtensionImage -PublisherName 'Microsoft.Azure.Monitor' -Type 'AzureMonitorLinuxAgent' -Location $region
+
+        #Update Object
+        $regionLatestVersions += [PSCustomObject]@{
+            location = $region
+            linuxLatestVersion = Get-latestVersion $linuxVersions.Version
+            windowsLatestVersion = Get-latestVersion $windowsVersions.Version
+        }
+    }
+}
 
 $agentsToUpgrade = @()
+
+Write-Host ('Evaluating {0} machines' -f $machines.Count)
 
 ForEach ($machine in $machines){
     # Cannot trust the OsType is properly detected, check for AzureMonitorWindowsAgent and AzureMonitorLinuxAgent
     $agent = $null
+
+    Write-Verbose ('Evaluating {0}' -f $machine.Name)
+
     If($machine.Type -like 'Microsoft.Compute/virtualMachines'){
         $state = (($machine | Get-AzVM -Status).statuses | Where Code -like 'PowerState*').DisplayStatus
         $windowsAgent = Get-AzVMExtension -VMName $machine.Name -ResourceGroupName $machine.ResourceGroupName -Name 'AzureMonitorWindowsAgent' -ErrorAction SilentlyContinue
@@ -36,6 +115,14 @@ ForEach ($machine in $machines){
         $windowsAgent = Get-AzConnectedMachineExtension MachineName $machine.Name -ResourceGroupName $machine.ResourceGroupName -Name 'AzureMonitorWindowsAgent' -ErrorAction SilentlyContinue
         $linuxAgent = Get-AzConnectedMachineExtension MachineName $machine.Name -ResourceGroupName $machine.ResourceGroupName -Name 'AzureMonitorLinuxAgent' -ErrorAction SilentlyContinue
     }
+
+    # If latestVersion is flagged, get the latest published version for the region where the machine resides
+    If($latestVersion){
+        Write-Verbose ('Latest Version Parameter Specified. Getting Latest Version for Region: {0}' -f $machine.Location)
+        $linuxTargetVersion = $regionLatestVersions | Where-Object {$_.location -like $machine.Location} | Select -ExpandProperty linuxLatestVersion
+        $windowsTargetVersion = $regionLatestVersions | Where-Object {$_.location -like $machine.Location} | Select -ExpandProperty windowsLatestVersion
+    }
+
     # Build Agent Objects
     If ($windowsAgent){
         $agent = $windowsAgent
@@ -50,28 +137,29 @@ ForEach ($machine in $machines){
     
     # Add Additional Attributes
     If ($agent){   
-        #Fix Target Version, cannot contain leading zeros
-        $temp =  $agent.TargetVersion.ToString("0.00")
-
-        $temp.ToString().ToString("0.00")
-        [System.Version]('1.9.0')
-
+        #Fix Target Version, can only be major and minor version
+        $agent.TargetVersion = ('{0}.{1}'-f ([Version]($agent.TargetVersion)).Major, ([Version]($agent.TargetVersion)).Minor)
         $agent | Add-Member -MemberType NoteProperty -Name CurrentVersion -Value $agent.TypeHandlerVersion -Force
         $agent | Add-Member -MemberType NoteProperty -Name MachineType -Value $machine.Type -Force
         $agent | Add-Member -MemberType NoteProperty -Name MachineState -Value $state -Force
         $agent | Add-Member -MemberType NoteProperty -Name MachineName -Value $machine.Name -Force
         $agent | Add-Member -MemberType NoteProperty -Name SubscriptionId -Value $machine.id.split('/')[2] -Force
         $agentsToUpgrade += $agent
+
+        Write-Verbose ($agent | Select VMName, SubscriptionId, ResourceGroupName, MachineState, MachineType, Name, CurrentVersion, TargetVersion, extensionTarget, EnableAutomaticUpgrade, ProvisioningState)
     }
 }
 
 If ($report){
+    Write-Host 'Report only specified'
     $agentsToUpgrade | Select VMName, SubscriptionId, ResourceGroupName, MachineState, MachineType, Name, CurrentVersion, TargetVersion, extensionTarget, EnableAutomaticUpgrade, ProvisioningState | ft
 }else {
     #Get only running or connected machines
     $agentsToUpgrade = $agentsToUpgrade | Where-Object {$_.MachineState -like 'VM running' -or $_.MachineState -like 'Connected'}
     #Get only machines that do not match the target version
-    $agentsToUpgrade = $agentsToUpgrade | Where-Object {$_.CurrentVersion -lt $_.TargetVersion} 
+    $agentsToUpgrade = $agentsToUpgrade | Where-Object {[Version]$_.CurrentVersion -lt [Version]$_.TargetVersion} 
+
+    Write-Host ('{0} out of {1} machines to upgrade' -f $agentsToUpgrade.count, $machines.Count)
 
     ForEach ($agent in $agentsToUpgrade){
         If($agent.MachineType -like 'Microsoft.Compute/virtualMachines'){
@@ -81,7 +169,7 @@ If ($report){
                 properties = @{
                     publisher = $agent.Publisher
                     type = $agent.ExtensionType
-                    typeHandlerVersion = '1.9'#$agent.TargetVersion.split('.')[0..2] -join '.' 
+                    typeHandlerVersion = $agent.TargetVersion
                 }
             }
         }
@@ -91,13 +179,20 @@ If ($report){
             $body = @{
                 extensionTargets = @{
                     "$($agent.extensionTarget)"= @{
-                        targetVersion = $agent.TargetVersion.split('.')[0..2] -join '.'
+                        targetVersion = $agent.TargetVersion
                     }
                 }
             }
         }
-
-        $uri
-        Invoke-AzRestMethod -Uri $uri -Method $method -Payload $($body | ConvertTo-Json)
+        Write-Host ('Updating {0} from version {1} to latest version: {2} ' -f $agent.MachineName, $agent.CurrentVersion, $agent.TargetVersion)
+        Write-Verbose $uri
+        $request = Invoke-AzRestMethod -Uri $uri -Method $method -Payload $($body | ConvertTo-Json)
+        $reqContent = $request.Content | ConvertFrom-Json
+        $request | Add-Member -MemberType NoteProperty -Name provisioningState -Value $reqContent.properties.provisioningState -Force
+        $request | Add-Member -MemberType NoteProperty -Name publisher -Value $reqContent.properties.publisher -Force
+        $request | Add-Member -MemberType NoteProperty -Name type -Value $reqContent.properties.type -Force
+        $request | Add-Member -MemberType NoteProperty -Name typeHandlerVersion -Value $reqContent.properties.typeHandlerVersion -Force
+        $request | Add-Member -MemberType NoteProperty -Name machineName -Value $agent.MachineName -Force
+        $request | Select machineName, StatusCode, Method, provisioningState, publisher, type, typeHandlerVersion
     }
 }
