@@ -15,7 +15,7 @@
    
 # Overview
 
-**update-ama.ps1** is a powershell script you can use to update the Azure Monitor Agent on Azure Virtual Machines and Azure Arc Machines. The script will handle both linux and windows servers with the below features.
+[**update-ama.ps1**](https://github.com/seanstark/sentinel-tools/blob/main/ama-management/update-ama.ps1) is a powershell script you can use to update the Azure Monitor Agent on Azure Virtual Machines and Azure Arc Machines. The script will handle both linux and windows servers with the below features.
 
 - Update the Azure Monitor Agent to a specific version
 - Update the Azure Monitor Agent to the latest version
