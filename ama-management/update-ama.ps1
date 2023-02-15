@@ -38,7 +38,7 @@
     .\update-ama.ps1 -machines $(Get-AzConnectedMachine) latestVersion
 
  .EXAMPLE
-    Generate a report of Azure Arc Machines Machines with current versions
+    Generate a report of Azure Arc Machines with current versions
     .\update-ama.ps1 -machines $(Get-AzConnectedMachine) latestVersion -report
 #>
 
