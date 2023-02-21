@@ -15,13 +15,16 @@
    
 # Overview
 
-**update-ama.ps1** is a powershell script you can use to update the Azure Monitor Agent on Azure Virtual Machines and Azure Arc Machines. The script will handle both linux and windows servers with the below features.
+[**update-ama.ps1**](https://github.com/seanstark/sentinel-tools/blob/main/ama-management/update-ama.ps1) is a powershell script you can use to update the Azure Monitor Agent on Azure Virtual Machines and Azure Arc Machines. The script will handle both linux and windows servers with the below features.
 
 - Update the Azure Monitor Agent to a specific version
 - Update the Azure Monitor Agent to the latest version
 - Report on current versions without updating
 
 # Usage
+
+ > Azure Arc does not return a detailed status of the udpate request
+
 - The script takes input from an object of machines from either [**Get-AzVM**](https://learn.microsoft.com/powershell/module/az.compute/get-azvm?view) or [**Get-AzConnectedMachine**](https://learn.microsoft.com/powershell/module/az.connectedmachine/get-azconnectedmachine). This will give you the flexibility to scope updates to specific machines. 
 
 - You can specify the versions you want to update to using the **linuxTargetVersion** and **windowsTargetVersion** parameters.
@@ -42,12 +45,12 @@
 
 ### Update Azure Virtual Machines to the latest version of Windows and Linux
 ```
-.\update-ama.ps1 -machines $(Get-AzVM) latestVersion
+.\update-ama.ps1 -machines $(Get-AzVM) -latestVersion
 ```
 
 ### Generate a report of Azure Virtual Machines with current versions
 ```
-.\update-ama.ps1 -machines $(Get-AzVM) latestVersion -report
+.\update-ama.ps1 -machines $(Get-AzVM) -latestVersion -report
 ```
 
 ## Azure Arc Machines
@@ -59,10 +62,10 @@
 
 ### Update Azure Arc Machines to the latest version of Windows and Linux
 ```
-.\update-ama.ps1 -machines $(Get-AzConnectedMachine) latestVersion
+.\update-ama.ps1 -machines $(Get-AzConnectedMachine) -latestVersion
 ```
 
 ### Generate a report of Azure Arc Machines with current versions
 ```
-.\update-ama.ps1 -machines $(Get-AzConnectedMachine) latestVersion -report
+.\update-ama.ps1 -machines $(Get-AzConnectedMachine) -latestVersion -report
 ```
