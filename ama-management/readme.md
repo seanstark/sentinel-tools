@@ -45,12 +45,12 @@
 
 ### Update Azure Virtual Machines to the latest version of Windows and Linux
 ```
-.\update-ama.ps1 -machines $(Get-AzVM) latestVersion
+.\update-ama.ps1 -machines $(Get-AzVM) -latestVersion
 ```
 
 ### Generate a report of Azure Virtual Machines with current versions
 ```
-.\update-ama.ps1 -machines $(Get-AzVM) latestVersion -report
+.\update-ama.ps1 -machines $(Get-AzVM) -latestVersion -report
 ```
 
 ## Azure Arc Machines
@@ -62,10 +62,10 @@
 
 ### Update Azure Arc Machines to the latest version of Windows and Linux
 ```
-.\update-ama.ps1 -machines $(Get-AzConnectedMachine) latestVersion
+.\update-ama.ps1 -machines $(Get-AzConnectedMachine) -latestVersion
 ```
 
 ### Generate a report of Azure Arc Machines with current versions
 ```
-.\update-ama.ps1 -machines $(Get-AzConnectedMachine) latestVersion -report
+.\update-ama.ps1 -machines $(Get-AzConnectedMachine) -latestVersion -report
 ```
