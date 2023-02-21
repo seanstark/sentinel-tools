@@ -56,7 +56,16 @@ param(
     [switch]$latestVersion,
 
     [Parameter(Mandatory=$false)]
-    [switch]$report
+    [switch]$report,
+
+    [Parameter(Mandatory=$false)]
+    [string]$extPublisherName = 'Microsoft.Azure.Monitor',
+
+    [Parameter(Mandatory=$false)]
+    [string]$windowsExtType = 'AzureMonitorWindowsAgent',
+
+    [Parameter(Mandatory=$false)]
+    [string]$linuxExtType = 'AzureMonitorLinuxAgent'
 )
 
 $requiredModules = 'Az.Accounts', 'Az.Compute', 'Az.ConnectedMachine'
@@ -67,10 +76,8 @@ ForEach ($module in $modulesToInstall){
     Install-Module $module -force
 }
 
-If(!(Get-AzContext)){
-    Write-Host ('Connecting to Azure Subscription: {0}' -f $subscriptionId) -ForegroundColor Yellow
-    Connect-AzAccount -Subscription $subscriptionId | Out-Null
-}
+# This isn't used for anything other than to query for arc extension versions
+$subscriptionId = (Get-AzContext | Select -ExpandProperty Subscription).id
 
 function Get-latestVersion{
     Param($versions)
@@ -80,11 +87,24 @@ function Get-latestVersion{
 
 #Get Latest Versions for each machine region
 If($latestVersion){
+    
     $regionLatestVersions = @()
     $regions = $machines.location | Get-Unique
     ForEach ($region in $regions){
-        $windowsVersions = Get-AzVMExtensionImage -PublisherName 'Microsoft.Azure.Monitor' -Type 'AzureMonitorWindowsAgent' -Location $region 
-        $linuxVersions = Get-AzVMExtensionImage -PublisherName 'Microsoft.Azure.Monitor' -Type 'AzureMonitorLinuxAgent' -Location $region
+        Write-Verbose ('Getting Region Latest Extension Versions for {0}' -f $region )
+        # Azure Native Virtual Machines
+        $windowsVersions = Get-AzVMExtensionImage -PublisherName $extPublisherName -Type $windowsExtType -Location $region 
+        $linuxVersions = Get-AzVMExtensionImage -PublisherName $extPublisherName -Type $linuxExtType -Location $region
+
+        # Azure Arc Machines
+        If($machines[0].Type -like 'Microsoft.HybridCompute/machines'){
+            Write-Verbose ('Getting Azure Arc Region Latest Extension Versions for {0}' -f $region )
+            $uri = ('https://management.azure.com/subscriptions/{0}/providers/Microsoft.HybridCompute/locations/{1}/publishers/{2}/extensionTypes/{3}/versions?api-version=2022-12-27-preview' -f $subscriptionId, $region, $extPublisherName, $windowsExtType)
+            $windowsVersions = (Invoke-AzRestMethod -Uri $uri -Method GET).Content | ConvertFrom-Json | Select -ExpandProperty properties
+
+            $uri = ('https://management.azure.com/subscriptions/{0}/providers/Microsoft.HybridCompute/locations/{1}/publishers/{2}/extensionTypes/{3}/versions?api-version=2022-12-27-preview' -f $subscriptionId, $region, $extPublisherName, $linuxExtType)
+            $linuxVersions = (Invoke-AzRestMethod -Uri $uri -Method GET).Content | ConvertFrom-Json | Select -ExpandProperty properties
+        }
 
         #Update Object
         $regionLatestVersions += [PSCustomObject]@{
@@ -127,18 +147,18 @@ ForEach ($machine in $machines){
     If ($windowsAgent){
         $agent = $windowsAgent
         $agent | Add-Member -MemberType NoteProperty -Name TargetVersion -Value $windowsTargetVersion -Force
-        $agent | Add-Member -MemberType NoteProperty -Name extensionTarget -Value 'Microsoft.Azure.Monitor.AzureMonitorWindowsAgent' -Force
+        $agent | Add-Member -MemberType NoteProperty -Name extensionTarget -Value $windowsAgent.extensionTarget -Force
     }
     If ($linuxAgent){
         $agent = $linuxAgent
         $agent | Add-Member -MemberType NoteProperty -Name TargetVersion -Value $linuxTargetVersion -Force
-        $agent | Add-Member -MemberType NoteProperty -Name extensionTarget -Value 'Microsoft.Azure.Monitor.AzureMonitorLinuxAgent' -Force
+        $agent | Add-Member -MemberType NoteProperty -Name extensionTarget -Value $linuxAgent.extensionTarget -Force
     }
     
     # Add Additional Attributes
     If ($agent){   
         #Fix Target Version, can only be major and minor version
-        $agent.TargetVersion = ('{0}.{1}'-f ([Version]($agent.TargetVersion)).Major, ([Version]($agent.TargetVersion)).Minor)
+        $agent | Add-Member -MemberType NoteProperty -Name TargetMajorMinorVersion -Value ('{0}.{1}'-f ([Version]($agent.TargetVersion)).Major, ([Version]($agent.TargetVersion)).Minor) -Force
         $agent | Add-Member -MemberType NoteProperty -Name CurrentVersion -Value $agent.TypeHandlerVersion -Force
         $agent | Add-Member -MemberType NoteProperty -Name MachineType -Value $machine.Type -Force
         $agent | Add-Member -MemberType NoteProperty -Name MachineState -Value $state -Force
@@ -169,7 +189,7 @@ If ($report){
                 properties = @{
                     publisher = $agent.Publisher
                     type = $agent.ExtensionType
-                    typeHandlerVersion = $agent.TargetVersion
+                    typeHandlerVersion = $agent.TargetMajorMinorVersion
                 }
             }
         }
@@ -179,7 +199,7 @@ If ($report){
             $body = @{
                 extensionTargets = @{
                     "$($agent.extensionTarget)"= @{
-                        targetVersion = $agent.TargetVersion
+                        targetVersion = $agent.TargetMajorMinorVersion
                     }
                 }
             }
