@@ -116,13 +116,13 @@ ForEach ($machine in $machines){
 
     If($machine.Type -like 'Microsoft.Compute/virtualMachines'){
         $state = (($machine | Get-AzVM -Status).statuses | Where Code -like 'PowerState*').DisplayStatus
-        $windowsAgent = Get-AzVMExtension -VMName $machine.Name -ResourceGroupName $machine.ResourceGroupName -Name 'AzureMonitorWindowsAgent' -ErrorAction SilentlyContinue
-        $linuxAgent = Get-AzVMExtension -VMName $machine.Name -ResourceGroupName $machine.ResourceGroupName -Name 'AzureMonitorLinuxAgent' -ErrorAction SilentlyContinue
+        $windowsAgent = Get-AzVMExtension -VMName $machine.Name -ResourceGroupName $machine.ResourceGroupName -Name $windowsExtType -ErrorAction SilentlyContinue
+        $linuxAgent = Get-AzVMExtension -VMName $machine.Name -ResourceGroupName $machine.ResourceGroupName -Name $linuxExtType -ErrorAction SilentlyContinue
     }
     If($machine.Type -like 'Microsoft.HybridCompute/machines'){
         $state = $machine.Status
-        $windowsAgent = Get-AzConnectedMachineExtension -MachineName $machine.Name -ResourceGroupName $machine.ResourceGroupName -Name 'AzureMonitorWindowsAgent' -ErrorAction SilentlyContinue
-        $linuxAgent = Get-AzConnectedMachineExtension -MachineName $machine.Name -ResourceGroupName $machine.ResourceGroupName -Name 'AzureMonitorLinuxAgent' -ErrorAction SilentlyContinue
+        $windowsAgent = Get-AzConnectedMachineExtension -MachineName $machine.Name -ResourceGroupName $machine.ResourceGroupName -Name $windowsExtType -ErrorAction SilentlyContinue
+        $linuxAgent = Get-AzConnectedMachineExtension -MachineName $machine.Name -ResourceGroupName $machine.ResourceGroupName -Name $linuxExtType -ErrorAction SilentlyContinue
     }
 
     # If latestVersion is flagged, get the latest published version for the region where the machine resides
