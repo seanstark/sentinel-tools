@@ -19,7 +19,7 @@
 
  > Azure Arc does not return a detailed status of the udpate request
  > 
- > The rest API only allows upgrading to Major+Minor versions. Therefore you can't upgrade from 1.2 to 1.2.2. 
+ > The rest API only allows upgrading to Major+Minor versions. Therefore you can't upgrade from 1.2 to 1.2.2 as an example, only to 1.3
 
 - The script takes input from an object of machines from either [**Get-AzVM**](https://learn.microsoft.com/powershell/module/az.compute/get-azvm?view) or [**Get-AzConnectedMachine**](https://learn.microsoft.com/powershell/module/az.connectedmachine/get-azconnectedmachine). This will give you the flexibility to scope updates to specific machines. 
 
