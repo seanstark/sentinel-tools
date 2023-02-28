@@ -196,15 +196,17 @@ If ($report){
         If($agent.MachineType -like 'Microsoft.HybridCompute/machines'){
             $uri = ('https://management.azure.com/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.HybridCompute/machines/{2}/upgradeExtensions?api-version=2022-12-27-preview' -f $agent.SubscriptionId, $agent.ResourceGroupName, $agent.MachineName)
             $method = 'POST'
+            $targetType = ('{0}.{1}' -f $agent.Publisher, $agent.Name)
             $body = @{
                 extensionTargets = @{
-                    "$($agent.extensionTarget)"= @{
+                    "$targetType"= @{
                         targetVersion = $agent.TargetMajorMinorVersion
                     }
                 }
             }
         }
-        Write-Host ('Updating {0} from version {1} to latest version: {2} ' -f $agent.MachineName, $agent.CurrentVersion, $agent.TargetVersion)
+        Write-Host ('Updating {0} from version {1} to latest version: {2}({3}) ' -f $agent.MachineName, $agent.CurrentVersion, $agent.TargetVersion, $agent.TargetMajorMinorVersion)
+        Write-Verbose $($body | ConvertTo-Json)
         Write-Verbose $uri
         $request = Invoke-AzRestMethod -Uri $uri -Method $method -Payload $($body | ConvertTo-Json)
         $reqContent = $request.Content | ConvertFrom-Json
