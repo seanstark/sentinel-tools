@@ -127,13 +127,17 @@ ForEach ($machine in $machines){
 
     If($machine.Type -like 'Microsoft.Compute/virtualMachines'){
         $state = (($machine | Get-AzVM -Status).statuses | Where Code -like 'PowerState*').DisplayStatus
-        $windowsAgent = Get-AzVMExtension -VMName $machine.Name -ResourceGroupName $machine.ResourceGroupName -Name 'AzureMonitorWindowsAgent' -ErrorAction SilentlyContinue
-        $linuxAgent = Get-AzVMExtension -VMName $machine.Name -ResourceGroupName $machine.ResourceGroupName -Name 'AzureMonitorLinuxAgent' -ErrorAction SilentlyContinue
+        if ($state -like 'VM running'){
+            $windowsAgent = Get-AzVMExtension -VMName $machine.Name -ResourceGroupName $machine.ResourceGroupName -Name 'AzureMonitorWindowsAgent' -ErrorAction SilentlyContinue
+            $linuxAgent = Get-AzVMExtension -VMName $machine.Name -ResourceGroupName $machine.ResourceGroupName -Name 'AzureMonitorLinuxAgent' -ErrorAction SilentlyContinue
+        }
     }
     If($machine.Type -like 'Microsoft.HybridCompute/machines'){
         $state = $machine.Status
-        $windowsAgent = Get-AzConnectedMachineExtension -MachineName $machine.Name -ResourceGroupName $machine.ResourceGroupName -Name 'AzureMonitorWindowsAgent' -ErrorAction SilentlyContinue
-        $linuxAgent = Get-AzConnectedMachineExtension -MachineName $machine.Name -ResourceGroupName $machine.ResourceGroupName -Name 'AzureMonitorLinuxAgent' -ErrorAction SilentlyContinue
+        if ($state -like 'Connected'){
+            $windowsAgent = Get-AzConnectedMachineExtension -MachineName $machine.Name -ResourceGroupName $machine.ResourceGroupName -Name 'AzureMonitorWindowsAgent' -ErrorAction SilentlyContinue
+            $linuxAgent = Get-AzConnectedMachineExtension -MachineName $machine.Name -ResourceGroupName $machine.ResourceGroupName -Name 'AzureMonitorLinuxAgent' -ErrorAction SilentlyContinue
+        }
     }
 
     # If latestVersion is flagged, get the latest published version for the region where the machine resides
@@ -172,7 +176,7 @@ ForEach ($machine in $machines){
 
 If ($report){
     Write-Host 'Report only specified'
-    $agentsToUpgrade | Select MachineName, SubscriptionId, ResourceGroupName, MachineState, MachineType, Name, CurrentVersion, TargetVersion, extensionTarget, EnableAutomaticUpgrade, ProvisioningState | ft
+    $agentsToUpgrade | Select MachineName, SubscriptionId, ResourceGroupName, MachineState, MachineType, Name, CurrentVersion, TargetVersion, TargetMajorMinorVersion, extensionTarget, EnableAutomaticUpgrade, ProvisioningState | ft
 }else {
     #Get only running or connected machines
     $agentsToUpgrade = $agentsToUpgrade | Where-Object {$_.MachineState -like 'VM running' -or $_.MachineState -like 'Connected'}
