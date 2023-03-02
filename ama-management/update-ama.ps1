@@ -137,9 +137,9 @@ ForEach ($machine in $machines){
     }
     If($machine.Type -like 'Microsoft.HybridCompute/machines'){
         $state = $machine.Status
-        Write-Verbose ('Machine State: {0}' -f $state)
+        Write-Verbose $state
         if ($state -like 'Connected'){
-            Write-Verbose $state
+            Write-Verbose ('Machine State: {0}' -f $state)
             $windowsAgent = Get-AzConnectedMachineExtension -MachineName $machine.Name -ResourceGroupName $machine.ResourceGroupName -Name 'AzureMonitorWindowsAgent' -ErrorAction SilentlyContinue
             $linuxAgent = Get-AzConnectedMachineExtension -MachineName $machine.Name -ResourceGroupName $machine.ResourceGroupName -Name 'AzureMonitorLinuxAgent' -ErrorAction SilentlyContinue
         }
