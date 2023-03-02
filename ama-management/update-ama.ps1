@@ -121,20 +121,25 @@ Write-Host ('Evaluating {0} machines' -f $machines.Count)
 
 ForEach ($machine in $machines){
     # Cannot trust the OsType is properly detected, check for AzureMonitorWindowsAgent and AzureMonitorLinuxAgent
-    $agent = $null
+    $agent = $null; $windowsAgent = $null; $linuxAgent = $null; $state= $null
 
     Write-Verbose ('Evaluating {0}' -f $machine.Name)
+    # Write-Verbose $machine | out-string #Enable for debug logging
 
     If($machine.Type -like 'Microsoft.Compute/virtualMachines'){
         $state = (($machine | Get-AzVM -Status).statuses | Where Code -like 'PowerState*').DisplayStatus
+        Write-Verbose $state
         if ($state -like 'VM running'){
+            Write-Verbose ('Machine State: {0}' -f $state)
             $windowsAgent = Get-AzVMExtension -VMName $machine.Name -ResourceGroupName $machine.ResourceGroupName -Name 'AzureMonitorWindowsAgent' -ErrorAction SilentlyContinue
             $linuxAgent = Get-AzVMExtension -VMName $machine.Name -ResourceGroupName $machine.ResourceGroupName -Name 'AzureMonitorLinuxAgent' -ErrorAction SilentlyContinue
         }
     }
     If($machine.Type -like 'Microsoft.HybridCompute/machines'){
         $state = $machine.Status
+        Write-Verbose ('Machine State: {0}' -f $state)
         if ($state -like 'Connected'){
+            Write-Verbose $state
             $windowsAgent = Get-AzConnectedMachineExtension -MachineName $machine.Name -ResourceGroupName $machine.ResourceGroupName -Name 'AzureMonitorWindowsAgent' -ErrorAction SilentlyContinue
             $linuxAgent = Get-AzConnectedMachineExtension -MachineName $machine.Name -ResourceGroupName $machine.ResourceGroupName -Name 'AzureMonitorLinuxAgent' -ErrorAction SilentlyContinue
         }
@@ -170,7 +175,7 @@ ForEach ($machine in $machines){
         $agent | Add-Member -MemberType NoteProperty -Name SubscriptionId -Value $machine.id.split('/')[2] -Force
         $agentsToUpgrade += $agent
 
-        Write-Verbose ($agent | Select MachineName, SubscriptionId, ResourceGroupName, MachineState, MachineType, Name, CurrentVersion, TargetVersion, extensionTarget, EnableAutomaticUpgrade, ProvisioningState)
+        Write-Verbose ($agent | Select MachineName, SubscriptionId, ResourceGroupName, MachineState, MachineType, Name, CurrentVersion, TargetVersion, TargetMajorMinorVersion, extensionTarget, EnableAutomaticUpgrade, ProvisioningState)
     }
 }
 
