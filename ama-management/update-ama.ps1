@@ -150,6 +150,7 @@ ForEach ($machine in $machines){
         Write-Verbose ('Latest Version Parameter Specified. Getting Latest Version for Region: {0}' -f $machine.Location)
         $linuxTargetVersion = $regionLatestVersions | Where-Object {$_.location -like $machine.Location} | Select -ExpandProperty linuxLatestVersion
         $windowsTargetVersion = $regionLatestVersions | Where-Object {$_.location -like $machine.Location} | Select -ExpandProperty windowsLatestVersion
+        Write-Verbose ('Latest Windows Version: {0}, Latest Linux Version: {1}' -f $windowsTargetVersion, $linuxTargetVersion)
     }
 
     # Build Agent Objects
