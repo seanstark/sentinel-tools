@@ -78,7 +78,7 @@ function Get-latestVersion{
 If($latestVersion){
     
     $regionLatestVersions = @()
-    $regions = $machines.location | Get-Unique
+    $regions = $machines.location | Sort-Object | Get-Unique
     ForEach ($region in $regions){
         Write-Verbose ('Getting Region Latest Extension Versions for {0}' -f $region )
         # Azure Native Virtual Machines
