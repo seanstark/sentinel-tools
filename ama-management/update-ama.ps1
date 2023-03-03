@@ -89,7 +89,7 @@ function Get-latestVersion{
 If($latestVersion){
     
     $regionLatestVersions = @()
-    $regions = $machines.location | Get-Unique
+    $regions = $machines.location | Sort-Object | Get-Unique
     ForEach ($region in $regions){
         Write-Verbose ('Getting Region Latest Extension Versions for {0}' -f $region )
         # Azure Native Virtual Machines
@@ -128,7 +128,7 @@ ForEach ($machine in $machines){
 
     If($machine.Type -like 'Microsoft.Compute/virtualMachines'){
         $state = (($machine | Get-AzVM -Status).statuses | Where Code -like 'PowerState*').DisplayStatus
-        Write-Verbose $state
+        #Write-Verbose $state
         if ($state -like 'VM running'){
             Write-Verbose ('Machine State: {0}' -f $state)
             $windowsAgent = Get-AzVMExtension -VMName $machine.Name -ResourceGroupName $machine.ResourceGroupName -Name 'AzureMonitorWindowsAgent' -ErrorAction SilentlyContinue
@@ -137,7 +137,7 @@ ForEach ($machine in $machines){
     }
     If($machine.Type -like 'Microsoft.HybridCompute/machines'){
         $state = $machine.Status
-        Write-Verbose $state
+        #Write-Verbose $state
         if ($state -like 'Connected'){
             Write-Verbose ('Machine State: {0}' -f $state)
             $windowsAgent = Get-AzConnectedMachineExtension -MachineName $machine.Name -ResourceGroupName $machine.ResourceGroupName -Name 'AzureMonitorWindowsAgent' -ErrorAction SilentlyContinue
