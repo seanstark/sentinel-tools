@@ -146,7 +146,7 @@ ForEach ($machine in $machines){
     }
 
     # If latestVersion is flagged, get the latest published version for the region where the machine resides
-    If($latestVersion){
+    If($latestVersion -and ($state -like 'Connected' -or $state -like 'VM running')){
         Write-Verbose ('Latest Version Parameter Specified. Getting Latest Version for Region: {0}' -f $machine.Location)
         $linuxTargetVersion = $regionLatestVersions | Where-Object {$_.location -like $machine.Location} | Select -ExpandProperty linuxLatestVersion
         $windowsTargetVersion = $regionLatestVersions | Where-Object {$_.location -like $machine.Location} | Select -ExpandProperty windowsLatestVersion
