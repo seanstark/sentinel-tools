@@ -35,5 +35,5 @@
 
 ### Update Azure Virtual Machines to a specific version of the Azure Monitor Agent
 ```
-.\update-ama.ps1 -machines $(Get-AzVM) -linuxTargetVersion 1.22.2 -windowsTargetVersion 1.10.0.0 -extPublisherName 'Microsoft.Azure.Monitor' -windowsExtType 'AzureMonitorWindowsAgent' -linuxExtType 'AzureMonitorLinuxAgent'
+.\update-extension.ps1 -machines $(Get-AzVM) -linuxTargetVersion 1.22.2 -windowsTargetVersion 1.10.0.0 -extPublisherName 'Microsoft.Azure.Monitor' -windowsExtType 'AzureMonitorWindowsAgent' -linuxExtType 'AzureMonitorLinuxAgent'
 ```
