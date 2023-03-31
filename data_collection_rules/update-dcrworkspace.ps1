@@ -21,7 +21,7 @@
     The full Resource Id of the new log analytics workspace change to
 
  .EXAMPLE
-    .\update-dcrdatastream.ps1 -subscriptionId 'ada06e68-375e-4210-be3a-c6cacebf41c5' -resourceGroup 'sentinel-dcrs' -ruleName 'windows-events' -currentWorkspaceId 'b6222115-73bc-4c99-b795-4560c061aced' -newWorkspaceResourceId '/subscriptions/166c8347-0480-4aa7-b984-75f0fda42c69/resourceGroups/sentinel/providers/Microsoft.OperationalInsights/workspaces/sentinel'
+    .\update-dcrworkspace.ps1 -subscriptionId 'ada078449-375e-4210-be3a-c6cacebf41c5' -resourceGroup 'sentinel-dcrs' -ruleName 'windows-events' -currentWorkspaceId 'b6222115-73bc-4c99-b795-4560c061aced' -newWorkspaceResourceId '/subscriptions/166c8347-0480-4aa7-b984-75f0fda42c69/resourceGroups/sentinel/providers/Microsoft.OperationalInsights/workspaces/sentinel'
 #>
 
 param(
