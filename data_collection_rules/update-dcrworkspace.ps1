@@ -1,6 +1,6 @@
 <#
  .DESCRIPTION
-    This script will update data collection rule destination workspace 
+    This script will update a data collection rule destination log analytics workspace 
 
  .PARAMETER subscriptionId
     Specify the subscriptionID GUID where your data collection rule resides
