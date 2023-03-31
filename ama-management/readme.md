@@ -23,7 +23,7 @@
 
 # Usage
 
- > Azure Arc does not return a detailed status of the udpate request
+ > Azure Arc does not return a detailed status of the update request
  > 
  > The rest API only allows upgrading to Major+Minor versions. Therefore you can't upgrade from 1.2 to 1.2.2 as an example, only to 1.3
 
