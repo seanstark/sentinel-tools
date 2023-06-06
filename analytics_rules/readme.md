@@ -65,6 +65,11 @@ You will need to setup a GitHub **personal access token** in order for the Power
 
 > ![GitHub PAT](/images/github_pat.png)
 
+
+Depending on your organizaiton affiliation you may need to authorize the token for use with SSO to the Azure organization
+
+![image](https://github.com/seanstark/sentinel-tools/assets/84108246/9d6dacac-fc11-421c-9b90-28fc80863ddb)
+
 ### Required PowerShell Modules
 The script will check and install any missing modules. For reference the below is required
 - PowerShellForGitHub 
