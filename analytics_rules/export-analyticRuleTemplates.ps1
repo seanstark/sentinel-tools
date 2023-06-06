@@ -13,7 +13,7 @@
         Author: seanstark-ms
         Link to GitHub Source: https://github.com/seanstark/sentinel-tools/tree/main/analytics_rules
         Requires PowerShell Version 7.0 and above
-        Requires PowerShell Modules: 'PowerShellForGitHub', 'Az.Accounts', 'Az.SecurityInsights', 'powershell-yaml'
+        Requires PowerShell Modules: 'PowerShellForGitHub', 'powershell-yaml'
 #>
 
 param(
