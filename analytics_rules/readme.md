@@ -1,5 +1,5 @@
 # Exporting Scheduled Analytics Rules From Templates
-You can export all rules from from the [Sentinel Github rule template repository](https://github.com/Azure/Azure-Sentinel) using the export-analyticRuleTemplates.ps1 script
+You can export all rules from from the [Sentinel Github rule template repository](https://github.com/Azure/Azure-Sentinel) using the [export-analyticRuleTemplates.ps1](/analytics_rules/export-analyticRuleTemplates.ps1) script
 
 - [Configuration Requirements](#configuration-requirements)
   * [Github Personal Access Token](#github-personal-access-token)
