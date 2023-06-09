@@ -1,6 +1,6 @@
 <#
  .DESCRIPTION
-    This script will update a data collection rule destination with an associated data collection endpoint 
+    This script will update a data collection rule with an associated data collection endpoint 
 
  .PARAMETER subscriptionId
     Specify the subscriptionID GUID where your data collection rule resides
