@@ -18,7 +18,7 @@
     The full Resource ID of the data collection endpoint
 
  .EXAMPLE
-    .\update-dcrworkspace.ps1 -subscriptionId 'ada078449-375e-4210-be3a-c6cacebf41c5' -resourceGroup 'sentinel-dcrs' -ruleName 'windows-events' -dataCollectionEndpointId '/subscriptions/ada111e68-375e-4330-be3a-c6caddbf41c5/resourceGroups/data-collection-end/providers/Microsoft.Insights/dataCollectionEndpoints/dce-customlog-westus2'
+    .\update-dcrDataCollectionEndpoint.ps1 -subscriptionId 'ada078449-375e-4210-be3a-c6cacebf41c5' -resourceGroup 'sentinel-dcrs' -ruleName 'windows-events' -dataCollectionEndpointId '/subscriptions/ada111e68-375e-4330-be3a-c6caddbf41c5/resourceGroups/data-collection-end/providers/Microsoft.Insights/dataCollectionEndpoints/dce-customlog-westus2'
 #>
 
 param(
