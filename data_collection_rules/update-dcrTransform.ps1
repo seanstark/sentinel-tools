@@ -56,10 +56,10 @@ $uri = ('https://management.azure.com/subscriptions/{0}/resourceGroups/{1}/provi
 $dcr = (Invoke-AzRestMethod -Uri $uri).content | ConvertFrom-Json -Depth 20
 
 #Update the data collection endpoint
-If ($dcr.properties.transformKql){
-    $dcr.properties.transformKql = $transformKql
+If ($dcr.properties.dataFlows.transformKql){
+    $dcr.properties.dataFlows.transformKql = $transformKql
 }else{
-    $dcr.properties | Add-Member -MemberType NoteProperty -Name 'transformKql' -Value $transformKql -Force
+    $dcr.properties.dataFlows | Add-Member -MemberType NoteProperty -Name 'transformKql' -Value $transformKql -Force
 }
 
 $newDCR = $dcr | ConvertTo-Json -Depth 20
