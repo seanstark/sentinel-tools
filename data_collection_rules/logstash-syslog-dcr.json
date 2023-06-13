@@ -1,0 +1,55 @@
+{
+    "properties": {
+        "immutableId": "dcr-d9867d61b4634dcd9d310872e0780d30",
+        "dataCollectionEndpointId": "/subscriptions/ada06e68-375e-4210-be3a-c6cacebf41c5/resourceGroups/data-collection-end/providers/Microsoft.Insights/dataCollectionEndpoints/dce-customlog-westus3",
+        "streamDeclarations": {
+            "Custom-Microsoft-Syslog": {
+                "columns": [
+                    {
+                        "name": "TimeGenerated",
+                        "type": "datetime"
+                    },
+                    {
+                        "name": "RawData",
+                        "type": "string"
+                    }
+                ]
+            }
+        },
+        "destinations": {
+            "logAnalytics": [
+                {
+                    "workspaceResourceId": "/subscriptions/ada06e68-375e-4210-be3a-c6cacebf41c5/resourcegroups/sentinel-prd/providers/microsoft.operationalinsights/workspaces/test-new",
+                    "workspaceId": "488aedbf-638c-4844-aeaa-888b16f278db",
+                    "name": "Custom-Microsoft-Syslog-Workspace"
+                }
+            ]
+        },
+        "dataFlows": [
+            {
+                "streams": [
+                    "Custom-Microsoft-Syslog"
+                ],
+                "destinations": [
+                    "Custom-Microsoft-Syslog-Workspace"
+                ],
+                "transformKql": "source | extend TimeGenerated = todatetime(parse_json(RawData).timestamp)",
+                "outputStream": "Microsoft-Syslog"
+            }
+        ],
+        "provisioningState": "Succeeded"
+    },
+    "location": "westus3",
+    "id": "/subscriptions/ada06e68-375e-4210-be3a-c6cacebf41c5/resourceGroups/sentinel-dcrs/providers/Microsoft.Insights/dataCollectionRules/logstash-syslog-custom",
+    "name": "logstash-syslog-custom",
+    "type": "Microsoft.Insights/dataCollectionRules",
+    "etag": "\"d600cb27-0000-4d00-0000-6488a4600000\"",
+    "systemData": {
+        "createdBy": "sean.stark@msdx250797.onmicrosoft.com",
+        "createdByType": "User",
+        "createdAt": "2023-06-13T17:16:15.6406971Z",
+        "lastModifiedBy": "sean.stark@msdx250797.onmicrosoft.com",
+        "lastModifiedByType": "User",
+        "lastModifiedAt": "2023-06-13T17:16:15.6406971Z"
+    }
+}
