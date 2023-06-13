@@ -1,55 +1,117 @@
 {
-    "properties": {
-        "immutableId": "dcr-d9867d61b4634dcd9d310872e0780d30",
-        "dataCollectionEndpointId": "/subscriptions/ada06e68-375e-4210-be3a-c6cacebf41c5/resourceGroups/data-collection-end/providers/Microsoft.Insights/dataCollectionEndpoints/dce-customlog-westus3",
-        "streamDeclarations": {
-            "Custom-Microsoft-Syslog": {
-                "columns": [
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "dataCollectionRuleName": {
+            "type": "String",
+            "metadata": {
+                "description": "Specify the name of the Data Collection Rule to create."
+            }
+        },
+        "location": {
+            "defaultValue": "",
+            "type": "String",
+            "metadata": {
+                "description": "Specify the location in which to create the Data Collection Rule."
+            }
+        },
+        "workspaceResourceId": {
+            "type": "String",
+            "metadata": {
+                "description": "Specify the Azure resource ID of the Log Analytics workspace to use."
+            }
+        },
+        "endpointResourceId": {
+            "type": "String",
+            "metadata": {
+                "description": "Specify the Azure resource ID of the Data Collection Endpoint to use."
+            }
+        },
+        "transformKql": {
+            "defaultValue": "source | project TimeGenerated = ls_timestamp, EventTime = todatetime(timestamp), Computer = logsource, HostName = logsource, HostIP = host, SyslogMessage = message, Facility = facility_label, SeverityLevel = severity_label",
+            "type": "String",
+            "metadata": {
+                "description": "The KQL statement to transform the data on ingest. The TimeGenerated datetime field is required"
+            }
+        }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Insights/dataCollectionRules",
+            "apiVersion": "2021-09-01-preview",
+            "name": "[parameters('dataCollectionRuleName')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "dataCollectionEndpointId": "[parameters('endpointResourceId')]",
+                "streamDeclarations": {
+                    "Custom-Microsoft-Syslog": {
+                        "columns": [
+                            {
+                                "name": "TimeGenerated",
+                                "type": "datetime"
+                            },
+                            {
+                                "name": "RawData",
+                                "type": "string"
+                            },
+							{
+								"name": "ls_timestamp",
+								"type": "datetime"
+							},
+							{
+								"name": "timestamp",
+								"type": "datetime"
+							},
+							{
+								"name": "message",
+								"type": "string"
+							},
+							{
+								"name": "facility_label",
+								"type": "string"
+							},
+							{
+								"name": "severity_label",
+								"type": "string"
+							},
+							{
+								"name": "host",
+								"type": "string"
+							},
+							{
+								"name": "logsource",
+								"type": "string"
+							}
+						]
+					}
+                },
+                "destinations": {
+                    "logAnalytics": [
+                        {
+                            "workspaceResourceId": "[parameters('workspaceResourceId')]",
+                            "name": "Custom-Microsoft-Syslog-Workspace"
+                        }
+                    ]
+                },
+                "dataFlows": [
                     {
-                        "name": "TimeGenerated",
-                        "type": "datetime"
-                    },
-                    {
-                        "name": "RawData",
-                        "type": "string"
+                        "streams": [
+                            "Custom-Microsoft-Syslog"
+                        ],
+                        "destinations": [
+                            "Custom-Microsoft-Syslog-Workspace"
+                        ],
+                        "transformKql": "[parameters('transformKql')]",
+                        "outputStream": "Microsoft-Syslog"
                     }
                 ]
             }
-        },
-        "destinations": {
-            "logAnalytics": [
-                {
-                    "workspaceResourceId": "/subscriptions/ada06e68-375e-4210-be3a-c6cacebf41c5/resourcegroups/sentinel-prd/providers/microsoft.operationalinsights/workspaces/test-new",
-                    "workspaceId": "488aedbf-638c-4844-aeaa-888b16f278db",
-                    "name": "Custom-Microsoft-Syslog-Workspace"
-                }
-            ]
-        },
-        "dataFlows": [
-            {
-                "streams": [
-                    "Custom-Microsoft-Syslog"
-                ],
-                "destinations": [
-                    "Custom-Microsoft-Syslog-Workspace"
-                ],
-                "transformKql": "source | extend TimeGenerated = todatetime(parse_json(RawData).timestamp)",
-                "outputStream": "Microsoft-Syslog"
-            }
-        ],
-        "provisioningState": "Succeeded"
-    },
-    "location": "westus3",
-    "id": "/subscriptions/ada06e68-375e-4210-be3a-c6cacebf41c5/resourceGroups/sentinel-dcrs/providers/Microsoft.Insights/dataCollectionRules/logstash-syslog-custom",
-    "name": "logstash-syslog-custom",
-    "type": "Microsoft.Insights/dataCollectionRules",
-    "etag": "\"d600cb27-0000-4d00-0000-6488a4600000\"",
-    "systemData": {
-        "createdBy": "sean.stark@msdx250797.onmicrosoft.com",
-        "createdByType": "User",
-        "createdAt": "2023-06-13T17:16:15.6406971Z",
-        "lastModifiedBy": "sean.stark@msdx250797.onmicrosoft.com",
-        "lastModifiedByType": "User",
-        "lastModifiedAt": "2023-06-13T17:16:15.6406971Z"
+        }
+    ],
+    "outputs": {
+        "dataCollectionRuleId": {
+            "type": "String",
+            "value": "[resourceId('Microsoft.Insights/dataCollectionRules', parameters('dataCollectionRuleName'))]"
+        }
     }
 }
