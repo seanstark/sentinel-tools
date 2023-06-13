@@ -31,6 +31,9 @@ param(
     [Parameter(Mandatory=$true)]
     [string]$ruleName,
 
+    [Parameter(Mandatory=$true)]
+    [string]$streamName,
+
     [Parameter(Mandatory=$false)]
     [string]$apiVersion = '2022-06-01',
 
@@ -56,10 +59,12 @@ $uri = ('https://management.azure.com/subscriptions/{0}/resourceGroups/{1}/provi
 $dcr = (Invoke-AzRestMethod -Uri $uri).content | ConvertFrom-Json -Depth 20
 
 #Update the data collection endpoint
-If ($dcr.properties.dataFlows.transformKql){
-    $dcr.properties.dataFlows.transformKql = $transformKql
-}else{
-    $dcr.properties.dataFlows | Add-Member -MemberType NoteProperty -Name 'transformKql' -Value $transformKql -Force
+If ($dcr.properties.dataFlows | where streams -eq $streamName){
+    If (($dcr.properties.dataFlows | where streams -eq $streamName).transformKql){
+        ($dcr.properties.dataFlows | where streams -eq $streamName).transformKql = $transformKql
+    }else{
+        ($dcr.properties.dataFlows | where streams -eq $streamName).dataFlows | Add-Member -MemberType NoteProperty -Name 'transformKql' -Value $transformKql -Force
+    }
 }
 
 $newDCR = $dcr | ConvertTo-Json -Depth 20
