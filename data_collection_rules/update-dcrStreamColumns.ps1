@@ -18,13 +18,13 @@
     The stream declaration name to update.
 
 .PARAMETER columnsToAdd
-    Specify an array of columns to add to the stream. This needs to be in a json formated list, example: {name: Message, type: string}, {name: Host, type: string} 
+    Specify an array of columns to add to the stream. This needs to be in a json formated list, example: '{"name": "Test1", "type": "string"}', '{"name": "Test2", "type": "string"}' 
 
 .PARAMETER columnsToRemove
     Specify an array of columns to remove from the stream. This needs to be a list of names, example: 'Message', 'Host'
 
  .EXAMPLE
-    .\update-dcrTransform.ps1 -subscriptionId 'ada078449-375e-4210-be3a-c6cacebf41c5' -resourceGroup 'sentinel-dcrs' -ruleName 'windows-events' -columnsToAdd {name: Message, type: string}, {name: Host, type: string} 
+    .\update-dcrTransform.ps1 -subscriptionId 'ada078449-375e-4210-be3a-c6cacebf41c5' -resourceGroup 'sentinel-dcrs' -ruleName 'windows-events' -columnsToAdd '{"name": "Test1", "type": "string"}', '{"name": "Test2", "type": "string"}'
 
  .EXAMPLE
     .\update-dcrTransform.ps1 -subscriptionId 'ada078449-375e-4210-be3a-c6cacebf41c5' -resourceGroup 'sentinel-dcrs' -ruleName 'windows-events' -columnsToRemove 'Message', 'Host'
@@ -44,14 +44,17 @@ param(
     [string]$streamName,
 
     [Parameter(Mandatory=$false)]
-    [string]$columnsToAdd,
+    [string[]]$columnsToAdd,
 
     [Parameter(Mandatory=$false)]
-    [string]$columnsToRemove,
+    [string[]]$columnsToRemove,
 
     [Parameter(Mandatory=$false)]
     [string]$apiVersion = '2022-06-01'
 )
+
+[string[]]$columnsToAdd = '{"name": "Test1", "type": "string"}', '{"name": "Test2", "type": "string"}'
+[string[]]$columnsToRemove = 'RawData'
 
 $requiredModules = 'Az.Accounts'
 $availableModules = Get-Module -ListAvailable -Name $requiredModules
@@ -71,11 +74,18 @@ $uri = ('https://management.azure.com/subscriptions/{0}/resourceGroups/{1}/provi
 $dcr = (Invoke-AzRestMethod -Uri $uri).content | ConvertFrom-Json -Depth 20
 
 #Update the data collection endpoint
-If ($dcr.properties.streamDeclarations | where streams -eq $streamName){
-    If (($dcr.properties.streamDeclarations | where streams -eq $streamName).columns){
-        ($dcr.properties.streamDeclarations | where streams -eq $streamName).columns += $transformKql
-    }else{
-        ($dcr.properties.dataFlows | where streams -eq $streamName).dataFlows | Add-Member -MemberType NoteProperty -Name 'transformKql' -Value $transformKql -Force
+If ($dcr.properties.streamDeclarations."$streamName"){
+    #Columns to Add
+    If ($columnsToAdd){
+        ForEach ($columnToAdd in $columnsToAdd){
+            $dcr.properties.streamDeclarations."$streamName".columns = @($dcr.properties.streamDeclarations."$streamName".columns) + $($columnToAdd | ConvertFrom-Json)
+        }
+    }
+    #Columns to Remove
+    If ($columnsToRemove) {
+        ForEach ($columnToRemove in $columnsToRemove){
+            $dcr.properties.streamDeclarations."$streamName".columns = $dcr.properties.streamDeclarations."$streamName".columns | where name -ne $columnToRemove
+        }
     }
 }
 

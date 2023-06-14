@@ -58,7 +58,7 @@ If(!(Get-AzContext)){
 $uri = ('https://management.azure.com/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Insights/dataCollectionRules/{2}?api-version={3}' -f $subscriptionId, $resourceGroup, $ruleName, $apiVersion)
 $dcr = (Invoke-AzRestMethod -Uri $uri).content | ConvertFrom-Json -Depth 20
 
-#Update the data collection endpoint
+#Update the data collection rule transformation
 If ($dcr.properties.dataFlows | where streams -eq $streamName){
     If (($dcr.properties.dataFlows | where streams -eq $streamName).transformKql){
         ($dcr.properties.dataFlows | where streams -eq $streamName).transformKql = $transformKql
