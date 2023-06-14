@@ -53,9 +53,6 @@ param(
     [string]$apiVersion = '2022-06-01'
 )
 
-[string[]]$columnsToAdd = '{"name": "Test1", "type": "string"}', '{"name": "Test2", "type": "string"}'
-[string[]]$columnsToRemove = 'RawData'
-
 $requiredModules = 'Az.Accounts'
 $availableModules = Get-Module -ListAvailable -Name $requiredModules
 $modulesToInstall = $requiredModules | where-object {$_ -notin $availableModules.Name}
