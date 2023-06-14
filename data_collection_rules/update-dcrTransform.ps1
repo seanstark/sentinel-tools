@@ -15,7 +15,7 @@
     Optionally you can specify the api version to use for Microsoft.Insights/dataCollectionRules
 
 .PARAMETER transformKql
-    The full Resource ID of the data collection endpoint
+    Specify the KQL transform statement in a single line
 
  .EXAMPLE
     .\update-dcrTransform.ps1 -subscriptionId 'ada078449-375e-4210-be3a-c6cacebf41c5' -resourceGroup 'sentinel-dcrs' -ruleName 'windows-events' -transformKql 'source | extend TimeGenerated = todatetime(parse_json(RawData).timestamp) | extend SyslogMessage = RawData"'
