@@ -1,6 +1,6 @@
 <#
  .DESCRIPTION
-    This script will update a data collection rule with an associated kql transform statement 
+    This script will update a data collection rule stream declaration columns
 
  .PARAMETER subscriptionId
     Specify the subscriptionID GUID where your data collection rule resides
@@ -24,10 +24,10 @@
     Specify an array of columns to remove from the stream. This needs to be a list of names, example: 'Message', 'Host'
 
  .EXAMPLE
-    .\update-dcrTransform.ps1 -subscriptionId 'ada078449-375e-4210-be3a-c6cacebf41c5' -resourceGroup 'sentinel-dcrs' -ruleName 'windows-events' -columnsToAdd '{"name": "Test1", "type": "string"}', '{"name": "Test2", "type": "string"}'
+    .\update-dcrStreamColumns.ps1 -subscriptionId 'ada078449-375e-4210-be3a-c6cacebf41c5' -resourceGroup 'sentinel-dcrs' -ruleName 'windows-events' -columnsToAdd '{"name": "Test1", "type": "string"}', '{"name": "Test2", "type": "string"}'
 
  .EXAMPLE
-    .\update-dcrTransform.ps1 -subscriptionId 'ada078449-375e-4210-be3a-c6cacebf41c5' -resourceGroup 'sentinel-dcrs' -ruleName 'windows-events' -columnsToRemove 'Message', 'Host'
+    .\update-dcrStreamColumns.ps1 -subscriptionId 'ada078449-375e-4210-be3a-c6cacebf41c5' -resourceGroup 'sentinel-dcrs' -ruleName 'windows-events' -columnsToRemove 'Message', 'Host'
 #>
 
 param(
