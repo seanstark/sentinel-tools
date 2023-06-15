@@ -1,0 +1,122 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "dataCollectionRuleName": {
+            "type": "String",
+			"defaultValue": "logstash-sentinel",
+            "metadata": {
+                "description": "Specify the name of the Data Collection Rule to create."
+            }
+        },
+        "location": {
+            "defaultValue": "",
+            "type": "String",
+            "metadata": {
+                "description": "Specify the location in which to create the Data Collection Rule."
+            }
+        },
+        "workspaceResourceId": {
+            "type": "String",
+            "metadata": {
+                "description": "Specify the Azure resource ID of the Log Analytics workspace to use."
+            }
+        },
+        "dataCollectionEndpointResourceId": {
+            "type": "String",
+            "metadata": {
+                "description": "Specify the Azure resource ID of the Data Collection Endpoint to use."
+            }
+        },
+        "transformKql": {
+            "defaultValue": "source | project TimeGenerated = ls_timestamp, HostName = hostname, Facility = facility, SeverityLevel = severity, SyslogMessage = message, ProcessID = pid, ProcessName = process, Computer = hostname, HostIP = ip, EventTime = timestamp, SourceSystem = service",
+            "type": "String",
+            "metadata": {
+                "description": "The KQL statement to transform the data on ingest. The TimeGenerated datetime field is required"
+            }
+        }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Insights/dataCollectionRules",
+            "apiVersion": "2021-09-01-preview",
+            "name": "[parameters('dataCollectionRuleName')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "dataCollectionEndpointId": "[parameters('dataCollectionEndpointResourceId')]",
+                "streamDeclarations": {
+                    "Custom-Microsoft-Syslog": {
+                        "columns": [
+							{
+								"name": "ls_timestamp",
+								"type": "datetime"
+							},
+							{
+								"name": "hostname",
+								"type": "string"
+							},
+							{
+								"name": "facility",
+								"type": "string"
+							},
+							{
+								"name": "severity",
+								"type": "string"
+							},
+							{
+								"name": "message",
+								"type": "string"
+							},
+							{
+								"name": "pid",
+								"type": "int"
+							},
+							{
+								"name": "process",
+								"type": "string"
+							},
+							{
+								"name": "ip",
+								"type": "string"
+							},
+							{
+								"name": "timestamp",
+								"type": "datetime"
+							},
+							{
+								"name": "service",
+								"type": "string"
+							}
+						]
+					}
+                },
+                "destinations": {
+                    "logAnalytics": [
+                        {
+                            "workspaceResourceId": "[parameters('workspaceResourceId')]",
+                            "name": "Custom-Microsoft-Syslog-Workspace"
+                        }
+                    ]
+                },
+                "dataFlows": [
+                    {
+                        "streams": [
+                            "Custom-Microsoft-Syslog"
+                        ],
+                        "destinations": [
+                            "Custom-Microsoft-Syslog-Workspace"
+                        ],
+                        "transformKql": "[parameters('transformKql')]",
+                        "outputStream": "Microsoft-Syslog"
+                    }
+                ]
+            }
+        }
+    ],
+    "outputs": {
+        "dataCollectionRuleId": {
+            "type": "String",
+            "value": "[resourceId('Microsoft.Insights/dataCollectionRules', parameters('dataCollectionRuleName'))]"
+        }
+    }
+}
