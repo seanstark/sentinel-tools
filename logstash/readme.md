@@ -1,5 +1,8 @@
 ## Sending logs to Sentinel using Logstash
 
+## Deploy the Data Collection Rule
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fseanstark%2Fsentinel-tools%2Fmain%2Flogstash%2Flogstash-syslog-dcr.json)
+
 ## Logstash Debugging
 
 Run logstash interactively to view console output
