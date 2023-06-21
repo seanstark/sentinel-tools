@@ -114,7 +114,7 @@ You can turn on debug logging with logstash via different methods. The methods b
 	``` ruby
         stdout {
             codec => rubydebug{}
-        }
+        } 
 	```
 
 3. Start logstash in interactive moode.
