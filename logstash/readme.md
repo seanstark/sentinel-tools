@@ -112,7 +112,7 @@ You can turn on debug logging with logstash via different methods. The methods b
 
 2. Add the below to your logstash configuration output section
 	``` ruby
-	stdout {
+        stdout {
             codec => rubydebug{}
         }
 	```
@@ -127,11 +127,11 @@ You can turn on debug logging with logstash via different methods. The methods b
 5. To enable further debug output, open another ssh sessions and run the below
 	``` 
 	curl -XPUT 'localhost:9600/_node/logging?pretty' -H 'Content-Type: application/json' -d'
-	    {
-                "logger.logstash.inputs.syslog" : "DEBUG",
-	        "logger.logstash.filters.grok" : "DEBUG",
-	        "logger.logstash.outputs.microsoftsentineloutput" : "DEBUG"
-	    }
+	{
+    	    "logger.logstash.inputs.syslog" : "DEBUG",
+    	    "logger.logstash.filters.grok" : "DEBUG",
+    	    "logger.logstash.outputs.microsoftsentineloutput" : "DEBUG"
+	}
 	    '
 	```
 
