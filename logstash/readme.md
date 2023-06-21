@@ -73,7 +73,7 @@ Run logstash interactively to view console output during testing to ensure logs 
 	service logstash stop
 	```
 
-2. Start logstash in interactive moode. (Specify the full path to the configuration file after -f)
+2. Start logstash in interactive mode. (Specify the full path to the configuration file after -f)
 	```
 	/usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/sentinel.conf
 	```
