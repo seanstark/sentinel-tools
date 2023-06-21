@@ -1,36 +1,16 @@
 ## Sending logs to Sentinel using Logstash
 
-## Deploy the Data Collection Rule
+## Step 1 - Deploy the Data Collection Rule
 Deploy the custom data collection rule in Azure
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fseanstark%2Fsentinel-tools%2Fmain%2Flogstash%2Flogstash-syslog-dcr.json)
 
-## Logstash Debugging
+## Step 2 - Create a logstash configuration file
+Default directory is /etc/logstash/conf.d/
 
-Run logstash interactively to view console output
+### Logstash Configuration Example
 
-```
-#Stop logstash service first
-service logstash stop
-
-# Specify the full path to the configuration file after -f
-/usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/sentinel.conf
-```
-
-To enable debug output, open another ssh sessions and run the below
-``` 
-curl -XPUT 'localhost:9600/_node/logging?pretty' -H 'Content-Type: application/json' -d'
-{
-    "logger.logstash.inputs.syslog" : "DEBUG",
-	"logger.logstash.filters.grok" : "DEBUG",
-	"logger.logstash.outputs.microsoftsentineloutput" : "DEBUG"
-}
-'
-```
-
-## Logstash Configuration Example
-
-```
+``` ruby
 input {
   syslog {
     port => 11536
@@ -70,7 +50,7 @@ output {
 }
 ```
 
-## Syslog Configuration
+## Step 3 - Configure rsyslog to forward logs to logstash
 
 Update your rsyslog.conf or other rsyslog config files to sent to the syslog input port you defined above in the logstash config file. Example:
 
@@ -78,3 +58,37 @@ Update your rsyslog.conf or other rsyslog config files to sent to the syslog inp
 # Send all syslog to logstash
 *.* @0.0.0.0:11536
 ```
+
+## Test the configuration
+
+Run logstash interactively to view console output
+
+1. Stop the logstash service first
+	```
+	service logstash stop
+	```
+
+2. Add the below your logstash configuration output section
+	``` ruby
+	stdout {
+            codec => rubydebug{}
+        }
+	```
+
+3. Start logstash in interactive moode. (Specify the full path to the configuration file after -f)
+	```
+	/usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/sentinel.conf
+	```
+
+4. To enable further debug output, open another ssh sessions and run the below
+	``` 
+	curl -XPUT 'localhost:9600/_node/logging?pretty' -H 'Content-Type: application/json' -d'
+	    {
+                "logger.logstash.inputs.syslog" : "DEBUG",
+	        "logger.logstash.filters.grok" : "DEBUG",
+	        "logger.logstash.outputs.microsoftsentineloutput" : "DEBUG"
+	    }
+	    '
+	```
+
+
