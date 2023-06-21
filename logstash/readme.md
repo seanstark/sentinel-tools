@@ -132,7 +132,7 @@ You can turn on debug logging with logstash via different methods. The methods b
     	    "logger.logstash.filters.grok" : "DEBUG",
     	    "logger.logstash.outputs.microsoftsentineloutput" : "DEBUG"
 	}
-	    '
+	'
 	```
 
 
