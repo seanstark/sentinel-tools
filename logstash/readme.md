@@ -82,6 +82,8 @@ Run logstash interactively to view console output during testing to ensure logs 
 
    ![image](https://github.com/seanstark/sentinel-tools/assets/84108246/4878d36c-094a-4405-8607-776ccf3fa4e3)
 
+4. You can stop the interactive process by entering ctrl + C
+
 ## Step 5 - Run logstash as service
 
 1. Start logstash as service
