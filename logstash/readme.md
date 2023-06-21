@@ -39,22 +39,22 @@ input {
 }
 filter {
   grok {
-    match => { "message" => "%{SYSLOGTIMESTAMP:ls_timestamp} %{SYSLOGHOST:hostname} %{DATA:process}\[%{DATA:pid}\]:%{SPACE}%{TIMESTAMP_ISO8601:timestamp} %{LOGLEVEL:severity} \[%{DATA:proctag}\]%{SPACE}%{GREEDYDATA:message}" }
-	add_field => { 
-		"facility" => "%{[facility][name]}"
-		"ip" => "%{[host][ip]}"
+    match => {
+		"message" => "%{SYSLOGTIMESTAMP:ls_timestamp} %{SYSLOGHOST:hostname} %{DATA:proc}(?:\[%{POSINT:pid}\])?:%{SPACE}%{TIMESTAMP_ISO8601:timestamp} %{LOGLEVEL:severity} \[%{DATA:proctag}\]%{SPACE}%{GREEDYDATA:message}" 
 	}
   }
   mutate {
-    replace => { 
-		"process" => "%{[process][name]}"
-		"pid" => "%{[process][pid]}"
+	replace => {
+	    "service" => "logstash"
+		"ip" => "%{[host][ip]}"
 		"hostname" => "%{[host][hostname]}"
-		"severity" => "%{[log][syslog][severity][name]}" 
-		"service" => "logstash"
+		"severity" => "%{[log][syslog][severity][name]}"
+		"facility" => "%{[log][syslog][facility][name]}"
+		"pid" => "%{[process][pid]}"
+		"process_name" => "%{[process][name]}"
 	}
-	convert => {
-		"pid" => "integer"
+ 	convert => { 
+		"[pid]" => "integer"
 	}
   }
 }
