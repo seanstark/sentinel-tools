@@ -32,11 +32,16 @@ filter {
 		"facility" => "%{[log][syslog][facility][name]}"
 		"pid" => "%{[process][pid]}"
 		"process_name" => "%{[process][name]}"
-	}
+		}
  	convert => { 
 		"[pid]" => "integer"
+		}
 	}
-  }
+	if [process_name] == "%{[process][name]}" {
+		mutate {
+			remove_field => ["process_name", "pid"]
+		}
+	}
 }
 output {
     microsoft-sentinel-logstash-output-plugin {
