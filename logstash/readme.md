@@ -87,15 +87,16 @@ Run logstash interactively to view console output during testing to ensure logs 
 ## Step 5 - Run logstash as service
 
 1. Start logstash as service
-Logstash will use any configuration files you have in the logstash config directory, /etc/logstash/conf.d/ by default.
-```
-serivce logstash start
-```
+   
+   Logstash will use any configuration files you have in the logstash config directory, /etc/logstash/conf.d/ by default.
+   ```
+   serivce logstash start
+   ```
 
-2. Verify the service is running
-```
-serivce logstash status
-```
+3. Verify the service is running
+   ```
+   serivce logstash status
+   ```
 
 ## Troubleshooting
 
