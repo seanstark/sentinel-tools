@@ -78,7 +78,9 @@ Run logstash interactively to view console output during testing to ensure logs 
 	/usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/sentinel.conf
 	```
 
-3. Verify in the console output logs are getting sent to log analytics
+3. Verify in the console output logstash is listening on the defined local port and logs are getting sent to log analytics.
+
+   ![image](https://github.com/seanstark/sentinel-tools/assets/84108246/4878d36c-094a-4405-8607-776ccf3fa4e3)
 
 ## Step 5 - Run logstash as service
 
@@ -95,7 +97,7 @@ serivce logstash status
 
 ## Troubleshooting
 
-## Debug Logging
+### Debug Logging
 You can turn on debug logging with logstash via different methods. The methods below will work when running logstash in interactive mode.
 
 1. Stop the logstash service first
