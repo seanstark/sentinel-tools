@@ -37,6 +37,27 @@ input {
 	type => syslog
   }
 }
+filter {
+  grok {
+    match => { "message" => "%{SYSLOGTIMESTAMP:ls_timestamp} %{SYSLOGHOST:hostname} %{DATA:process}\[%{DATA:pid}\]:%{SPACE}%{TIMESTAMP_ISO8601:timestamp} %{LOGLEVEL:severity} \[%{DATA:proctag}\]%{SPACE}%{GREEDYDATA:message}" }
+	add_field => { 
+		"facility" => "%{[facility][name]}"
+		"ip" => "%{[host][ip]}"
+	}
+  }
+  mutate {
+    replace => { 
+		"process" => "%{[process][name]}"
+		"pid" => "%{[process][pid]}"
+		"hostname" => "%{[host][hostname]}"
+		"severity" => "%{[log][syslog][severity][name]}" 
+		"service" => "logstash"
+	}
+	convert => {
+		"pid" => "integer"
+	}
+  }
+}
 output {
     microsoft-sentinel-logstash-output-plugin {
       client_app_Id => "<service principle app id>"
