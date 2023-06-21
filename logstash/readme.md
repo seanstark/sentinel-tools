@@ -64,9 +64,39 @@ Update your rsyslog.conf or other rsyslog config files to sent to the syslog inp
 *.* @0.0.0.0:11536
 ```
 
-## Test the configuration
+## Step 4 - Test the configuration
 
-Run logstash interactively to view console output
+Run logstash interactively to view console output during testing to ensure logs are being sent to the log analytics workspace
+
+1. Stop the logstash service first
+	```
+	service logstash stop
+	```
+
+2. Start logstash in interactive moode. (Specify the full path to the configuration file after -f)
+	```
+	/usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/sentinel.conf
+	```
+
+3. Verify in the console output logs are getting sent to log analytics
+
+## Step 5 - Run logstash as service
+
+1. Start logstash as service
+Logstash will use any configuration files you have in the logstash config directory, /etc/logstash/conf.d/ by default.
+```
+serivce logstash start
+```
+
+2. Verify the service is running
+```
+serivce logstash status
+```
+
+## Troubleshooting
+
+## Debug Logging
+You can turn on debug logging with logstash via different methods. The methods below will work when running logstash in interactive mode.
 
 1. Stop the logstash service first
 	```
@@ -95,5 +125,7 @@ Run logstash interactively to view console output
 	    }
 	    '
 	```
+
+
 
 
