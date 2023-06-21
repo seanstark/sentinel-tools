@@ -73,16 +73,18 @@ Run logstash interactively to view console output during testing to ensure logs 
 	service logstash stop
 	```
 
-2. Start logstash in interactive mode. (Specify the full path to the configuration file after -f)
+2. Start logstash in interactive mode.
+
+   (Specify the full path to the configuration file after -f)
 	```
 	/usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/sentinel.conf
 	```
 
-3. Verify in the console output logstash is listening on the defined local port and logs are getting sent to log analytics.
+4. Verify in the console output logstash is listening on the defined local port and logs are getting sent to log analytics.
 
    ![image](https://github.com/seanstark/sentinel-tools/assets/84108246/4878d36c-094a-4405-8607-776ccf3fa4e3)
 
-4. You can stop the interactive process by entering ctrl + C
+5. You can stop the interactive process by entering ctrl + C
 
 ## Step 5 - Run logstash as service
 
@@ -108,19 +110,21 @@ You can turn on debug logging with logstash via different methods. The methods b
 	service logstash stop
 	```
 
-2. Add the below your logstash configuration output section
+2. Add the below to your logstash configuration output section
 	``` ruby
 	stdout {
             codec => rubydebug{}
         }
 	```
 
-3. Start logstash in interactive moode. (Specify the full path to the configuration file after -f)
+3. Start logstash in interactive moode.
+   
+   (Specify the full path to the configuration file after -f)
 	```
 	/usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/sentinel.conf
 	```
 
-4. To enable further debug output, open another ssh sessions and run the below
+5. To enable further debug output, open another ssh sessions and run the below
 	``` 
 	curl -XPUT 'localhost:9600/_node/logging?pretty' -H 'Content-Type: application/json' -d'
 	    {
