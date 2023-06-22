@@ -3,12 +3,16 @@
 ## Step 1 - Deploy the Data Collection Rule
 Deploy the custom data collection rule in Azure
 
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fseanstark%2Fsentinel-tools%2Fmain%2Flogstash%2Flogstash-syslog-dcr.json)
+| Syslog |
+| ------ |
+| [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fseanstark%2Fsentinel-tools%2Fmain%2Flogstash%2Flogstash-syslog-dcr.json) |
 
 ## Step 2 - Create a logstash configuration file
 Default directory is /etc/logstash/conf.d/
 
 ### Logstash Configuration Example
+
+#### Syslog
 
 ``` ruby
 input {
