@@ -1,0 +1,10 @@
+AuditLogs
+| where OperationName in ('User changed default security info','User deleted security info','User registered all required security info', 'User registered security info')
+| where Result == "success"
+| extend userPrincipalName = parse_json(tostring(InitiatedBy.user)).userPrincipalName
+| extend IPAddress = tostring(parse_json(tostring(InitiatedBy.user)).ipAddress)
+| where userPrincipalName in (
+    (_GetWatchlist('watchlist') 
+    | project userPrincipalName)
+    )
+| project TimeGenerated, userPrincipalName, IPAddress, OperationName, ResultReason, LoggedByService, AdditionalDetails
