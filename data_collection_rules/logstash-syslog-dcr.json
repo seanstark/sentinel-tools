@@ -4,6 +4,7 @@
     "parameters": {
         "dataCollectionRuleName": {
             "type": "String",
+			"defaultValue": "logstash-sentinel",
             "metadata": {
                 "description": "Specify the name of the Data Collection Rule to create."
             }
@@ -28,7 +29,7 @@
             }
         },
         "transformKql": {
-            "defaultValue": "source | project TimeGenerated = ls_timestamp, EventTime = todatetime(timestamp), Computer = logsource, HostName = logsource, HostIP = host, SyslogMessage = message, Facility = facility_label, SeverityLevel = severity_label",
+            "defaultValue": "source | project TimeGenerated = ls_timestamp, HostName = hostname, Facility = facility, SeverityLevel = severity, SyslogMessage = message, ProcessID = pid, ProcessName = process, Computer = hostname, HostIP = ip, EventTime = timestamp, SourceSystem = service",
             "type": "String",
             "metadata": {
                 "description": "The KQL statement to transform the data on ingest. The TimeGenerated datetime field is required"
@@ -46,40 +47,44 @@
                 "streamDeclarations": {
                     "Custom-Microsoft-Syslog": {
                         "columns": [
-                            {
-                                "name": "TimeGenerated",
-                                "type": "datetime"
-                            },
-                            {
-                                "name": "RawData",
-                                "type": "string"
-                            },
 							{
 								"name": "ls_timestamp",
 								"type": "datetime"
 							},
 							{
-								"name": "timestamp",
-								"type": "datetime"
+								"name": "hostname",
+								"type": "string"
+							},
+							{
+								"name": "facility",
+								"type": "string"
+							},
+							{
+								"name": "severity",
+								"type": "string"
 							},
 							{
 								"name": "message",
 								"type": "string"
 							},
 							{
-								"name": "facility_label",
+								"name": "pid",
+								"type": "int"
+							},
+							{
+								"name": "process",
 								"type": "string"
 							},
 							{
-								"name": "severity_label",
+								"name": "ip",
 								"type": "string"
 							},
 							{
-								"name": "host",
-								"type": "string"
+								"name": "timestamp",
+								"type": "datetime"
 							},
 							{
-								"name": "logsource",
+								"name": "service",
 								"type": "string"
 							}
 						]

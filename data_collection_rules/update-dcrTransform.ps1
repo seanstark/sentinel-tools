@@ -11,11 +11,17 @@
  .PARAMETER ruleName
     Specify the data collection rule name
 
-.PARAMETER apiVersion
-    Optionally you can specify the api version to use for Microsoft.Insights/dataCollectionRules
+.PARAMETER streamName
+    The stream declaration name to update.
+
+.PARAMETER outputStream
+    The outputStream name, the table name
 
 .PARAMETER transformKql
     Specify the KQL transform statement in a single line
+
+.PARAMETER apiVersion
+    Optionally you can specify the api version to use for Microsoft.Insights/dataCollectionRules
 
  .EXAMPLE
     .\update-dcrTransform.ps1 -subscriptionId 'ada078449-375e-4210-be3a-c6cacebf41c5' -resourceGroup 'sentinel-dcrs' -ruleName 'windows-events' -transformKql 'source | extend TimeGenerated = todatetime(parse_json(RawData).timestamp) | extend SyslogMessage = RawData"'
@@ -34,11 +40,14 @@ param(
     [Parameter(Mandatory=$true)]
     [string]$streamName,
 
-    [Parameter(Mandatory=$false)]
-    [string]$apiVersion = '2022-06-01',
-
     [Parameter(Mandatory=$true)]
-    [string]$transformKql
+    [string]$outputStream,
+    
+    [Parameter(Mandatory=$true)]
+    [string]$transformKql,
+
+    [Parameter(Mandatory=$false)]
+    [string]$apiVersion = '2022-06-01'
 )
 
 $requiredModules = 'Az.Accounts'
@@ -63,7 +72,8 @@ If ($dcr.properties.dataFlows | where streams -eq $streamName){
     If (($dcr.properties.dataFlows | where streams -eq $streamName).transformKql){
         ($dcr.properties.dataFlows | where streams -eq $streamName).transformKql = $transformKql
     }else{
-        ($dcr.properties.dataFlows | where streams -eq $streamName).dataFlows | Add-Member -MemberType NoteProperty -Name 'transformKql' -Value $transformKql -Force
+        ($dcr.properties.dataFlows | where streams -eq $streamName) | Add-Member -MemberType NoteProperty -Name 'transformKql' -Value $transformKql -Force
+        ($dcr.properties.dataFlows | where streams -eq $streamName) | Add-Member -MemberType NoteProperty -Name 'outputStream' -Value $outputStream -Force
     }
 }
 
