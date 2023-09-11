@@ -12,5 +12,5 @@ $msgraph = Get-AzureADServicePrincipal -Filter "AppId eq '00000003-0000-0000-c00
 $permission = $msgraph.AppRoles | where Value -Like 'SecurityAlert.Read.All' | Select-Object -First 1
 
 $msi = Get-AzureADServicePrincipal -ObjectId <app object id>
-New-AzureADServiceAppRoleAssignment -Id $permission.Id -ObjectId $msi.ObjectId -PrincipalId $msi.ObjectId -ResourceId $defenderApp.ObjectId
+New-AzureADServiceAppRoleAssignment -Id $permission.Id -ObjectId $msi.ObjectId -PrincipalId $msi.ObjectId -ResourceId $msgraph.ObjectId
 ```
