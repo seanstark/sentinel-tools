@@ -1,0 +1,172 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "metadata": {
+        "title": "",
+        "description": "",
+        "prerequisites": "",
+    "postDeployment": [],
+    "prerequisitesDeployTemplateFile": "",
+    "lastUpdateTime": "",
+"entities": [],
+"tags": [],
+"support": {
+"tier": "community",
+"armtemplate": "Generated from https://github.com/Azure/Azure-Sentinel/tree/master/Tools/Playbook-ARM-Template-Generator"
+},
+"author": {
+"name": ""
+}
+},
+"parameters": {
+"PlaybookName": {
+"defaultValue": "get-incident-chatgpt4",
+"type": "string"
+}
+},
+"variables": {
+"MicrosoftSentinelConnectionName": "[concat('MicrosoftSentinel-', parameters('PlaybookName'))]",
+"Openaigpt4ipConnectionName": "[concat('Openaigpt4ip-', parameters('PlaybookName'))]"
+},
+"resources": [
+{
+"properties": {
+    "provisioningState": "Succeeded",
+    "state": "Enabled",
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "contentVersion": "1.0.0.0",
+        "parameters": {
+            "$connections": {
+            "defaultValue": {},
+            "type": "Object"
+        }
+    },
+    "triggers": {
+        "Microsoft_Sentinel_incident": {
+            "type": "ApiConnectionWebhook",
+            "inputs": {
+                "body": {
+                    "callback_url": "@{listCallbackUrl()}"
+                },
+                "host": {
+                    "connection": {
+                        "name": "@parameters('$connections')['azuresentinel']['connectionId']"
+                    }
+                },
+                "path": "/incident-creation"
+            }
+        }
+    },
+    "actions": {
+        "For_each": {
+            "foreach": "@triggerBody()?['object']?['properties']?['Alerts']",
+            "actions": {
+                "Create_completion_-_OpenAI": {
+                    "runAfter": {
+                        "Defender_365_-_Get_Incident": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "ApiConnection",
+                    "inputs": {
+                        "body": {
+                            "model": "text-davinci-003"
+                        },
+                        "host": {
+                            "connection": {
+                                "name": "@parameters('$connections')['openaigpt4ip']['connectionId']"
+                            }
+                        },
+                        "method": "post",
+                        "path": "/v1/completions"
+                    }
+                },
+                "Defender_365_-_Get_Incident": {
+                "runAfter": {},
+                "type": "Http",
+                "inputs": {
+                    "authentication": {
+                        "audience": "https://graph.microsoft.com",
+                        "type": "ManagedServiceIdentity"
+                    },
+                    "method": "GET",
+                    "uri": "https://graph.microsoft.com/v1.0/security/alerts_v2/@{last(split(first(split(items('For_each')?['properties']?['alertLink'],'?tid')),'/'))}"
+                }
+            }
+        },
+    "runAfter": {},
+    "type": "Foreach"
+}
+},
+"outputs": {}
+},
+"parameters": {
+"$connections": {
+"value": {
+"azuresentinel": {
+    "connectionId": "[resourceId('Microsoft.Web/connections', variables('MicrosoftSentinelConnectionName'))]",
+    "connectionName": "[variables('MicrosoftSentinelConnectionName')]",
+    "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Azuresentinel')]",
+    "connectionProperties": {
+        "authentication": {
+            "type": "ManagedServiceIdentity"
+        }
+    }
+},
+"openaigpt4ip": {
+    "connectionId": "[resourceId('Microsoft.Web/connections', variables('Openaigpt4ipConnectionName'))]",
+    "connectionName": "[variables('Openaigpt4ipConnectionName')]",
+    "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Openaigpt4ip')]"
+}
+}
+}
+}
+},
+"name": "[parameters('PlaybookName')]",
+"type": "Microsoft.Logic/workflows",
+"location": "[resourceGroup().location]",
+"tags": {
+"hidden-SentinelTemplateName": "get-incident-chatgpt4",
+"hidden-SentinelTemplateVersion": "1.0"
+},
+"identity": {
+"type": "SystemAssigned"
+},
+"apiVersion": "2017-07-01",
+"dependsOn": [
+"[resourceId('Microsoft.Web/connections', variables('MicrosoftSentinelConnectionName'))]",
+"[resourceId('Microsoft.Web/connections', variables('Openaigpt4ipConnectionName'))]"
+]
+},
+{
+"type": "Microsoft.Web/connections",
+"apiVersion": "2016-06-01",
+"name": "[variables('MicrosoftSentinelConnectionName')]",
+"location": "[resourceGroup().location]",
+"kind": "V1",
+"properties": {
+"displayName": "[variables('MicrosoftSentinelConnectionName')]",
+"customParameterValues": {},
+"parameterValueType": "Alternative",
+"api": {
+"id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Azuresentinel')]"
+}
+}
+},
+{
+"type": "Microsoft.Web/connections",
+"apiVersion": "2016-06-01",
+"name": "[variables('Openaigpt4ipConnectionName')]",
+"location": "[resourceGroup().location]",
+"kind": "V1",
+"properties": {
+"displayName": "[variables('Openaigpt4ipConnectionName')]",
+"customParameterValues": {},
+"api": {
+"id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Openaigpt4ip')]"
+}
+}
+}
+]
+}
