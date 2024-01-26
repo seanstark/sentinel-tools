@@ -1,0 +1,85 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0",
+    "parameters": {
+        "apikey": {
+            "defaultValue": "-NA-",
+            "minLength": 1,
+            "type": "SecureString"
+        },
+        "domainname": {
+            "defaultValue": "Enter Okta domainname value",
+            "minLength": 1,
+            "type": "String"
+        },
+        "connectorDefinitionName": {
+            "defaultValue": "Okta Single Sign-On (Preview)",
+            "minLength": 1,
+            "type": "String"
+        },
+        "workspace": {
+            "defaultValue": "Sentinel Workspace Name",
+            "type": "String"
+        },
+		"dataCollectionEndpoint": {
+            "defaultValue": "Data Collection Endpoint name (found via the DCR Overview Page)",
+            "type": "String"
+        },
+		"dataCollectionRuleImmutableId": {
+            "defaultValue": "DCR immutableId (found via the JSON view on the DCR)",
+            "type": "String"
+        }
+    },
+    "variables": {
+        "_dataConnectorContentIdConnections2": "OktaSSOv2Connections",
+        "_oktaDomainHostName": "[first(split(parameters('domainname'), '.'))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.OperationalInsights/workspaces/providers/dataConnectors",
+            "apiVersion": "2023-02-01-preview",
+            "name": "[concat(parameters('workspace'), /Microsoft.SecurityInsights/OktaDCV1_2_', variables('_oktaDomainHostName'))]",
+            "location": "westus2",
+            "kind": "RestApiPoller",
+            "properties": {
+                "connectorDefinitionName": "OktaSSOv2",
+                "dcrConfig": {
+                    "dataCollectionEndpoint": "[parameters('dataCollectionEndpoint')]",
+                    "dataCollectionRuleImmutableId": "[parameters('dataCollectionRuleImmutableId')]",
+                    "streamName": "Custom-OktaSSO_CL"
+                },
+                "dataType": "Okta System Log API",
+                "response": {
+                    "eventsJsonPaths": [
+                        "$"
+                    ],
+                    "format": "json"
+                },
+                "paging": {
+                    "pagingType": "LinkHeader"
+                },
+                "auth": {
+                    "apiKeyName": "Authorization",
+                    "ApiKey": "[parameters('apikey')]",
+                    "apiKeyIdentifier": "SSWS",
+                    "type": "APIKey"
+                },
+                "request": {
+                    "apiEndpoint": "[concat('https://', parameters('domainname'), '/api/v1/logs')]",
+                    "rateLimitQPS": 10,
+                    "queryWindowInMin": 5,
+                    "httpMethod": "GET",
+                    "retryCount": 3,
+                    "timeoutInSeconds": 60,
+                    "headers": {
+                        "Accept": "application/json",
+                        "User-Agent": "Scuba"
+                    },
+                    "startTimeAttributeName": "since",
+                    "endTimeAttributeName": "until"
+                },
+                "isActive": true
+            }
+        }
+    ]
+}
