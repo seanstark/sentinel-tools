@@ -16,11 +16,11 @@
             "defaultValue": "Sentinel Workspace Name",
             "type": "String"
         },
-		"dataCollectionEndpoint": {
+        "dataCollectionEndpoint": {
             "defaultValue": "Data Collection Endpoint name (found via the DCR Overview Page)",
             "type": "String"
         },
-		"dataCollectionRuleImmutableId": {
+        "dataCollectionRuleImmutableId": {
             "defaultValue": "DCR immutableId (found via the JSON view on the DCR)",
             "type": "String"
         }
