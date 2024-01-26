@@ -12,11 +12,6 @@
             "minLength": 1,
             "type": "String"
         },
-        "connectorDefinitionName": {
-            "defaultValue": "Okta Single Sign-On (Preview)",
-            "minLength": 1,
-            "type": "String"
-        },
         "workspace": {
             "defaultValue": "Sentinel Workspace Name",
             "type": "String"
