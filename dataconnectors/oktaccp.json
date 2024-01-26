@@ -33,7 +33,7 @@
         {
             "type": "Microsoft.OperationalInsights/workspaces/providers/dataConnectors",
             "apiVersion": "2023-02-01-preview",
-            "name": "[concat(parameters('workspace'), /Microsoft.SecurityInsights/OktaDCV1_2_', variables('_oktaDomainHostName'))]",
+            "name": "[concat(parameters('workspace'), '/Microsoft.SecurityInsights/OktaDCV1_2_', variables('_oktaDomainHostName'))]",
             "location": "westus2",
             "kind": "RestApiPoller",
             "properties": {
