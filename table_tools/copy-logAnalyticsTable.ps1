@@ -21,7 +21,7 @@
     Specify the apiVersion to use, not required
 
  .EXAMPLE
-    Update Azure Virtual Machines to a specific version
+    Create a new log analytics table from an existing one
     .\copy-logAnalyticsTable.ps1 -sourceTableName 'Okta_CL' -newTableName 'Okta_AppTeam_CL' -subscriptionID 'ada06dd8-375e-4210-be3a-c6cdde3341c5' -resourceGroupName 'sentinel' -workspaceName 'sentinel-prd'
 #>
 
