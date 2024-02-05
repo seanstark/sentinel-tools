@@ -44,7 +44,7 @@
                     "streamName": "Custom-OktaSSO_CL"
                 },
                  "addOnAttributes": {
-                  "InstanceName": "[parameters('domainname')]"
+                  "Domain": "[parameters('domainname')]"
                 },
                 "dataType": "Okta System Log API",
                 "response": {
