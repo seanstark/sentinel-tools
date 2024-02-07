@@ -6,7 +6,7 @@
             "defaultValue": "githubauditlogs",
             "type": "String"
         },
-		"eventHubName": {
+        "eventHubName": {
             "defaultValue": "githubauditlogs",
             "type": "String"
         }
