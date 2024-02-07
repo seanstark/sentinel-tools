@@ -21,8 +21,8 @@
             "name": "[variables('_eventHubNamespace')]",
             "location": "East US",
             "sku": {
-                "name": "Basic",
-                "tier": "Basic",
+                "name": "Standard",
+                "tier": "Standard",
                 "capacity": 1
             },
             "properties": {
@@ -88,10 +88,10 @@
         {
             "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationrules",
             "apiVersion": "2023-01-01-preview",
-            "name": "[concat(variables('_eventHubNamespace'), '/githubauditloghub/GithubSendPolicy')]",
+            "name": "[concat(variables('_eventHubNamespace'), '/', parameters('eventHubName'), '/', parameters('eventHubName'), 'Send')]",
             "location": "eastus",
             "dependsOn": [
-                "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('_eventHubNamespace'), 'githubauditloghub')]",
+                "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('_eventHubNamespace'), parameters('eventHubName'))]",
                 "[resourceId('Microsoft.EventHub/namespaces', variables('_eventHubNamespace'))]"
             ],
             "properties": {
@@ -103,10 +103,10 @@
         {
             "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
             "apiVersion": "2023-01-01-preview",
-            "name": "[concat(variables('_eventHubNamespace'), '/githubauditloghub/$Default')]",
+            "name": "[concat(variables('_eventHubNamespace'), '/', parameters('eventHubName'), '/$Default')]",
             "location": "eastus",
             "dependsOn": [
-                "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('_eventHubNamespace'), 'githubauditloghub')]",
+                "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('_eventHubNamespace'), parameters('eventHubName'))]",
                 "[resourceId('Microsoft.EventHub/namespaces', variables('_eventHubNamespace'))]"
             ],
             "properties": {}
