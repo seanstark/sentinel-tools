@@ -1,0 +1,115 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "eventHubNamespace": {
+            "defaultValue": "githubauditlogs",
+            "type": "String"
+        },
+		"eventHubName": {
+            "defaultValue": "githubauditlogs",
+            "type": "String"
+        }
+    },
+    "variables": {
+        "_eventHubNamespace": "[concat(parameters('eventHubNamespace'), '-', uniqueString(parameters('eventHubNamespace')))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.EventHub/namespaces",
+            "apiVersion": "2023-01-01-preview",
+            "name": "[variables('_eventHubNamespace')]",
+            "location": "East US",
+            "sku": {
+                "name": "Basic",
+                "tier": "Basic",
+                "capacity": 1
+            },
+            "properties": {
+                "minimumTlsVersion": "1.2",
+                "publicNetworkAccess": "Enabled",
+                "disableLocalAuth": false,
+                "zoneRedundant": true,
+                "isAutoInflateEnabled": false,
+                "maximumThroughputUnits": 0,
+                "kafkaEnabled": false
+            }
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/authorizationrules",
+            "apiVersion": "2023-01-01-preview",
+            "name": "[concat(variables('_eventHubNamespace'), '/RootManageSharedAccessKey')]",
+            "location": "eastus",
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces', variables('_eventHubNamespace'))]"
+            ],
+            "properties": {
+                "rights": [
+                    "Listen",
+                    "Manage",
+                    "Send"
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/eventhubs",
+            "apiVersion": "2023-01-01-preview",
+            "name": "[concat(variables('_eventHubNamespace'), '/', parameters('eventHubName'))]",
+            "location": "eastus",
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces', variables('_eventHubNamespace'))]"
+            ],
+            "properties": {
+                "retentionDescription": {
+                    "cleanupPolicy": "Delete",
+                    "retentionTimeInHours": 1
+                },
+                "messageRetentionInDays": 1,
+                "partitionCount": 2,
+                "status": "Active"
+            }
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/networkrulesets",
+            "apiVersion": "2023-01-01-preview",
+            "name": "[concat(variables('_eventHubNamespace'), '/default')]",
+            "location": "eastus",
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces', variables('_eventHubNamespace'))]"
+            ],
+            "properties": {
+                "publicNetworkAccess": "Enabled",
+                "defaultAction": "Allow",
+                "virtualNetworkRules": [],
+                "ipRules": [],
+                "trustedServiceAccessEnabled": false
+            }
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationrules",
+            "apiVersion": "2023-01-01-preview",
+            "name": "[concat(variables('_eventHubNamespace'), '/githubauditloghub/GithubSendPolicy')]",
+            "location": "eastus",
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('_eventHubNamespace'), 'githubauditloghub')]",
+                "[resourceId('Microsoft.EventHub/namespaces', variables('_eventHubNamespace'))]"
+            ],
+            "properties": {
+                "rights": [
+                    "Send"
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
+            "apiVersion": "2023-01-01-preview",
+            "name": "[concat(variables('_eventHubNamespace'), '/githubauditloghub/$Default')]",
+            "location": "eastus",
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('_eventHubNamespace'), 'githubauditloghub')]",
+                "[resourceId('Microsoft.EventHub/namespaces', variables('_eventHubNamespace'))]"
+            ],
+            "properties": {}
+        }
+    ]
+}
