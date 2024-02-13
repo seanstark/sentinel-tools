@@ -45,3 +45,5 @@ To send events from Azure Event Hubs to Sentinel you wil require the below
    
    ![image](https://github.com/seanstark/sentinel-tools/assets/84108246/6d2a63d3-bfa1-4824-826d-7053648ff9bc)
 
+## Step 4 - Verify Logs
+1. After Step 1 - 3 are completed you should see events hitting your Event Hub Namespace and logs in your log analytics workspace
