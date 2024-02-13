@@ -21,14 +21,14 @@ This solution will ingest audit logs from GitHub Enterprise for all organization
    ![image](https://github.com/seanstark/sentinel-tools/assets/84108246/a5c4d65a-67a6-4c69-9f61-1ae04b2f3a1b)
 
 ## Step 3 - Create a GitHub Personal Access Token
-You will need a GitHub personal access token to enable polling for the Enterprise audit log. You need to use a classic token; you must be an enterprise admin and you must use an access token with the **read:audit_log** scope
+You will need a GitHub personal access token to enable polling for the Enterprise audit log. You need to use a **classic token**; you must be an enterprise admin and you must use an access token with the **read:audit_log** scope
 
 1. In the upper-right corner of any page, click your profile photo, then click **Settings**
 2. In the left sidebar, click **Developer settings**
 3. In the left sidebar, click **Personal access tokens** > **Tokens (classic)**
 4. Click **Generate new token (classic)**
 5. Give the token a name and add the **read:audit_log** scope
-6. Copy the access token to safe location
+6. Copy the access token to a safe location
 
 ## Step 4 - Configure the Sentinel Data Connector
 1. From Microsoft Sentinel navigate to **Data Connectors**
