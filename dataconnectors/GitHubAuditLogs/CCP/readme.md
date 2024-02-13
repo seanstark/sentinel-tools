@@ -1,3 +1,11 @@
+# GitHub Enterprise Audit Logs Sentinel CCP
+
+- [Solution Overview](#solution-overview)
+  * [Step 1 - Deploy the Data Connector](#step-1---deploy-the-data-connector)
+  * [Step 2 - Configure GitHub Enterprise](#step-2---configure-github-enterprise)
+  * [Step 3 - Create a GitHub Personal Access Token](#step-3---create-a-github-personal-access-token)
+  * [Step 4 - Configure the Sentinel Data Connector](#step-4---configure-the-sentinel-data-connector)
+
 # Solution Overview
 This solution will ingest audit logs from GitHub Enterprise for all organizations to Microsoft Sentinel using the Codeless Connector Platform data connector. The data will end up in the GitHubEntAuditLogPolling_CL table.
 
