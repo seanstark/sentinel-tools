@@ -17,5 +17,5 @@ You will need a GitHub personal access token to enable polling for the Enterpris
 ## Step 3 - Configure the Sentinel Data Connector
 1. From Microsoft Sentinel navigate to **Data Connectors**
 2. You should see a **GitHub Enterprise Audit Log (Preview)** data connector, click ***Open connector page**
-3. Enter your enterprise name and GitHub personal access token in the API Key field. Click Connect
+3. Enter your **enterprise name** and **GitHub personal access token** in the **API Key** field. Click **Connect**
 4. Generally the intial data will show up in the **GitHubEntAuditLogPolling_CL** table around 20 minutes after the data connector is configured
