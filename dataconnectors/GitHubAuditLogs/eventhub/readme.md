@@ -1,3 +1,4 @@
+## ⚠️ Work In Progress, not ready yet
 
 ## Solution Overview
 This solution will stream [audit logs](https://docs.github.com/en/enterprise-cloud@latest/admin/monitoring-activity-in-your-enterprise/reviewing-audit-logs-for-your-enterprise/about-the-audit-log-for-your-enterprise) from GitHub Enterprise for all organizations to an Azure Event Hub. Events that are sent to the Event Hub will then be ingested to the Microsoft Sentinel workspace via the method documented here - [Ingest events from Azure Event Hubs into Azure Monitor Logs](https://learn.microsoft.com/en-us/azure/azure-monitor/logs/ingest-logs-event-hub)
