@@ -2,121 +2,124 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "eventHubNamespace": {
-            "defaultValue": "githubauditlogs",
-            "type": "String"
-        },
         "eventHubName": {
             "defaultValue": "githubauditlogs",
             "type": "String"
         },
-		"location": {
-      		"type": "string",
-      		"defaultValue": "[resourceGroup().location]",
-      		"metadata": {
-        		"description": "Location for all resources."
-      	}
-    }
-    },
-    "variables": {
-        "_eventHubNamespace": "[concat(parameters('eventHubNamespace'), '-', uniqueString(parameters('eventHubNamespace')))]"
+        "eventHubNamespace": {
+            "defaultValue": "githubauditlogs",
+            "type": "String"
+        },
+        "eventHubLocation": {
+            "defaultValue": "westus3",
+            "metadata": {
+                "description": "Location for the Event Hub. Must be a supported region https://learn.microsoft.com/en-us/azure/azure-monitor/logs/ingest-logs-event-hub#supported-regions "
+            },
+            "type": "string"
+        }
     },
     "resources": [
         {
-            "type": "Microsoft.EventHub/namespaces",
             "apiVersion": "2023-01-01-preview",
+            "location": "[parameters('eventHubLocation')]",
             "name": "[variables('_eventHubNamespace')]",
-            "location": "[parameters('location')]",
-            "sku": {
-                "name": "Standard",
-                "tier": "Standard",
-                "capacity": 1
-            },
             "properties": {
+                "disableLocalAuth": false,
+                "isAutoInflateEnabled": false,
+                "kafkaEnabled": false,
+                "maximumThroughputUnits": 0,
                 "minimumTlsVersion": "1.2",
                 "publicNetworkAccess": "Enabled",
-                "disableLocalAuth": false,
-                "zoneRedundant": true,
-                "isAutoInflateEnabled": false,
-                "maximumThroughputUnits": 0,
-                "kafkaEnabled": false
-            }
+                "zoneRedundant": true
+            },
+            "sku": {
+                "capacity": 1,
+                "name": "Standard",
+                "tier": "Standard"
+            },
+            "type": "Microsoft.EventHub/namespaces"
         },
         {
-            "type": "Microsoft.EventHub/namespaces/authorizationrules",
             "apiVersion": "2023-01-01-preview",
-            "name": "[concat(variables('_eventHubNamespace'), '/RootManageSharedAccessKey')]",
-            "location": "eastus",
             "dependsOn": [
                 "[resourceId('Microsoft.EventHub/namespaces', variables('_eventHubNamespace'))]"
             ],
+            "location": "[parameters('eventHubLocation')]",
+            "name": "[concat(variables('_eventHubNamespace'), '/RootManageSharedAccessKey')]",
             "properties": {
                 "rights": [
                     "Listen",
                     "Manage",
                     "Send"
                 ]
-            }
+            },
+            "type": "Microsoft.EventHub/namespaces/authorizationrules"
         },
         {
-            "type": "Microsoft.EventHub/namespaces/eventhubs",
             "apiVersion": "2023-01-01-preview",
-            "name": "[concat(variables('_eventHubNamespace'), '/', parameters('eventHubName'))]",
-            "location": "eastus",
             "dependsOn": [
                 "[resourceId('Microsoft.EventHub/namespaces', variables('_eventHubNamespace'))]"
             ],
+            "location": "[parameters('eventHubLocation')]",
+            "name": "[concat(variables('_eventHubNamespace'), '/', parameters('eventHubName'))]",
             "properties": {
+                "messageRetentionInDays": 1,
+                "partitionCount": 2,
                 "retentionDescription": {
                     "cleanupPolicy": "Delete",
                     "retentionTimeInHours": 1
                 },
-                "messageRetentionInDays": 1,
-                "partitionCount": 2,
                 "status": "Active"
-            }
+            },
+            "type": "Microsoft.EventHub/namespaces/eventhubs"
         },
         {
-            "type": "Microsoft.EventHub/namespaces/networkrulesets",
             "apiVersion": "2023-01-01-preview",
-            "name": "[concat(variables('_eventHubNamespace'), '/default')]",
-            "location": "eastus",
             "dependsOn": [
                 "[resourceId('Microsoft.EventHub/namespaces', variables('_eventHubNamespace'))]"
             ],
+            "location": "[parameters('eventHubLocation')]",
+            "name": "[concat(variables('_eventHubNamespace'), '/default')]",
             "properties": {
-                "publicNetworkAccess": "Enabled",
                 "defaultAction": "Allow",
-                "virtualNetworkRules": [],
-                "ipRules": [],
-                "trustedServiceAccessEnabled": false
-            }
+                "ipRules": [
+                ],
+                "publicNetworkAccess": "Enabled",
+                "trustedServiceAccessEnabled": false,
+                "virtualNetworkRules": [
+                ]
+            },
+            "type": "Microsoft.EventHub/namespaces/networkrulesets"
         },
         {
-            "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationrules",
             "apiVersion": "2023-01-01-preview",
-            "name": "[concat(variables('_eventHubNamespace'), '/', parameters('eventHubName'), '/', parameters('eventHubName'), 'Send')]",
-            "location": "eastus",
             "dependsOn": [
                 "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('_eventHubNamespace'), parameters('eventHubName'))]",
                 "[resourceId('Microsoft.EventHub/namespaces', variables('_eventHubNamespace'))]"
             ],
+            "location": "[parameters('eventHubLocation')]",
+            "name": "[concat(variables('_eventHubNamespace'), '/', parameters('eventHubName'), '/', parameters('eventHubName'), 'Send')]",
             "properties": {
                 "rights": [
                     "Send"
                 ]
-            }
+            },
+            "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationrules"
         },
         {
-            "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
             "apiVersion": "2023-01-01-preview",
-            "name": "[concat(variables('_eventHubNamespace'), '/', parameters('eventHubName'), '/$Default')]",
-            "location": "eastus",
             "dependsOn": [
                 "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('_eventHubNamespace'), parameters('eventHubName'))]",
                 "[resourceId('Microsoft.EventHub/namespaces', variables('_eventHubNamespace'))]"
             ],
-            "properties": {}
+            "location": "[parameters('eventHubLocation')]",
+            "name": "[concat(variables('_eventHubNamespace'), '/', parameters('eventHubName'), '/$Default')]",
+            "properties": {
+            },
+            "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups"
         }
-    ]
+    ],
+    "variables": {
+        "_eventHubNamespace": "[concat(parameters('eventHubNamespace'), '-', uniqueString(parameters('eventHubNamespace')))]"
+    }
 }
