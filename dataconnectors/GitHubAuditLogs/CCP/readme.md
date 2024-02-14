@@ -8,6 +8,7 @@
 
 # Solution Overview
 This solution will ingest audit logs from GitHub Enterprise for all organizations to Microsoft Sentinel using the Codeless Connector Platform data connector. The data will end up in the **GitHubEntAuditLogPolling_CL** table.
+> ⚠️ If you are using IP Restrictions in GitHub you will need to whitelist the CIDR ranges for CCP under the **SCUBA** tag here - [Home Page - Azure IP Ranges](https://azureipranges.azurewebsites.net/)
 
 ## Step 1 - Deploy the Data Connector
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fseanstark%2Fsentinel-tools%2Fmain%2Fdataconnectors%2FGitHubAuditLogs%2FCCP%2FGitHubAuditLogs_CCP.json)
