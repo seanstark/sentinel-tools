@@ -1,6 +1,9 @@
 
 # Microsoft Sentinel Defender for Cloud Data Connector At Scale
 
+> ℹ️ This solution is no longer needed. Defender for Cloud is now integrated into the Defender XDR at the tenant level. You can integrate Defender XDR with Sentinel to sync all alerts and incidents.
+> See [Microsoft Defender for Cloud in Microsoft Defender XDR](https://learn.microsoft.com/en-us/microsoft-365/security/defender/microsoft-365-security-center-defender-cloud?view=o365-worldwide)
+
 This workflow will enable the Microsoft Defender for Cloud data connector in Microsoft Sentinel automatically for all subscriptions you have the logic app scoped to. The solution also provides the ability to:
 
 - Exclude Subscriptions
