@@ -29,7 +29,10 @@ You will need a GitHub personal access token to enable polling for the Enterpris
 3. In the left sidebar, click **Personal access tokens** > **Tokens (classic)**
 4. Click **Generate new token (classic)**
 5. Give the token a name and add the **read:audit_log** scope
-6. Copy the access token to a safe location
+   
+![image](https://github.com/seanstark/sentinel-tools/assets/84108246/d47009fa-a54e-420e-b84b-36fee737d702)
+
+7. Copy the access token to a safe location
 
 ## Step 4 - Configure the Sentinel Data Connector
 1. From Microsoft Sentinel navigate to **Data Connectors**
