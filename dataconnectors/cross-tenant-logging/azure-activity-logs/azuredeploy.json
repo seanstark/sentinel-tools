@@ -26,55 +26,64 @@
             "metadata": {
                 "description": "Enter value for diagnosticsSettingsName"
             },
-            "type": "string"
+            "type": "string",
+			"defaultValue": "send-to-sentinel"
         },
         "logCategoryAdministrative": {
             "metadata": {
                 "description": "Enter value for logCategoryAdministrative"
             },
-            "type": "string"
+            "type": "bool",
+			"defaultValue": true
         },
         "logCategoryAlert": {
             "metadata": {
                 "description": "Enter value for logCategoryAlert"
             },
-            "type": "string"
+            "type": "bool",
+			"defaultValue": true
         },
         "logCategoryAutoscale": {
             "metadata": {
                 "description": "Enter value for logCategoryAutoscale"
             },
-            "type": "string"
+            "type": "bool",
+			"defaultValue": true
         },
         "logCategoryPolicy": {
             "metadata": {
                 "description": "Enter value for logCategoryPolicy"
             },
-            "type": "string"
+            "type": "bool",
+			"defaultValue": true
         },
         "logCategoryRecommendation": {
             "metadata": {
                 "description": "Enter value for logCategoryRecommendation"
             },
-            "type": "string"
+            "type": "bool",
+			"defaultValue": true
         },
         "logCategoryResourceHealth": {
             "metadata": {
                 "description": "Enter value for logCategoryResourceHealth"
             },
-            "type": "string"
+            "type": "bool",
+			"defaultValue": true
         },
         "logCategorySecurity": {
             "metadata": {
                 "description": "Enter value for logCategorySecurity"
             },
-            "type": "string"
+            "type": "bool",
+			"defaultValue": true
         },
         "logCategoryServiceHealth": {
             "metadata": {
                 "description": "Enter value for logCategoryServiceHealth"
             },
-            "type": "string"
+            "type": "bool",
+			"defaultValue": true
         },
         "PlaybookName": {
             "defaultValue": "configure-azure-activity-logging",
@@ -82,7 +91,7 @@
         },
         "workspaceResourceId": {
             "metadata": {
-                "description": "Enter value for workspaceResourceId"
+                "description": "The full resourceID of the log analytics workspace"
             },
             "type": "string"
         }
