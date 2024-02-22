@@ -5,10 +5,13 @@
 - [Step 4 - Test The Logic App](#step-4-test-the-logic-app)
 
 # Solution Overview
-This solution will configure cross-tenant logging of Azure Activity Logs to a centralized log analytics in a primary tenant's workspace using Azure Lighthouse. 
+This solution will configure cross-tenant logging of Azure Activity Logs to a centralized log analytics in a primary tenant's workspace using Azure Lighthouse. The overall steps are to deploy the logic app in the tenant hosting the log analytics workspace and then deploy an Azure Lighthouse delegation to all other tenants to allow the logic app to create the logging profile. 
 
 # Step 1 - Deploy the Logic App
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https%3A%2F%2Fraw.githubusercontent.com%2Fseanstark%2Fsentinel-tools%2Fmain%2Fdataconnectors%2Fcross-tenant-logging%2Fazure-activity-logs%2Fazuredeploy.json)
+
+1. Deploy this in the tenant hosting the log analytics workspace
+   
+> [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https%3A%2F%2Fraw.githubusercontent.com%2Fseanstark%2Fsentinel-tools%2Fmain%2Fdataconnectors%2Fcross-tenant-logging%2Fazure-activity-logs%2Fazuredeploy.json)
 
 > ⚠️ Make you specify the full log analytics workspace resource id. Example: /subscriptions/\<subscriptionId\>/resourcegroups/\<resourceGroupName\>/providers/microsoft.operationalinsights/workspaces/\<workspaceName\>
 
