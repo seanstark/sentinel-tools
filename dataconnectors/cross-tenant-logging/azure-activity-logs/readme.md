@@ -17,3 +17,22 @@ Configure cross-tenant logging of Azure Activity Logs to centralized log analyti
 8. Select **Save**
 
 # Step 2 - Configure Azure Lighthouse
+1. From the Azure Portal navigate to **Azure Lighthouse**
+2. Select **Manage your customers**
+3. Select **Create ARM Template**
+4. Enter a **name** for the Azure Lighthouse offer (Sentinel Cross Tenant Logging)
+5. Enter a **description** (Configures Cross Tenant Logging of Azure resource provider logs to Sentinel)
+6. For the **Delegate scope** select **Subscription**
+7. Click Add Authorization
+8. Select **Service principal** and select the **system assigned managed identity of the logic app**
+
+>![image](https://github.com/seanstark/sentinel-tools/assets/84108246/4e47777a-13d7-4d06-a7ff-97775ff13fa6)
+
+9. Select the **Monitoring Contributor** role
+10. Select **Permanent** for the Access Type
+
+>![image](https://github.com/seanstark/sentinel-tools/assets/84108246/ea5b5988-6272-4bdf-9192-dab9cf64a067)
+
+11. Click **Add**
+12. Click **View Template**
+13. Next deploy the ARM template to your other Tenant Subscriptions
