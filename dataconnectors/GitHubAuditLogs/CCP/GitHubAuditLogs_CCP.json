@@ -119,7 +119,7 @@
 				"timeoutInSeconds": 60,
 				"headers": {
 					"Accept": "application/json",
-					"User-Agent": "Scuba"
+					"X-GitHub-Api-Version": "2022-11-28"
 				},
 				"queryParameters": {
 					"phrase": "created:{_QueryWindowStartTime}..{_QueryWindowEndTime}"
