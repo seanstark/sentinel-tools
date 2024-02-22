@@ -1,112 +1,100 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
-    "metadata": {
-        "author": {
-            "name": ""
-        },
-        "description": "",
-        "entities": [
-        ],
-        "lastUpdateTime": "",
-        "postDeployment": [
-        ],
-        "prerequisites": "",
-        "prerequisitesDeployTemplateFile": "",
-        "support": {
-            "armtemplate": "Generated from https://github.com/Azure/Azure-Sentinel/tree/master/Tools/Playbook-ARM-Template-Generator",
-            "tier": "community"
-        },
-        "tags": [
-        ],
-        "title": ""
-    },
     "parameters": {
         "diagnosticsSettingsName": {
+            "defaultValue": "send-to-sentinel",
+            "type": "String",
             "metadata": {
                 "description": "Enter value for diagnosticsSettingsName"
-            },
-            "type": "string",
-			"defaultValue": "send-to-sentinel"
+            }
         },
         "logCategoryAdministrative": {
+            "defaultValue": true,
+            "type": "Bool",
             "metadata": {
                 "description": "Enter value for logCategoryAdministrative"
-            },
-            "type": "bool",
-			"defaultValue": true
+            }
         },
         "logCategoryAlert": {
+            "defaultValue": true,
+            "type": "Bool",
             "metadata": {
                 "description": "Enter value for logCategoryAlert"
-            },
-            "type": "bool",
-			"defaultValue": true
+            }
         },
         "logCategoryAutoscale": {
+            "defaultValue": true,
+            "type": "Bool",
             "metadata": {
                 "description": "Enter value for logCategoryAutoscale"
-            },
-            "type": "bool",
-			"defaultValue": true
+            }
         },
         "logCategoryPolicy": {
+            "defaultValue": true,
+            "type": "Bool",
             "metadata": {
                 "description": "Enter value for logCategoryPolicy"
-            },
-            "type": "bool",
-			"defaultValue": true
+            }
         },
         "logCategoryRecommendation": {
+            "defaultValue": true,
+            "type": "Bool",
             "metadata": {
                 "description": "Enter value for logCategoryRecommendation"
-            },
-            "type": "bool",
-			"defaultValue": true
+            }
         },
         "logCategoryResourceHealth": {
+            "defaultValue": true,
+            "type": "Bool",
             "metadata": {
                 "description": "Enter value for logCategoryResourceHealth"
-            },
-            "type": "bool",
-			"defaultValue": true
+            }
         },
         "logCategorySecurity": {
+            "defaultValue": true,
+            "type": "Bool",
             "metadata": {
                 "description": "Enter value for logCategorySecurity"
-            },
-            "type": "bool",
-			"defaultValue": true
+            }
         },
         "logCategoryServiceHealth": {
+            "defaultValue": true,
+            "type": "Bool",
             "metadata": {
                 "description": "Enter value for logCategoryServiceHealth"
-            },
-            "type": "bool",
-			"defaultValue": true
+            }
         },
         "PlaybookName": {
             "defaultValue": "configure-azure-activity-logging",
-            "type": "string"
+            "type": "String"
         },
         "workspaceResourceId": {
+            "type": "String",
             "metadata": {
                 "description": "The full resourceID of the log analytics workspace"
-            },
-            "type": "string"
+            }
         }
+    },
+    "variables": {
+        "ArmConnectionName": "[concat('Arm-', parameters('PlaybookName'))]"
     },
     "resources": [
         {
+            "type": "Microsoft.Logic/workflows",
             "apiVersion": "2017-07-01",
+            "name": "[parameters('PlaybookName')]",
+            "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.Web/connections', variables('ArmConnectionName'))]"
             ],
+            "tags": {
+                "hidden-SentinelTemplateName": "configure-cross-tenant-logging",
+                "hidden-SentinelTemplateVersion": "1.0"
+            },
             "identity": {
                 "type": "SystemAssigned"
             },
-            "location": "[resourceGroup().location]",
-            "name": "[parameters('PlaybookName')]",
             "properties": {
                 "definition": {
                     "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
@@ -171,8 +159,7 @@
                                         },
                                         "uri": "https://management.azure.com/subscriptions/@{items('For_each_Subscription_-_Configure_Azure_Activity_Logs')?['subscriptionId']}/providers/microsoft.insights/diagnosticSettings/@{parameters('diagnosticsSettingsName')}"
                                     },
-                                    "runAfter": {
-                                    },
+                                    "runAfter": {},
                                     "type": "Http"
                                 }
                             },
@@ -197,18 +184,15 @@
                                     "x-ms-api-version": "2016-06-01"
                                 }
                             },
-                            "runAfter": {
-                            },
+                            "runAfter": {},
                             "type": "ApiConnection"
                         }
                     },
                     "contentVersion": "1.0.0.0",
-                    "outputs": {
-                    },
+                    "outputs": {},
                     "parameters": {
                         "$connections": {
-                            "defaultValue": {
-                            },
+                            "defaultValue": {},
                             "type": "Object"
                         },
                         "diagnosticsSettingsName": {
@@ -217,35 +201,35 @@
                         },
                         "logCategoryAdministrative": {
                             "defaultValue": "[parameters('logCategoryAdministrative')]",
-                            "type": "string"
+                            "type": "bool"
                         },
                         "logCategoryAlert": {
                             "defaultValue": "[parameters('logCategoryAlert')]",
-                            "type": "string"
+                            "type": "bool"
                         },
                         "logCategoryAutoscale": {
                             "defaultValue": "[parameters('logCategoryAutoscale')]",
-                            "type": "string"
+                            "type": "bool"
                         },
                         "logCategoryPolicy": {
                             "defaultValue": "[parameters('logCategoryPolicy')]",
-                            "type": "string"
+                            "type": "bool"
                         },
                         "logCategoryRecommendation": {
                             "defaultValue": "[parameters('logCategoryRecommendation')]",
-                            "type": "string"
+                            "type": "bool"
                         },
                         "logCategoryResourceHealth": {
                             "defaultValue": "[parameters('logCategoryResourceHealth')]",
-                            "type": "string"
+                            "type": "bool"
                         },
                         "logCategorySecurity": {
                             "defaultValue": "[parameters('logCategorySecurity')]",
-                            "type": "string"
+                            "type": "bool"
                         },
                         "logCategoryServiceHealth": {
                             "defaultValue": "[parameters('logCategoryServiceHealth')]",
-                            "type": "string"
+                            "type": "bool"
                         },
                         "workspaceResourceId": {
                             "defaultValue": "[parameters('workspaceResourceId')]",
@@ -284,31 +268,22 @@
                 },
                 "provisioningState": "Succeeded",
                 "state": "Enabled"
-            },
-            "tags": {
-                "hidden-SentinelTemplateName": "configure-cross-tenant-logging",
-                "hidden-SentinelTemplateVersion": "1.0"
-            },
-            "type": "Microsoft.Logic/workflows"
+            }
         },
         {
+            "type": "Microsoft.Web/connections",
             "apiVersion": "2016-06-01",
-            "kind": "V1",
-            "location": "[resourceGroup().location]",
             "name": "[variables('ArmConnectionName')]",
+            "location": "[resourceGroup().location]",
+            "kind": "V1",
             "properties": {
                 "api": {
                     "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Arm')]"
                 },
-                "customParameterValues": {
-                },
+                "customParameterValues": {},
                 "displayName": "[variables('ArmConnectionName')]",
                 "parameterValueType": "Alternative"
-            },
-            "type": "Microsoft.Web/connections"
+            }
         }
-    ],
-    "variables": {
-        "ArmConnectionName": "[concat('Arm-', parameters('PlaybookName'))]"
-    }
+    ]
 }
