@@ -10,6 +10,8 @@ This solution will configure cross-tenant logging of Azure Activity Logs to a ce
 # Step 1 - Deploy the Logic App
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https%3A%2F%2Fraw.githubusercontent.com%2Fseanstark%2Fsentinel-tools%2Fmain%2Fdataconnectors%2Fcross-tenant-logging%2Fazure-activity-logs%2Fazuredeploy.json)
 
+> ⚠️ Make you specify the full log analytics workspace resource id. Example: /subscriptions/\<subscriptionId\>/resourcegroups/\<resourceGroupName\>/providers/microsoft.operationalinsights/workspaces/\<workspaceName\>
+
 # Step 2 - Configure the Logic App
 1. Navigate to **Logic App** > **Identity** Section
 2. Confirm a system assigned managed identity was created and **copy** the **Object (principal) ID**
