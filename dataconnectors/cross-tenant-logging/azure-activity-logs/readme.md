@@ -1,3 +1,5 @@
+# Azure Activity Logs Cross Tenant Logging
+
 - [Solution Overview](#solution-overview)
 - [Step 1 - Deploy the Logic App](#step-1-deploy-the-logic-app)
 - [Step 2 - Configure the Logic App](#step-2-configure-the-logic-app)
