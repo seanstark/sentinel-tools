@@ -1,0 +1,305 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "metadata": {
+        "author": {
+            "name": ""
+        },
+        "description": "",
+        "entities": [
+        ],
+        "lastUpdateTime": "",
+        "postDeployment": [
+        ],
+        "prerequisites": "",
+        "prerequisitesDeployTemplateFile": "",
+        "support": {
+            "armtemplate": "Generated from https://github.com/Azure/Azure-Sentinel/tree/master/Tools/Playbook-ARM-Template-Generator",
+            "tier": "community"
+        },
+        "tags": [
+        ],
+        "title": ""
+    },
+    "parameters": {
+        "diagnosticsSettingsName": {
+            "metadata": {
+                "description": "Enter value for diagnosticsSettingsName"
+            },
+            "type": "string"
+        },
+        "logCategoryAdministrative": {
+            "metadata": {
+                "description": "Enter value for logCategoryAdministrative"
+            },
+            "type": "string"
+        },
+        "logCategoryAlert": {
+            "metadata": {
+                "description": "Enter value for logCategoryAlert"
+            },
+            "type": "string"
+        },
+        "logCategoryAutoscale": {
+            "metadata": {
+                "description": "Enter value for logCategoryAutoscale"
+            },
+            "type": "string"
+        },
+        "logCategoryPolicy": {
+            "metadata": {
+                "description": "Enter value for logCategoryPolicy"
+            },
+            "type": "string"
+        },
+        "logCategoryRecommendation": {
+            "metadata": {
+                "description": "Enter value for logCategoryRecommendation"
+            },
+            "type": "string"
+        },
+        "logCategoryResourceHealth": {
+            "metadata": {
+                "description": "Enter value for logCategoryResourceHealth"
+            },
+            "type": "string"
+        },
+        "logCategorySecurity": {
+            "metadata": {
+                "description": "Enter value for logCategorySecurity"
+            },
+            "type": "string"
+        },
+        "logCategoryServiceHealth": {
+            "metadata": {
+                "description": "Enter value for logCategoryServiceHealth"
+            },
+            "type": "string"
+        },
+        "PlaybookName": {
+            "defaultValue": "configure-azure-activity-logging",
+            "type": "string"
+        },
+        "workspaceResourceId": {
+            "metadata": {
+                "description": "Enter value for workspaceResourceId"
+            },
+            "type": "string"
+        }
+    },
+    "resources": [
+        {
+            "apiVersion": "2017-07-01",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/connections', variables('ArmConnectionName'))]"
+            ],
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "location": "[resourceGroup().location]",
+            "name": "[parameters('PlaybookName')]",
+            "properties": {
+                "definition": {
+                    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+                    "actions": {
+                        "For_each_Subscription_-_Configure_Azure_Activity_Logs": {
+                            "actions": {
+                                "HTTP_-_Configure_Diagnostic_Settings": {
+                                    "inputs": {
+                                        "authentication": {
+                                            "type": "ManagedServiceIdentity"
+                                        },
+                                        "body": {
+                                            "properties": {
+                                                "logs": [
+                                                    {
+                                                        "category": "Administrative",
+                                                        "categoryGroup": null,
+                                                        "enabled": "@parameters('logCategoryAdministrative')"
+                                                    },
+                                                    {
+                                                        "category": "Security",
+                                                        "categoryGroup": null,
+                                                        "enabled": "@parameters('logCategorySecurity')"
+                                                    },
+                                                    {
+                                                        "category": "ServiceHealth",
+                                                        "categoryGroup": null,
+                                                        "enabled": "@parameters('logCategoryServiceHealth')"
+                                                    },
+                                                    {
+                                                        "category": "Alert",
+                                                        "categoryGroup": null,
+                                                        "enabled": "@parameters('logCategoryAlert')"
+                                                    },
+                                                    {
+                                                        "category": "Recommendation",
+                                                        "categoryGroup": null,
+                                                        "enabled": "@parameters('logCategoryRecommendation')"
+                                                    },
+                                                    {
+                                                        "category": "Policy",
+                                                        "categoryGroup": null,
+                                                        "enabled": "@parameters('logCategoryPolicy')"
+                                                    },
+                                                    {
+                                                        "category": "Autoscale",
+                                                        "categoryGroup": null,
+                                                        "enabled": "@parameters('logCategoryAutoscale')"
+                                                    },
+                                                    {
+                                                        "category": "ResourceHealth",
+                                                        "categoryGroup": null,
+                                                        "enabled": "@parameters('logCategoryResourceHealth')"
+                                                    }
+                                                ],
+                                                "workspaceId": "@{parameters('workspaceResourceId')}"
+                                            }
+                                        },
+                                        "method": "PUT",
+                                        "queries": {
+                                            "api-version": "2021-05-01-preview"
+                                        },
+                                        "uri": "https://management.azure.com/subscriptions/@{items('For_each_Subscription_-_Configure_Azure_Activity_Logs')?['subscriptionId']}/providers/microsoft.insights/diagnosticSettings/@{parameters('diagnosticsSettingsName')}"
+                                    },
+                                    "runAfter": {
+                                    },
+                                    "type": "Http"
+                                }
+                            },
+                            "foreach": "@body('List_subscriptions_-_All_Tenants')?['value']",
+                            "runAfter": {
+                                "List_subscriptions_-_All_Tenants": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Foreach"
+                        },
+                        "List_subscriptions_-_All_Tenants": {
+                            "inputs": {
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['arm']['connectionId']"
+                                    }
+                                },
+                                "method": "get",
+                                "path": "/subscriptions",
+                                "queries": {
+                                    "x-ms-api-version": "2016-06-01"
+                                }
+                            },
+                            "runAfter": {
+                            },
+                            "type": "ApiConnection"
+                        }
+                    },
+                    "contentVersion": "1.0.0.0",
+                    "outputs": {
+                    },
+                    "parameters": {
+                        "$connections": {
+                            "defaultValue": {
+                            },
+                            "type": "Object"
+                        },
+                        "diagnosticsSettingsName": {
+                            "defaultValue": "[parameters('diagnosticsSettingsName')]",
+                            "type": "string"
+                        },
+                        "logCategoryAdministrative": {
+                            "defaultValue": "[parameters('logCategoryAdministrative')]",
+                            "type": "string"
+                        },
+                        "logCategoryAlert": {
+                            "defaultValue": "[parameters('logCategoryAlert')]",
+                            "type": "string"
+                        },
+                        "logCategoryAutoscale": {
+                            "defaultValue": "[parameters('logCategoryAutoscale')]",
+                            "type": "string"
+                        },
+                        "logCategoryPolicy": {
+                            "defaultValue": "[parameters('logCategoryPolicy')]",
+                            "type": "string"
+                        },
+                        "logCategoryRecommendation": {
+                            "defaultValue": "[parameters('logCategoryRecommendation')]",
+                            "type": "string"
+                        },
+                        "logCategoryResourceHealth": {
+                            "defaultValue": "[parameters('logCategoryResourceHealth')]",
+                            "type": "string"
+                        },
+                        "logCategorySecurity": {
+                            "defaultValue": "[parameters('logCategorySecurity')]",
+                            "type": "string"
+                        },
+                        "logCategoryServiceHealth": {
+                            "defaultValue": "[parameters('logCategoryServiceHealth')]",
+                            "type": "string"
+                        },
+                        "workspaceResourceId": {
+                            "defaultValue": "[parameters('workspaceResourceId')]",
+                            "type": "string"
+                        }
+                    },
+                    "triggers": {
+                        "Recurrence": {
+                            "evaluatedRecurrence": {
+                                "frequency": "Day",
+                                "interval": 1
+                            },
+                            "recurrence": {
+                                "frequency": "Day",
+                                "interval": 1
+                            },
+                            "type": "Recurrence"
+                        }
+                    }
+                },
+                "parameters": {
+                    "$connections": {
+                        "value": {
+                            "arm": {
+                                "connectionId": "[resourceId('Microsoft.Web/connections', variables('ArmConnectionName'))]",
+                                "connectionName": "[variables('ArmConnectionName')]",
+                                "connectionProperties": {
+                                    "authentication": {
+                                        "type": "ManagedServiceIdentity"
+                                    }
+                                },
+                                "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Arm')]"
+                            }
+                        }
+                    }
+                },
+                "provisioningState": "Succeeded",
+                "state": "Enabled"
+            },
+            "tags": {
+                "hidden-SentinelTemplateName": "configure-cross-tenant-logging",
+                "hidden-SentinelTemplateVersion": "1.0"
+            },
+            "type": "Microsoft.Logic/workflows"
+        },
+        {
+            "apiVersion": "2016-06-01",
+            "kind": "V1",
+            "location": "[resourceGroup().location]",
+            "name": "[variables('ArmConnectionName')]",
+            "properties": {
+                "api": {
+                    "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Arm')]"
+                },
+                "customParameterValues": {
+                },
+                "displayName": "[variables('ArmConnectionName')]",
+                "parameterValueType": "Alternative"
+            },
+            "type": "Microsoft.Web/connections"
+        }
+    ],
+    "variables": {
+        "ArmConnectionName": "[concat('Arm-', parameters('PlaybookName'))]"
+    }
+}
