@@ -16,7 +16,7 @@ This solution will configure cross-tenant logging of Azure Activity Logs to a ce
 
 1. Deploy this in the tenant hosting the log analytics workspace
    
-[![Deploy to Azure](https://raw.githubusercontent.com/seanstark/sentinel-tools/main/dataconnectors/cross-tenant-logging/azure-activity-logs/azuredeploy.json)
+> [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https://raw.githubusercontent.com/seanstark/sentinel-tools/main/dataconnectors/cross-tenant-logging/azure-activity-logs/azuredeploy.json)
 
 > ⚠️ Make you specify the full log analytics workspace resource id. Example: /subscriptions/\<subscriptionId\>/resourcegroups/\<resourceGroupName\>/providers/microsoft.operationalinsights/workspaces/\<workspaceName\>
 
