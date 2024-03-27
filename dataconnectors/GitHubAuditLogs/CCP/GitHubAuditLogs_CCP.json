@@ -123,7 +123,8 @@
 					"user-agent": "scuba"
 				},
 				"queryParameters": {
-					"phrase": "created:{_QueryWindowStartTime}..{_QueryWindowEndTime}&include=all"
+					"phrase": "created:{_QueryWindowStartTime}..{_QueryWindowEndTime}&",
+					"include": "all"
 				}
 			},
 			"paging": {
