@@ -12,7 +12,7 @@ The Azure Activity logs currently only contain GUIDs of Azure RBAC roles and ide
 ### update-AzureRBACRolesWatchlist
 The update-AzureRBACRolesWatchlist logic gets current role defintions in your tenant and creates/updates a watchlist with role definitions.
 
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fseanstark%2Fsentinel-tools%2Fmain%2Fenable-sentinel-mdfc-sub-con%2FcustomRoleDeploy.json)
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fseanstark%2Fsentinel-tools%2Fmain%2FAzure%2520Activity%2Fazuredeploy-update-AzureRBACRolesWatchlist.json)
 
 ## KQL Queries
 
