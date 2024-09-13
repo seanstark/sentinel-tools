@@ -1,0 +1,18 @@
+AzureActivity
+| where OperationNameValue =~ 'MICROSOFT.AUTHORIZATION/ROLEASSIGNMENTS/WRITE'
+| where ActivityStatusValue =~ 'Success' and ActivitySubstatusValue =~ 'Created'
+| project TimeGenerated, Caller, CallerIpAddress, SubscriptionId, ResourceGroup, CorrelationId, ActivityStatusValue, ActivitySubstatusValue
+// Join AzureActivity start events to get role assignment details, these are not included in the Success event
+| join kind=leftouter (
+    AzureActivity
+    | where OperationNameValue =~ 'MICROSOFT.AUTHORIZATION/ROLEASSIGNMENTS/WRITE'
+    | where ActivityStatusValue =~ 'Start'
+    | project-away Caller, CallerIpAddress, SubscriptionId, ResourceGroup
+    )
+    on CorrelationId
+| project-away CorrelationId1, ActivityStatusValue1
+| extend AssignedPrincipalId = tostring(parse_json(tostring(parse_json(tostring(parse_json(Properties).requestbody)).Properties)).PrincipalId)
+| extend AssignedPrincipalType = tostring(parse_json(tostring(parse_json(tostring(parse_json(Properties).requestbody)).Properties)).PrincipalType)
+| extend RoleDefinitionId = split(tostring(parse_json(tostring(parse_json(tostring(parse_json(Properties).requestbody)).Properties)).RoleDefinitionId), '/')[-1]
+| extend Scope = tostring(parse_json(tostring(parse_json(tostring(parse_json(Properties).requestbody)).Properties)).Scope)
+| project TimeGenerated, Actor = Caller, CallerIpAddress, CorrelationId, SubscriptionId, ResourceGroup, AssignedPrincipalId, AssignedPrincipalType, RoleDefinitionId, Scope, Src = SourceSystem, OperationNameValue, ActivityStatusValue, ActivitySubstatusValue
