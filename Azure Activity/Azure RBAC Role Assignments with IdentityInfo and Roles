@@ -1,0 +1,30 @@
+AzureActivity
+| where OperationNameValue =~ 'MICROSOFT.AUTHORIZATION/ROLEASSIGNMENTS/WRITE'
+| where ActivityStatusValue =~ 'Success' and ActivitySubstatusValue =~ 'Created'
+| project TimeGenerated, Caller, CallerIpAddress, SubscriptionId, ResourceGroup, CorrelationId, ActivityStatusValue, ActivitySubstatusValue
+// Join AzureActivity start events to get role assignment details, these are not included in the Success event
+| join kind=leftouter (
+    AzureActivity
+    | where OperationNameValue =~ 'MICROSOFT.AUTHORIZATION/ROLEASSIGNMENTS/WRITE'
+    | where ActivityStatusValue =~ 'Start'
+    | project-away Caller, CallerIpAddress, SubscriptionId, ResourceGroup
+    )
+    on CorrelationId
+| project-away CorrelationId1, ActivityStatusValue1
+| extend AssignedPrincipalId = tostring(parse_json(tostring(parse_json(tostring(parse_json(Properties).requestbody)).Properties)).PrincipalId)
+| extend AssignedPrincipalType = tostring(parse_json(tostring(parse_json(tostring(parse_json(Properties).requestbody)).Properties)).PrincipalType)
+| extend RoleDefinitionId = tostring(split(tostring(parse_json(tostring(parse_json(tostring(parse_json(Properties).requestbody)).Properties)).RoleDefinitionId), '/')[-1])
+| extend Scope = tostring(parse_json(tostring(parse_json(tostring(parse_json(Properties).requestbody)).Properties)).Scope)
+// Join the IdentityInfo to get the assigned identity UPN
+| join kind=inner (
+    IdentityInfo
+    | where TimeGenerated >= ago(30d)
+    | project AssignedPrincipalTenantId = TenantId, AssignedPrincipalUPN = AccountUPN, AssignedPrincipalId = AccountObjectId
+    ) on AssignedPrincipalId
+| project-away AssignedPrincipalId1
+| join kind=inner (
+    _GetWatchlist('AzureRoles')
+    | extend RoleDefinitionId = tostring(RoleDefinitionId)
+    | project RoleDefinitionId, RoleName, RoleType, RoleDescription
+    ) on RoleDefinitionId
+| project TimeGenerated, Actor = Caller, CallerIpAddress, CorrelationId, SubscriptionId, ResourceGroup, AssignedPrincipalUPN, AssignedPrincipalId, AssignedPrincipalType, AssignedPrincipalTenantId, RoleName, RoleType, RoleDefinitionId, RoleDescription, Scope, Src = SourceSystem, OperationNameValue, ActivityStatusValue, ActivitySubstatusValue
