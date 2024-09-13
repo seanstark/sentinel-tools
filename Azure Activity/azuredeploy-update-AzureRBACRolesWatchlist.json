@@ -1,0 +1,308 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "metadata": {
+        "title": "",
+        "description": "",
+        "prerequisites": "",
+    "postDeployment": [],
+    "prerequisitesDeployTemplateFile": "",
+    "lastUpdateTime": "",
+"entities": [],
+"tags": [],
+"support": {
+"tier": "community",
+"armtemplate": "Generated from https://github.com/Azure/Azure-Sentinel/tree/master/Tools/Playbook-ARM-Template-Generator"
+},
+"author": {
+"name": ""
+}
+},
+"parameters": {
+"PlaybookName": {
+"defaultValue": "update-AzureRBACRolesWatchlist",
+"type": "string"
+},
+"Sentinel Resource Group": {
+"type": "String",
+"metadata": {
+    "description": "Enter value for Sentinel Resource Group"
+}
+},
+"Sentinel Subscription ID": {
+"type": "String",
+"metadata": {
+    "description": "Enter value for Sentinel Subscription ID"
+}
+},
+"Sentinel Workspace ID": {
+"type": "String",
+"metadata": {
+    "description": "Enter value for Sentinel Workspace ID"
+}
+}
+},
+"variables": {
+"MicrosoftSentinelConnectionName": "[concat('MicrosoftSentinel-', parameters('PlaybookName'))]"
+},
+"resources": [
+{
+"properties": {
+    "provisioningState": "Succeeded",
+    "state": "Enabled",
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "contentVersion": "1.0.0.0",
+        "parameters": {
+            "$connections": {
+            "defaultValue": {},
+            "type": "Object"
+        },
+        "Sentinel Resource Group": {
+            "type": "String",
+            "defaultValue": "[parameters('Sentinel Resource Group')]"
+        },
+        "Sentinel Subscription ID": {
+            "type": "String",
+            "defaultValue": "[parameters('Sentinel Subscription ID')]"
+        },
+        "Sentinel Workspace ID": {
+            "type": "String",
+            "defaultValue": "[parameters('Sentinel Workspace ID')]"
+        }
+    },
+    "triggers": {
+        "Recurrence": {
+            "recurrence": {
+                "frequency": "Day",
+                "interval": 1
+            },
+            "evaluatedRecurrence": {
+                "frequency": "Day",
+                "interval": 1
+            },
+            "type": "Recurrence"
+        }
+    },
+    "actions": {
+        "Create_CSV_table": {
+            "runAfter": {
+                "Parse_JSON": [
+                    "Succeeded"
+                ]
+            },
+            "type": "Table",
+            "inputs": {
+                "columns": [
+                    {
+                        "header": "RoleName",
+                        "value": "@item()?['properties']?['roleName']"
+                    },
+                    {
+                        "header": "RoleDefinitionId",
+                        "value": "@item()?['name']"
+                    },
+                    {
+                        "header": "RoleType",
+                        "value": "@item()?['properties']?['type']"
+                    },
+                    {
+                        "header": "RoleDescription",
+                        "value": "@item()?['properties']?['description']"
+                    }
+                ],
+                "format": "CSV",
+                "from": "@body('Parse_JSON')?['value']"
+            }
+        },
+        "Get_Azure_RBAC_Roles": {
+        "runAfter": {},
+        "type": "Http",
+        "inputs": {
+            "authentication": {
+                "type": "ManagedServiceIdentity"
+            },
+            "method": "GET",
+            "queries": {
+                "api-version": "2022-04-01",
+                "select": "roleName,name,type,description"
+            },
+            "uri": "https://management.azure.com/providers/Microsoft.Authorization/roleDefinitions"
+        },
+        "runtimeConfiguration": {
+            "contentTransfer": {
+                "transferMode": "Chunked"
+            }
+        }
+    },
+    "Parse_JSON": {
+        "runAfter": {
+            "Get_Azure_RBAC_Roles": [
+                "Succeeded"
+            ]
+        },
+        "type": "ParseJson",
+        "inputs": {
+            "content": "@body('Get_Azure_RBAC_Roles')",
+            "schema": {
+                "properties": {
+                    "value": {
+                        "items": {
+                            "properties": {
+                                "id": {
+                                    "type": "string"
+                                },
+                                "name": {
+                                    "type": "string"
+                                },
+                                "properties": {
+                                    "properties": {
+                                        "assignableScopes": {
+                                            "items": {
+                                                "type": "string"
+                                            },
+                                            "type": "array"
+                                        },
+                                    "createdBy": {},
+                                    "createdOn": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "permissions": {
+                                        "items": {
+                                            "properties": {
+                                                "actions": {
+                                                    "items": {
+                                                        "type": "string"
+                                                    },
+                                                    "type": "array"
+                                                },
+                                                "dataActions": {
+                                                    "type": "array"
+                                                },
+                                                "notActions": {
+                                                    "type": "array"
+                                                },
+                                                "notDataActions": {
+                                                    "type": "array"
+                                                }
+                                            },
+                                            "required": [
+                                                "actions",
+                                                "dataActions",
+                                                "notActions",
+                                                "notDataActions"
+                                            ],
+                                            "type": "object"
+                                        },
+                                        "type": "array"
+                                    },
+                                    "roleName": {
+                                        "type": "string"
+                                    },
+                                    "type": {
+                                        "type": "string"
+                                    },
+                                "updatedBy": {},
+                                "updatedOn": {
+                                    "type": "string"
+                                }
+                            },
+                            "type": "object"
+                        },
+                        "type": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "id",
+                        "name",
+                        "properties",
+                        "type"
+                    ],
+                    "type": "object"
+                },
+                "type": "array"
+            }
+        },
+        "type": "object"
+    }
+}
+},
+"Watchlists_-_Create_a_new_Watchlist": {
+"runAfter": {
+    "Create_CSV_table": [
+        "Succeeded"
+    ]
+},
+"type": "ApiConnection",
+"inputs": {
+    "body": {
+        "description": "Azure RBAC Definitions",
+        "displayName": "Azure Role Definitions",
+        "itemsSearchKey": "RoleDefinitionId",
+        "rawContent": "@{body('Create_CSV_table')}"
+    },
+    "host": {
+        "connection": {
+            "name": "@parameters('$connections')['azuresentinel']['connectionId']"
+        }
+    },
+    "method": "put",
+    "path": "/Watchlists/subscriptions/@{encodeURIComponent(parameters('Sentinel Subscription ID'))}/resourceGroups/@{encodeURIComponent(parameters('Sentinel Resource Group'))}/workspaces/@{encodeURIComponent(parameters('Sentinel Workspace ID'))}/watchlists/@{encodeURIComponent('AzureRoles')}"
+}
+}
+},
+"outputs": {}
+},
+"parameters": {
+"$connections": {
+"value": {
+"azuresentinel": {
+"connectionId": "[resourceId('Microsoft.Web/connections', variables('MicrosoftSentinelConnectionName'))]",
+"connectionName": "[variables('MicrosoftSentinelConnectionName')]",
+"id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Azuresentinel')]",
+"connectionProperties": {
+    "authentication": {
+        "type": "ManagedServiceIdentity"
+    }
+}
+}
+}
+}
+}
+},
+"name": "[parameters('PlaybookName')]",
+"type": "Microsoft.Logic/workflows",
+"location": "[resourceGroup().location]",
+"tags": {
+"hidden-SentinelTemplateName": "update-AzureRBACRolesWatchlist",
+"hidden-SentinelTemplateVersion": "1.0"
+},
+"identity": {
+"type": "SystemAssigned"
+},
+"apiVersion": "2017-07-01",
+"dependsOn": [
+"[resourceId('Microsoft.Web/connections', variables('MicrosoftSentinelConnectionName'))]"
+]
+},
+{
+"type": "Microsoft.Web/connections",
+"apiVersion": "2016-06-01",
+"name": "[variables('MicrosoftSentinelConnectionName')]",
+"location": "[resourceGroup().location]",
+"kind": "V1",
+"properties": {
+"displayName": "[variables('MicrosoftSentinelConnectionName')]",
+"customParameterValues": {},
+"parameterValueType": "Alternative",
+"api": {
+"id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Azuresentinel')]"
+}
+}
+}
+]
+}
