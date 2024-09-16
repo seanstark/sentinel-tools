@@ -10,8 +10,7 @@ The Azure Activity logs currently only contain GUIDs of Azure RBAC roles and ide
 ## Data Enrichment
 
 ### update-AzureRBACRolesWatchlist
-The update-AzureRBACRolesWatchlist logic gets current role defintions in your tenant and creates/updates a watchlist with role definitions.
-
+The update-AzureRBACRolesWatchlist logic apps gets current role defintions in your tenant and creates/updates a watchlist with role definitions.
 > The logic app will run once a day by default
 
 1. [<img src="https://aka.ms/deploytoazurebutton" width=12% height=12%>](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fseanstark%2Fsentinel-tools%2Fmain%2FAzure%2520Activity%2Fazuredeploy-update-AzureRBACRolesWatchlist.json)
