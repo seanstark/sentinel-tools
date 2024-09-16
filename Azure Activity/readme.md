@@ -22,6 +22,6 @@ The update-AzureRBACRolesWatchlist logic gets current role defintions in your te
 
 | Query | Description |
 |---|---|
-| [Azure RBAC Role Assignments](/Azure%20RBAC%20Role%20Assignments.kql)| Gets Azure RBAC role changes |
+| [Azure RBAC Role Assignments](./Azure%20RBAC%20Role%20Assignments.kql)| Gets Azure RBAC role changes |
 | Azure RBAC Role Assignments with IdentityInfo | Gets Azure RBAC role changes and assigned identity information from the IdentityInfo table. Requires UEBA |
 | Azure RBAC Role Assignments with IdentityInfo and Roles | Gets Azure RBAC role changes, assigned identity information from the IdentityInfo table and role information from the AzureRoles watchlist. Requires UEBA and the logic app |
