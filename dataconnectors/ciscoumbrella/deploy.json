@@ -1,0 +1,223 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "description": "Deploys a Log Analytics custom table (CiscoUmbrellaDNS_CL), a Data Collection Endpoint, and a Data Collection Rule that collects JSON log files (Custom JSON Logs) from VMs running the Azure Monitor Agent. Schema based on the Azure-Sentinel CiscoUmbrellaDNS_table.json."
+  },
+  "parameters": {
+    "workspaceName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the existing Log Analytics workspace (in this resource group) that will host the custom table and receive the data."
+      }
+    },
+    "dataCollectionEndpointName": {
+      "type": "string",
+      "defaultValue": "dce-cisco-umbrella-dns",
+      "metadata": {
+        "description": "Name of the Data Collection Endpoint to create. A DCE is required for Custom JSON Logs collection via the Azure Monitor Agent."
+      }
+    },
+    "dataCollectionRuleName": {
+      "type": "string",
+      "defaultValue": "dcr-cisco-umbrella-dns-json",
+      "metadata": {
+        "description": "Name of the Data Collection Rule to create."
+      }
+    },
+    "filePatterns": {
+      "type": "array",
+      "defaultValue": [
+        "C:\\CiscoUmbrella\\dns\\*.json",
+        "/var/log/ciscoumbrella/dns/*.json"
+      ],
+      "metadata": {
+        "description": "One or more file patterns identifying the JSON (JSONL/NDJSON) log files on the agent machine. Wildcards are allowed in the file name and the first-level folder above it only."
+      }
+    }
+  },
+  "variables": {
+    "tableName": "CiscoUmbrellaDNS_CL",
+    "streamName": "Custom-CiscoUmbrellaDNS_CL"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.OperationalInsights/workspaces/tables",
+      "apiVersion": "2022-10-01",
+      "name": "[format('{0}/{1}', parameters('workspaceName'), variables('tableName'))]",
+      "properties": {
+        "schema": {
+          "name": "[variables('tableName')]",
+          "description": "The Cisco Secure Access DNS logs show your organization's traffic through the Secure Access DNS resolvers.",
+          "columns": [
+            { "name": "TimeGenerated", "type": "datetime", "description": "The time the record was generated." },
+            { "name": "Timestamp", "type": "string", "description": "The date and time of the DNS event, expressed as a UTC-formatted string." },
+            { "name": "MostGranularIdentity", "type": "string", "description": "The first identity matched with this request in order of granularity." },
+            { "name": "Identities", "type": "string", "description": "All identities associated with this request." },
+            { "name": "InternalIp", "type": "string", "description": "The internal IP address that made the request." },
+            { "name": "ExternalIp", "type": "string", "description": "The external IP address that made the request." },
+            { "name": "Action", "type": "string", "description": "Whether the request was allowed or blocked." },
+            { "name": "QueryType", "type": "string", "description": "The type of DNS request that was made." },
+            { "name": "ResponseCode", "type": "string", "description": "The DNS return code for this request." },
+            { "name": "Domain", "type": "string", "description": "The domain that was requested." },
+            { "name": "Categories", "type": "string", "description": "The security or content categories that the destination matches." },
+            { "name": "MostGranularIdentityType", "type": "string", "description": "The first identity type matched with this request in order of granularity." },
+            { "name": "IdentityTypes", "type": "string", "description": "The type of identity that made the request, for example: Roaming Computer, Network." },
+            { "name": "BlockedCategories", "type": "string", "description": "The categories that resulted in the destination being blocked." },
+            { "name": "RuleId", "type": "string", "description": "The ID of the access rule when the DNS request is matched by a policy." },
+            { "name": "DestinationCountries", "type": "string", "description": "The two-character country identifier of the domain that was requested." },
+            { "name": "OrganizationId", "type": "string", "description": "The Secure Access organization ID." }
+          ]
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "deployCiscoUmbrellaDnsDcrDce",
+      "dependsOn": [
+        "[resourceId('Microsoft.OperationalInsights/workspaces/tables', parameters('workspaceName'), variables('tableName'))]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "parameters": {
+          "location": {
+            "value": "[reference(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName')), '2022-10-01', 'Full').location]"
+          },
+          "workspaceResourceId": {
+            "value": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]"
+          },
+          "dataCollectionEndpointName": {
+            "value": "[parameters('dataCollectionEndpointName')]"
+          },
+          "dataCollectionRuleName": {
+            "value": "[parameters('dataCollectionRuleName')]"
+          },
+          "filePatterns": {
+            "value": "[parameters('filePatterns')]"
+          },
+          "streamName": {
+            "value": "[variables('streamName')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "parameters": {
+            "location": { "type": "string" },
+            "workspaceResourceId": { "type": "string" },
+            "dataCollectionEndpointName": { "type": "string" },
+            "dataCollectionRuleName": { "type": "string" },
+            "filePatterns": { "type": "array" },
+            "streamName": { "type": "string" }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Insights/dataCollectionEndpoints",
+              "apiVersion": "2023-03-11",
+              "name": "[parameters('dataCollectionEndpointName')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "networkAcls": {
+                  "publicNetworkAccess": "Enabled"
+                }
+              }
+            },
+            {
+              "type": "Microsoft.Insights/dataCollectionRules",
+              "apiVersion": "2023-03-11",
+              "name": "[parameters('dataCollectionRuleName')]",
+              "location": "[parameters('location')]",
+              "kind": "Linux",
+              "dependsOn": [
+                "[resourceId('Microsoft.Insights/dataCollectionEndpoints', parameters('dataCollectionEndpointName'))]"
+              ],
+              "properties": {
+                "dataCollectionEndpointId": "[resourceId('Microsoft.Insights/dataCollectionEndpoints', parameters('dataCollectionEndpointName'))]",
+                "streamDeclarations": {
+                  "Custom-CiscoUmbrellaDNS_CL": {
+                    "columns": [
+                      { "name": "TimeGenerated", "type": "datetime" },
+                      { "name": "Timestamp", "type": "string" },
+                      { "name": "Most_Granular_Identity", "type": "string" },
+                      { "name": "Identities", "type": "string" },
+                      { "name": "Internal_IP", "type": "string" },
+                      { "name": "External_IP", "type": "string" },
+                      { "name": "Action", "type": "string" },
+                      { "name": "Query_Type", "type": "string" },
+                      { "name": "Response_Code", "type": "string" },
+                      { "name": "Domain", "type": "string" },
+                      { "name": "Categories", "type": "string" },
+                      { "name": "Most_Granular_Identity_Type", "type": "string" },
+                      { "name": "Identity_Types", "type": "string" },
+                      { "name": "Blocked_Categories", "type": "string" },
+                      { "name": "Rule_ID", "type": "string" },
+                      { "name": "Destination_Countries", "type": "string" },
+                      { "name": "Organization_ID", "type": "string" }
+                    ]
+                  }
+                },
+                "dataSources": {
+                  "logFiles": [
+                    {
+                      "name": "ciscoUmbrellaDnsJson",
+                      "streams": [ "[parameters('streamName')]" ],
+                      "filePatterns": "[parameters('filePatterns')]",
+                      "format": "json"
+                    }
+                  ]
+                },
+                "destinations": {
+                  "logAnalytics": [
+                    {
+                      "name": "clv2ws1",
+                      "workspaceResourceId": "[parameters('workspaceResourceId')]"
+                    }
+                  ]
+                },
+                "dataFlows": [
+                  {
+                    "streams": [ "[parameters('streamName')]" ],
+                    "destinations": [ "clv2ws1" ],
+                    "outputStream": "[parameters('streamName')]",
+                    "transformKql": "source | extend TimeGenerated = todatetime(tostring(Timestamp)) , MostGranularIdentity = ['Most_Granular_Identity'] , InternalIp = ['Internal_IP'] , ExternalIp = ['External_IP'] , QueryType = ['Query_Type'] , ResponseCode = ['Response_Code'] , MostGranularIdentityType = ['Most_Granular_Identity_Type'] , IdentityTypes = ['Identity_Types'] , BlockedCategories = ['Blocked_Categories'] , RuleId = ['Rule_ID'] , DestinationCountries = ['Destination_Countries'] , OrganizationId = ['Organization_ID'] | project TimeGenerated , Timestamp , MostGranularIdentity , Identities , InternalIp , ExternalIp , Action , QueryType , ResponseCode , Domain , Categories , MostGranularIdentityType , IdentityTypes , BlockedCategories , RuleId , DestinationCountries , OrganizationId"                  }
+                ]
+              }
+            }
+          ],
+          "outputs": {
+            "dataCollectionRuleId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Insights/dataCollectionRules', parameters('dataCollectionRuleName'))]"
+            },
+            "dataCollectionEndpointId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Insights/dataCollectionEndpoints', parameters('dataCollectionEndpointName'))]"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "tableName": {
+      "type": "string",
+      "value": "[variables('tableName')]"
+    },
+    "streamName": {
+      "type": "string",
+      "value": "[variables('streamName')]"
+    },
+    "dataCollectionRuleId": {
+      "type": "string",
+      "value": "[reference('deployCiscoUmbrellaDnsDcrDce').outputs.dataCollectionRuleId.value]"
+    },
+    "dataCollectionEndpointId": {
+      "type": "string",
+      "value": "[reference('deployCiscoUmbrellaDnsDcrDce').outputs.dataCollectionEndpointId.value]"
+    }
+  }
+}
