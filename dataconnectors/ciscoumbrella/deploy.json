@@ -28,7 +28,6 @@
     "filePatterns": {
       "type": "array",
       "defaultValue": [
-        "C:\\CiscoUmbrella\\dns\\*.json",
         "/var/log/ciscoumbrella/dns/*.json"
       ],
       "metadata": {
@@ -50,23 +49,31 @@
           "name": "[variables('tableName')]",
           "description": "The Cisco Secure Access DNS logs show your organization's traffic through the Secure Access DNS resolvers.",
           "columns": [
-            { "name": "TimeGenerated", "type": "datetime", "description": "The time the record was generated." },
-            { "name": "Timestamp", "type": "string", "description": "The date and time of the DNS event, expressed as a UTC-formatted string." },
-            { "name": "MostGranularIdentity", "type": "string", "description": "The first identity matched with this request in order of granularity." },
-            { "name": "Identities", "type": "string", "description": "All identities associated with this request." },
+            { "name": "TimeGenerated", "type": "datetime", "description": "The time the record was generated (derived from the event timestamp)." },
+            { "name": "Timestamp", "type": "long", "description": "The event time as a Unix epoch value in milliseconds." },
+            { "name": "EventDate", "type": "string", "description": "The date of the DNS event (UTC)." },
+            { "name": "EventTime", "type": "string", "description": "The time of the DNS event (UTC)." },
+            { "name": "EventType", "type": "string", "description": "The type of event, for example: dns." },
+            { "name": "Verdict", "type": "string", "description": "Whether the request was allowed or blocked." },
+            { "name": "ReturnCode", "type": "int", "description": "The DNS return code for this request." },
+            { "name": "Domain", "type": "string", "description": "The domain that was requested." },
+            { "name": "QueryType", "type": "string", "description": "The type of DNS request that was made." },
             { "name": "InternalIp", "type": "string", "description": "The internal IP address that made the request." },
             { "name": "ExternalIp", "type": "string", "description": "The external IP address that made the request." },
-            { "name": "Action", "type": "string", "description": "Whether the request was allowed or blocked." },
-            { "name": "QueryType", "type": "string", "description": "The type of DNS request that was made." },
-            { "name": "ResponseCode", "type": "string", "description": "The DNS return code for this request." },
-            { "name": "Domain", "type": "string", "description": "The domain that was requested." },
-            { "name": "Categories", "type": "string", "description": "The security or content categories that the destination matches." },
-            { "name": "MostGranularIdentityType", "type": "string", "description": "The first identity type matched with this request in order of granularity." },
-            { "name": "IdentityTypes", "type": "string", "description": "The type of identity that made the request, for example: Roaming Computer, Network." },
-            { "name": "BlockedCategories", "type": "string", "description": "The categories that resulted in the destination being blocked." },
             { "name": "RuleId", "type": "string", "description": "The ID of the access rule when the DNS request is matched by a policy." },
-            { "name": "DestinationCountries", "type": "string", "description": "The two-character country identifier of the domain that was requested." },
-            { "name": "OrganizationId", "type": "string", "description": "The Secure Access organization ID." }
+            { "name": "RuleLabel", "type": "string", "description": "The label of the access rule that matched the request." },
+            { "name": "RuleTrafficType", "type": "string", "description": "The traffic type associated with the matched access rule." },
+            { "name": "DeviceId", "type": "string", "description": "The identifier of the device that made the request." },
+            { "name": "Identities", "type": "dynamic", "description": "All identities associated with this request." },
+            { "name": "Categories", "type": "dynamic", "description": "The security or content categories that the destination matches." },
+            { "name": "PolicyCategories", "type": "dynamic", "description": "The categories matched by policy for this request." },
+            { "name": "AllApplications", "type": "dynamic", "description": "All applications associated with this request." },
+            { "name": "AllowedApplications", "type": "dynamic", "description": "Applications that were allowed for this request." },
+            { "name": "BlockedApplications", "type": "dynamic", "description": "Applications that were blocked for this request." },
+            { "name": "DestinationCountries", "type": "dynamic", "description": "The countries of the requested destination." },
+            { "name": "DestinationCountryCodes", "type": "dynamic", "description": "The two-character country codes of the requested destination." },
+            { "name": "DestinationContinents", "type": "dynamic", "description": "The continents of the requested destination." },
+            { "name": "Threats", "type": "dynamic", "description": "The threats associated with this request." }
           ]
         }
       }
@@ -140,23 +147,28 @@
                 "streamDeclarations": {
                   "Custom-CiscoUmbrellaDNS_CL": {
                     "columns": [
-                      { "name": "TimeGenerated", "type": "datetime" },
-                      { "name": "Timestamp", "type": "string" },
-                      { "name": "Most_Granular_Identity", "type": "string" },
-                      { "name": "Identities", "type": "string" },
-                      { "name": "Internal_IP", "type": "string" },
-                      { "name": "External_IP", "type": "string" },
-                      { "name": "Action", "type": "string" },
-                      { "name": "Query_Type", "type": "string" },
-                      { "name": "Response_Code", "type": "string" },
-                      { "name": "Domain", "type": "string" },
-                      { "name": "Categories", "type": "string" },
-                      { "name": "Most_Granular_Identity_Type", "type": "string" },
-                      { "name": "Identity_Types", "type": "string" },
-                      { "name": "Blocked_Categories", "type": "string" },
-                      { "name": "Rule_ID", "type": "string" },
-                      { "name": "Destination_Countries", "type": "string" },
-                      { "name": "Organization_ID", "type": "string" }
+                      { "name": "returncode", "type": "int" },
+                      { "name": "externalip", "type": "string" },
+                      { "name": "allapplications", "type": "dynamic" },
+                      { "name": "date", "type": "string" },
+                      { "name": "internalip", "type": "string" },
+                      { "name": "destinationcountries", "type": "dynamic" },
+                      { "name": "rule", "type": "dynamic" },
+                      { "name": "time", "type": "string" },
+                      { "name": "querytype", "type": "string" },
+                      { "name": "policycategories", "type": "dynamic" },
+                      { "name": "type", "type": "string" },
+                      { "name": "destinationcontinents", "type": "dynamic" },
+                      { "name": "categories", "type": "dynamic" },
+                      { "name": "destinationcountrycodes", "type": "dynamic" },
+                      { "name": "verdict", "type": "string" },
+                      { "name": "device", "type": "dynamic" },
+                      { "name": "domain", "type": "string" },
+                      { "name": "timestamp", "type": "long" },
+                      { "name": "blockedapplications", "type": "dynamic" },
+                      { "name": "allowedapplications", "type": "dynamic" },
+                      { "name": "identities", "type": "dynamic" },
+                      { "name": "threats", "type": "dynamic" }
                     ]
                   }
                 },
@@ -183,7 +195,7 @@
                     "streams": [ "[parameters('streamName')]" ],
                     "destinations": [ "clv2ws1" ],
                     "outputStream": "[parameters('streamName')]",
-                    "transformKql": "source | extend TimeGenerated = todatetime(tostring(Timestamp)) , MostGranularIdentity = ['Most_Granular_Identity'] , InternalIp = ['Internal_IP'] , ExternalIp = ['External_IP'] , QueryType = ['Query_Type'] , ResponseCode = ['Response_Code'] , MostGranularIdentityType = ['Most_Granular_Identity_Type'] , IdentityTypes = ['Identity_Types'] , BlockedCategories = ['Blocked_Categories'] , RuleId = ['Rule_ID'] , DestinationCountries = ['Destination_Countries'] , OrganizationId = ['Organization_ID'] | project TimeGenerated , Timestamp , MostGranularIdentity , Identities , InternalIp , ExternalIp , Action , QueryType , ResponseCode , Domain , Categories , MostGranularIdentityType , IdentityTypes , BlockedCategories , RuleId , DestinationCountries , OrganizationId"                  }
+                    "transformKql": "source | extend TimeGenerated = todatetime(datetime(1970-01-01) + tolong(['timestamp']) * 1ms) , Timestamp = tolong(['timestamp']) , EventDate = tostring(['date']) , EventTime = tostring(['time']) , EventType = tostring(['type']) , Verdict = tostring(verdict) , ReturnCode = toint(returncode) , Domain = tostring(domain) , QueryType = tostring(querytype) , InternalIp = tostring(internalip) , ExternalIp = tostring(externalip) , RuleId = tostring(['rule'].id) , RuleLabel = tostring(['rule'].label) , RuleTrafficType = tostring(['rule'].traffictype) , DeviceId = tostring(device.id) , Identities = todynamic(identities) , Categories = todynamic(categories) , PolicyCategories = todynamic(policycategories) , AllApplications = todynamic(allapplications) , AllowedApplications = todynamic(allowedapplications) , BlockedApplications = todynamic(blockedapplications) , DestinationCountries = todynamic(destinationcountries) , DestinationCountryCodes = todynamic(destinationcountrycodes) , DestinationContinents = todynamic(destinationcontinents) , Threats = todynamic(threats) | project TimeGenerated , Timestamp , EventDate , EventTime , EventType , Verdict , ReturnCode , Domain , QueryType , InternalIp , ExternalIp , RuleId , RuleLabel , RuleTrafficType , DeviceId , Identities , Categories , PolicyCategories , AllApplications , AllowedApplications , BlockedApplications , DestinationCountries , DestinationCountryCodes , DestinationContinents , Threats"                  }
                 ]
               }
             }
