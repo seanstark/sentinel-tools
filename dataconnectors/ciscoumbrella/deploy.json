@@ -147,6 +147,7 @@
                 "streamDeclarations": {
                   "Custom-CiscoUmbrellaDNS_CL": {
                     "columns": [
+                      { "name": "TimeGenerated", "type": "datetime" },
                       { "name": "returncode", "type": "int" },
                       { "name": "externalip", "type": "string" },
                       { "name": "allapplications", "type": "dynamic" },
